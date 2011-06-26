@@ -1,0 +1,53 @@
+febootstrap (2.7-0.1) unstable; urgency=low
+
+  * Non-maintainer upload - Acked by the maintainer.
+  * New upstream release.
+  * Switch to dpkg-source 3.0 (quilt) format.
+  * Update debian/control:
+    - move Build-Depends-Indep to Build-Depends.
+    - remove perl build dependency.
+    - bump Standards-Version from 3.8.1 to 3.8.4 (no changes needed).
+    - update Homepage field.
+    - switch from Architecture: all to any (supermin binaries).
+    - add required ${shlibs:Depends}.
+    - bump Depends versions.
+  * Switch debian/rules to dh usage.
+
+ -- Fathi Boudra <fabo@debian.org>  Thu, 17 Jun 2010 10:59:27 +0300
+
+febootstrap (2.1-4) unstable; urgency=low
+
+  * Change section and priority.
+  * Remove shlibs:Depends.
+  * Remove presubj.
+  * Remove dh_strip.
+  * Remove dh_installexamples.
+  * Remove other commented dh_* commands.
+  * Remove CVS files by passing -I & -i options to dpkg-buildpackage.
+  * Add debian/watch file.
+  * Use Build-Depends-Indep instead of Build-Depends.
+  * Change debian/copyright license information.
+
+ -- Richard Jones <rjones@redhat.com>  Mon, 01 Jun 2009 16:20:51 +0100
+
+febootstrap (2.1-3) unstable; urgency=low
+
+  * Added presubj for reportbug.
+  * Suggests filelight | gnome-utils.
+
+ -- Richard Jones <rjones@redhat.com>  Tue, 26 May 2009 15:04:01 +0100
+
+febootstrap (2.1-2) unstable; urgency=low
+
+  * Suggests upx -> upx-nrv.
+  * License Debian packaging under GPLv2+.
+  * Remove shlibdeps, CFLAGS, LIBS, cross-compilation from rules.
+  * Remove comments from debian/rules.
+
+ -- Richard Jones <rjones@redhat.com>  Mon, 25 May 2009 10:06:54 +0100
+
+febootstrap (2.1-1) unstable; urgency=low
+
+  * Initial release (Closes: #530425)
+
+ -- Richard Jones <rjones@redhat.com>  Sun, 24 May 2009 20:23:01 +0100

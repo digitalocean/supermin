@@ -1,0 +1,20 @@
+Source: febootstrap
+Section: admin
+Priority: optional
+Maintainer: Hilko Bengen <bengen@debian.org>
+Build-Depends: debhelper (>= 7.4.15), autotools-dev, automake, m4, gawk,
+ aptitude,
+ ocaml-nox, ocaml-findlib, dh-ocaml,
+ perl-doc,
+ comerr-dev, e2fslibs-dev
+Standards-Version: 3.9.2
+Homepage: http://people.redhat.com/~rjones/febootstrap/
+
+Package: febootstrap
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, aptitude, cpio
+Description: tool for building supermin appliances.
+ febootstrap is a tool for building supermin appliances. These are
+ tiny appliances [similar to virtual machines], usually around 100KB
+ in size, which get fully instantiated on-the-fly in a fraction of a
+ second when one of them is booted.
