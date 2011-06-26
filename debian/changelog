@@ -1,3 +1,10 @@
+febootstrap (3.6-1) unstable; urgency=low
+
+  * New upstream version.
+  * New maintainer.
+
+ -- Hilko Bengen <bengen@debian.org>  Tue, 28 Jun 2011 01:06:25 +0200
+
 febootstrap (2.7-0.1) unstable; urgency=low
 
   * Non-maintainer upload - Acked by the maintainer.
