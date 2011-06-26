@@ -1,0 +1,158 @@
+=head1 NAME
+
+febootstrap-supermin-helper - Reconstruct initramfs from supermin appliance.
+
+=head1 SYNOPSIS
+
+ febootstrap-supermin-helper supermin.img hostfiles.txt host_cpu kernel initrd
+ febootstrap-supermin-helper input [...] host_cpu kernel initrd
+
+ febootstrap-supermin-helper -f ext2 input [...] host_cpu kernel initrd appliance
+
+ febootstrap-supermin-helper -f checksum input [...] host_cpu
+
+=head1 DESCRIPTION
+
+I<febootstrap-supermin-helper> reconstructs a bootable kernel and
+initramfs from a supermin appliance.  First you should be familiar
+with L<febootstrap(8)>.
+
+=head1 PARAMETERS
+
+Of the required parameters, the first few are I<input> files, and the
+last two or three are I<output> files.
+
+C<supermin.img> and C<hostfiles.txt> are the input files which
+describe the supermin appliance.  (You can also use a directory name
+here which is searched for files).
+
+C<host_cpu> should be the host CPU, eg. C<x86_64> or C<i686>.
+
+C<kernel>, C<initrd> and C<appliance> are the temporary output files
+that this script produces.  These output files are meant to be used
+just for booting the appliance, and should be deleted straight
+afterwards.  The extra C<appliance> parameter is only required when
+the format is C<ext2>.  None of these parameters are needed for
+the checksum output C<-f checksum>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-f fmt> | B<--format fmt>
+
+Select the output format for the appliance.  Possible formats are:
+
+=over 4
+
+=item cpio
+
+A Linux initramfs.  This is the default.
+
+In this case you have to supply names for the C<kernel>
+and C<initrd>, where the C<initrd> is the appliance.
+
+=item ext2
+
+An ext2 filesystem.
+
+In this case you have to supply names for the C<kernel>, a small
+C<initrd> which is used just to locate the appliance, and the
+C<appliance> (the ext2 filesystem).
+
+=item checksum
+
+Output a checksum.
+
+This prints a checksum which only changes when one of the input files
+changes.
+
+You can use this in order to cache the output of a previous run of
+this program: computing the checksum is much quicker than building an
+appliance, and you only need to invalidate the cache (and consequently
+rebuild the appliance) when the checksum changes.  Note that the
+host_cpu and the UID of the current user are included in the checksum.
+
+=back
+
+=item B<-k file> | B<--kmods file>
+
+If this option is specified, then C<file> should be a list of
+wildcards matching kernel module names, eg:
+
+ virtio*.ko
+ scsi*.ko
+ piix.ko
+
+In this case, only kernel modules matching those wildcards will be
+included in the output appliance.  Note: You must resolve any
+dependencies yourself as this does not pull in dependent modules
+automatically.
+
+If this option is not specified, then every kernel module from the
+host will be included.  This is safer, but can produce rather large
+appliances which need a lot more memory to boot.
+
+=item B<-u user> | B<--user user> | B<-g group> | B<--group group>
+
+Run febootstrap-supermin-helper as an alternate user and/or group.
+C<user> and C<group> can be specified as either a name, which will
+be resolved using the system name service, or a uid/gid.  Use of these
+options requires root privileges.
+
+Use of these options is required if running febootstrap-supermin-helper
+as root with the effective uid/gid set to non-root.  Bash will reset
+the effective uid/gid to the real uid/gid when invoked.  As
+febootstrap-supermin-helper uses bash in parts, this will result in the
+creation of an appliance with a mixture of ownerships.
+
+=back
+
+=head1 SPEED
+
+In libguestfs, on a mid-range Intel-based PC, we reconstruct the
+initramfs using this script in around 1/5th of a second (assuming a
+"hot cache" - it's rather slower when run the first time on a cold
+cache).
+
+Some tips to improve performance:
+
+=over 4
+
+=item *
+
+Use a kernel module whitelist (the C<--kmods> option), and only
+list the kernel modules you really need.
+
+=item *
+
+Minimize the appliance, removing as much extraneous junk as possible.
+
+=back
+
+=head1 SEE ALSO
+
+L<febootstrap(8)>.
+
+=head1 AUTHORS
+
+Richard W.M. Jones <rjones @ redhat . com>
+
+=head1 COPYRIGHT
+
+(C) Copyright 2009-2010 Red Hat Inc.,
+L<http://people.redhat.com/~rjones/febootstrap>.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
