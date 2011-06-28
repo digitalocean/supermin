@@ -1,7 +1,9 @@
 Source: febootstrap
 Section: admin
 Priority: optional
-Maintainer: Hilko Bengen <bengen@debian.org>
+Maintainer: Debian Libvirt Maintainers <pkg-libvirt-maintainers@lists.alioth.debian.org>
+Uploaders: Hilko Bengen <bengen@debian.org>
+DM-Upload-Allowed: yes
 Build-Depends: debhelper (>= 7.4.15), autotools-dev, automake, m4, gawk,
  aptitude,
  ocaml-nox, ocaml-findlib, dh-ocaml,
@@ -9,6 +11,8 @@ Build-Depends: debhelper (>= 7.4.15), autotools-dev, automake, m4, gawk,
  comerr-dev, e2fslibs-dev
 Standards-Version: 3.9.2
 Homepage: http://people.redhat.com/~rjones/febootstrap/
+Vcs-Git: git://git.debian.org/git/pkg-libvirt/febootstrap.git
+Vcs-Browser: http://git.debian.org/?p=pkg-libvirt/febootstrap.git
 
 Package: febootstrap
 Architecture: any
