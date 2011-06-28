@@ -1,0 +1,4 @@
+- Figure out default ELF object architectures for
+  armel, ia64, mips, mipsel, s390, sparc
+- (Possibly) figure out how to set up an initrd equivalent for
+  kfreebsd-*, hurd-*

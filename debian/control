@@ -15,7 +15,7 @@ Vcs-Git: git://git.debian.org/git/pkg-libvirt/febootstrap.git
 Vcs-Browser: http://git.debian.org/?p=pkg-libvirt/febootstrap.git
 
 Package: febootstrap
-Architecture: any
+Architecture: amd64 i386 powerpc
 Depends: ${shlibs:Depends}, ${misc:Depends}, aptitude, cpio
 Description: tool for building supermin appliances.
  febootstrap is a tool for building supermin appliances. These are
