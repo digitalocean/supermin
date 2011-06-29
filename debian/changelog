@@ -1,3 +1,14 @@
+febootstrap (3.6-2) unstable; urgency=low
+
+  * Passed the package to Pkg-libvirt Maintainers group
+  * Restricted architectures to the architectures for which the
+    autobuilders successfully built 3.6-1, added TODO items
+  * Added two patches from upstream git repository
+    - Translation of error conditions for the insmod routine
+    - new module loading order pre-calculation routine
+
+ -- Hilko Bengen <bengen@debian.org>  Wed, 29 Jun 2011 21:03:36 +0200
+
 febootstrap (3.6-1) unstable; urgency=low
 
   * New upstream version.
