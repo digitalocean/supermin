@@ -1,0 +1,29 @@
+From: Hilko Bengen <bengen@hilluzination.de>
+Date: Sun, 24 Jul 2011 16:15:24 +0200
+Subject: added some architectures, output diagnostics in case of error
+
+---
+ helper/elf-default-arch |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
+
+diff --git a/helper/elf-default-arch b/helper/elf-default-arch
+index 54af14d..e39c3ce 100755
+--- a/helper/elf-default-arch
++++ b/helper/elf-default-arch
+@@ -26,7 +26,15 @@ case $(uname -m) in
+     s390x) echo "elf64-s390 s390:31-bit" ;;
+     ppc) echo "elf32-powerpc powerpc" ;;
+     ppc64) echo "elf64-powerpc powerpc" ;;
++    armv5tell) echo "elf32-little armel" ;;
++    ia64) echo "elf64-ia64-little ia64" ;;
++    sparc|sparc64) echo "elf32-sparc sparc" ;;
++    mips|mips64) echo "elf32-tradbigmips mips" ;;
+     *)
+         echo "This architecture is not recognized.  Please update helper/elf-default-arch."
++        echo "objcopy --info"
++        objcopy --info
++        echo "uname -m:"
++        uname -m
+         exit 1
+ esac
+-- 

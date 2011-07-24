@@ -1,0 +1,21 @@
+From: Hilko Bengen <bengen@hilluzination.de>
+Date: Sun, 24 Jul 2011 14:51:21 +0200
+Subject: Don't overwrite debian/changelog
+
+---
+ configure.ac |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 1e748ab..2c69002 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -94,7 +94,6 @@ AC_CHECK_HEADER([ext2fs/ext2fs.h],[],[
+ 
+ AC_CONFIG_HEADERS([config.h])
+ AC_CONFIG_FILES([config.ml
+-        debian/changelog
+         Makefile
+         lib/Makefile
+         helper/Makefile])
+-- 
