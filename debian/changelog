@@ -1,3 +1,12 @@
+febootstrap (3.7-1) unstable; urgency=low
+
+  * New upstream version
+  * Removed two patches
+  * added architectures to helper/elf-default-arch, try to build on all
+    architectures.
+
+ -- Hilko Bengen <bengen@debian.org>  Sun, 24 Jul 2011 16:18:13 +0200
+
 febootstrap (3.6-2) unstable; urgency=low
 
   * Passed the package to Pkg-libvirt Maintainers group
