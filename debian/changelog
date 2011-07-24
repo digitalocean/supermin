@@ -1,3 +1,9 @@
+febootstrap (3.7-2) unstable; urgency=low
+
+  * restrict architecture to linux-*
+
+ -- Hilko Bengen <bengen@debian.org>  Sun, 24 Jul 2011 18:28:29 +0200
+
 febootstrap (3.7-1) unstable; urgency=low
 
   * New upstream version
