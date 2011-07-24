@@ -3,15 +3,19 @@ Date: Sun, 24 Jul 2011 16:15:24 +0200
 Subject: added some architectures, output diagnostics in case of error
 
 ---
- helper/elf-default-arch |    8 ++++++++
- 1 files changed, 8 insertions(+), 0 deletions(-)
+ helper/elf-default-arch |   16 ++++++++++++++--
+ 1 files changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/helper/elf-default-arch b/helper/elf-default-arch
-index 54af14d..e39c3ce 100755
+index 54af14d..7579ba4 100755
 --- a/helper/elf-default-arch
 +++ b/helper/elf-default-arch
-@@ -26,7 +26,15 @@ case $(uname -m) in
-     s390x) echo "elf64-s390 s390:31-bit" ;;
+@@ -23,10 +23,22 @@ case $(uname -m) in
+     i[3456]86) echo "elf32-i386 i386" ;;
+     x86_64) echo "elf64-x86-64 i386" ;;
+     s390) echo "elf32-s390 s390:31-bit" ;;
+-    s390x) echo "elf64-s390 s390:31-bit" ;;
++    s390x) echo "elf62-s390 s390:31-bit" ;;
      ppc) echo "elf32-powerpc powerpc" ;;
      ppc64) echo "elf64-powerpc powerpc" ;;
 +    armv5tell) echo "elf32-little armel" ;;
@@ -19,11 +23,16 @@ index 54af14d..e39c3ce 100755
 +    sparc|sparc64) echo "elf32-sparc sparc" ;;
 +    mips|mips64) echo "elf32-tradbigmips mips" ;;
      *)
-         echo "This architecture is not recognized.  Please update helper/elf-default-arch."
-+        echo "objcopy --info"
-+        objcopy --info
-+        echo "uname -m:"
-+        uname -m
+-        echo "This architecture is not recognized.  Please update helper/elf-default-arch."
++        echo "unknown unknown"
++        (
++            echo "This architecture is not recognized.  Please update helper/elf-default-arch."
++            echo "objcopy --info"
++            objcopy --info
++            echo "uname -m:"
++            uname -m
++        ) >&2
          exit 1
++        ;;
  esac
 -- 
