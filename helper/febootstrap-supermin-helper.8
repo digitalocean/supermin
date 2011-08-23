@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "FEBOOTSTRAP-SUPERMIN-HELPER 8"
-.TH FEBOOTSTRAP-SUPERMIN-HELPER 8 "2010-12-07" "febootstrap-3.1" "Virtualization Support"
+.TH FEBOOTSTRAP-SUPERMIN-HELPER 8 "2011-07-22" "febootstrap-3.7" "Virtualization Support"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -241,6 +241,28 @@ Use a kernel module whitelist (the \f(CW\*(C`\-\-kmods\*(C'\fR option), and only
 list the kernel modules you really need.
 .IP "\(bu" 4
 Minimize the appliance, removing as much extraneous junk as possible.
+.SH "ENVIRONMENT VARIABLES"
+.IX Header "ENVIRONMENT VARIABLES"
+.IP "\s-1FEBOOTSTRAP_KERNEL\s0" 4
+.IX Item "FEBOOTSTRAP_KERNEL"
+If this environment variable is set, then automatic selection of the
+kernel is bypassed and this kernel is used.
+.Sp
+The environment variable should point to a kernel file,
+eg. \f(CW\*(C`/boot/vmlinuz\-3.0.x86_64\*(C'\fR
+.Sp
+The corresponding module path is guessed from the kernel name, but you
+can override that by setting \f(CW\*(C`FEBOOTSTRAP_MODULES\*(C'\fR.
+.IP "\s-1FEBOOTSTRAP_MODULES\s0" 4
+.IX Item "FEBOOTSTRAP_MODULES"
+If \f(CW\*(C`FEBOOTSTRAP_KERNEL\*(C'\fR and \f(CW\*(C`FEBOOTSTRAP_MODULES\*(C'\fR are both set, then
+automatic selection of the kernel is bypassed and the kernel and
+module path are set to these values.
+.Sp
+The environment variable should point to a module directory,
+eg. \f(CW\*(C`/lib/modules/3.0.x86_64/\*(C'\fR
+.Sp
+This has no effect if \f(CW\*(C`FEBOOTSTRAP_KERNEL\*(C'\fR is not set.
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
 \&\fIfebootstrap\fR\|(8).

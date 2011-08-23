@@ -17,7 +17,7 @@ dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 dnl
 dnl Written by Richard W.M. Jones <rjones@redhat.com>
 
-AC_INIT(febootstrap,3.7)
+AC_INIT(febootstrap,3.8)
 AM_INIT_AUTOMAKE
 
 dnl Check for basic C environment.
@@ -91,6 +91,11 @@ LIBS="$old_LIBS"
 AC_CHECK_HEADER([ext2fs/ext2fs.h],[],[
   AC_MSG_FAILURE([Header <ext2fs/ext2fs.h> not found (part of e2fsprogs)])
 ])
+
+AC_CHECK_PROG(GAWK,[gawk],[gawk],[no])
+if test "x$GAWK" = "xno" ; then
+  AC_MSG_FAILURE([gawk (GNU awk) not found])
+fi
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([config.ml

@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "FEBOOTSTRAP 8"
-.TH FEBOOTSTRAP 8 "2010-12-07" "febootstrap-3.3" "Virtualization Support"
+.TH FEBOOTSTRAP 8 "2011-07-22" "febootstrap-3.7" "Virtualization Support"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -371,8 +371,11 @@ For example:
 Usually the kernel and kernel modules are \fInot\fR included in the
 supermin appliance.  When the appliance is instantiated, the kernel
 modules from the host kernel are copied in, and it is booted using the
-host kernel.  febootstrap-supermin-helper is able to choose the best
-host kernel available to boot the appliance.
+host kernel.
+.PP
+febootstrap-supermin-helper is able to choose the best host kernel
+available to boot the appliance.  Users can override this by setting
+environment variables (see \fIfebootstrap\-supermin\-helper\fR\|(8)).
 .SS "\s-1BOOTING\s0 \s-1AND\s0 \s-1CACHING\s0 \s-1THE\s0 \s-1SUPERMIN\s0 \s-1APPLIANCE\s0"
 .IX Subsection "BOOTING AND CACHING THE SUPERMIN APPLIANCE"
 For fastest boot times you should cache the output of
