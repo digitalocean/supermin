@@ -1,0 +1,150 @@
+From: Hilko Bengen <bengen@hilluzination.de>
+Date: Sun, 24 Jul 2011 14:51:36 +0200
+Subject: autogenerate
+
+---
+ Makefile.in        |   20 +++++++++-----------
+ configure          |    3 +--
+ helper/Makefile.in |   16 +++++++++++-----
+ 3 files changed, 21 insertions(+), 18 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 827357c..16ebed1 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -57,9 +57,8 @@ host_triplet = @host@
+ DIST_COMMON = README $(am__configure_deps) $(srcdir)/.depend \
+ 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+ 	$(srcdir)/config.h.in $(srcdir)/config.ml.in \
+-	$(top_srcdir)/configure $(top_srcdir)/debian/changelog.in \
+-	COPYING INSTALL compile config.guess config.sub depcomp \
+-	install-sh missing
++	$(top_srcdir)/configure COPYING INSTALL compile config.guess \
++	config.sub depcomp install-sh missing
+ subdir = .
+ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+ am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
+@@ -118,7 +117,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
+  configure.lineno config.status.lineno
+ mkinstalldirs = $(install_sh) -d
+ CONFIG_HEADER = config.h
+-CONFIG_CLEAN_FILES = config.ml debian/changelog
++CONFIG_CLEAN_FILES = config.ml
+ CONFIG_CLEAN_VPATH_FILES =
+ am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+ am__vpath_adj = case $$p in \
+@@ -868,8 +867,6 @@ bin_SCRIPTS = febootstrap
+ SOURCES_ML = $(filter %.ml,$(SOURCES))
+ BOBJECTS = $(SOURCES_ML:.ml=.cmo)
+ XOBJECTS = $(SOURCES_ML:.ml=.cmx)
+-@HAVE_OCAMLOPT_FALSE@OBJECTS = $(BOBJECTS)
+-@HAVE_OCAMLOPT_TRUE@OBJECTS = $(XOBJECTS)
+ OCAMLPACKAGES = -package unix,str
+ OCAMLFLAGS = -warn-error CDEFLMPSUVXYZ
+ SUFFIXES = .cmo .cmi .cmx .ml .mli .mll .mly
+@@ -941,8 +938,6 @@ distclean-hdr:
+ 	-rm -f config.h stamp-h1
+ config.ml: $(top_builddir)/config.status $(srcdir)/config.ml.in
+ 	cd $(top_builddir) && $(SHELL) ./config.status $@
+-debian/changelog: $(top_builddir)/config.status $(top_srcdir)/debian/changelog.in
+-	cd $(top_builddir) && $(SHELL) ./config.status $@
+ install-binSCRIPTS: $(bin_SCRIPTS)
+ 	@$(NORMAL_INSTALL)
+ 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
+@@ -1465,9 +1460,12 @@ uninstall-man: uninstall-man8
+ 	uninstall-man uninstall-man8
+ 
+ 
+-febootstrap: $(OBJECTS)
+-	$(OCAMLFIND) $(OCAMLBEST) $(OCAMLFLAGS) $(OCAMLPACKAGES) -linkpkg \
+-	  $^ -o $@
++@HAVE_OCAMLOPT_FALSE@febootstrap: $(BOBJECTS)
++@HAVE_OCAMLOPT_FALSE@	$(OCAMLFIND) ocamlc $(OCAMLFLAGS) $(OCAMLPACKAGES) -linkpkg \
++@HAVE_OCAMLOPT_FALSE@	  $^ -o $@
++@HAVE_OCAMLOPT_TRUE@febootstrap: $(XOBJECTS)
++@HAVE_OCAMLOPT_TRUE@	$(OCAMLFIND) ocamlopt $(OCAMLFLAGS) $(OCAMLPACKAGES) -linkpkg \
++@HAVE_OCAMLOPT_TRUE@	  $^ -o $@
+ 
+ .mli.cmi:
+ 	$(OCAMLFIND) ocamlc $(OCAMLFLAGS) $(OCAMLPACKAGES) -c $< -o $@
+diff --git a/configure b/configure
+index 8398bab..5eb02bb 100755
+--- a/configure
++++ b/configure
+@@ -19107,7 +19107,7 @@ fi
+ 
+ ac_config_headers="$ac_config_headers config.h"
+ 
+-ac_config_files="$ac_config_files config.ml debian/changelog Makefile lib/Makefile helper/Makefile"
++ac_config_files="$ac_config_files config.ml Makefile lib/Makefile helper/Makefile"
+ 
+ cat >confcache <<\_ACEOF
+ # This file is a shell script that caches the results of configure
+@@ -19885,7 +19885,6 @@ do
+     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
+     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
+     "config.ml") CONFIG_FILES="$CONFIG_FILES config.ml" ;;
+-    "debian/changelog") CONFIG_FILES="$CONFIG_FILES debian/changelog" ;;
+     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+     "lib/Makefile") CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
+     "helper/Makefile") CONFIG_FILES="$CONFIG_FILES helper/Makefile" ;;
+diff --git a/helper/Makefile.in b/helper/Makefile.in
+index 4b28a9b..44d918f 100644
+--- a/helper/Makefile.in
++++ b/helper/Makefile.in
+@@ -835,6 +835,7 @@ init_LDFLAGS = -static
+ # http://www.doof.me.uk/2010/05/07/cute-objcopy-hack/
+ ELF_DEFAULT_ARCH = $(shell $(srcdir)/elf-default-arch | gawk '{ print $$1 }')
+ DEFAULT_ARCH = $(shell $(srcdir)/elf-default-arch | gawk '{ print $$2 }')
++CLEANFILES = ext2init.S
+ man_MANS = \
+ 	febootstrap-supermin-helper.8
+ 
+@@ -844,7 +845,7 @@ man_MANS = \
+ EXTRA_DIST = \
+ 	febootstrap-supermin-helper.8 \
+ 	febootstrap-supermin-helper.pod \
+-	elf-default-arch
++	bin2s.pl
+ 
+ all: all-am
+ 
+@@ -859,9 +860,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
+ 	      exit 1;; \
+ 	  esac; \
+ 	done; \
+-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign helper/Makefile'; \
++	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu helper/Makefile'; \
+ 	$(am__cd) $(top_srcdir) && \
+-	  $(AUTOMAKE) --foreign helper/Makefile
++	  $(AUTOMAKE) --gnu helper/Makefile
+ .PRECIOUS: Makefile
+ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
+ 	@case '$?' in \
+@@ -1255,6 +1256,7 @@ install-strip:
+ mostlyclean-generic:
+ 
+ clean-generic:
++	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
+ 
+ distclean-generic:
+ 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
+@@ -1351,11 +1353,15 @@ uninstall-man: uninstall-man8
+ 	ps ps-am tags uninstall uninstall-am uninstall-binPROGRAMS \
+ 	uninstall-man uninstall-man8
+ 
+-ext2init.o: init
++
++ext2init.o: ext2init.S
++	$(CC) -o $@ -c $<
++
++ext2init.S: init
+ 	strip --strip-all $<
+ 	@file $< | grep -isq static || \
+ 	  (echo "*** error: init is not staticly linked"; exit 1)
+-	objcopy -I binary -B $(DEFAULT_ARCH) -O $(ELF_DEFAULT_ARCH) $< $@
++	./bin2s.pl $< $@
+ 
+ @HAVE_PERLDOC_TRUE@febootstrap-supermin-helper.8: febootstrap-supermin-helper.pod
+ @HAVE_PERLDOC_TRUE@	pod2man \
+-- 
