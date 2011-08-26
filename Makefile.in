@@ -838,10 +838,10 @@ SUBDIRS = lib helper
 # Note these must be in build dependency order.
 SOURCES = \
 	config.ml \
-	febootstrap_utils.mli \
-	febootstrap_utils.ml \
 	febootstrap_cmdline.mli \
 	febootstrap_cmdline.ml \
+	febootstrap_utils.mli \
+	febootstrap_utils.ml \
 	febootstrap_package_handlers.mli \
 	febootstrap_package_handlers.ml \
 	febootstrap_yum_rpm.ml \
@@ -870,6 +870,8 @@ BOBJECTS = $(SOURCES_ML:.ml=.cmo)
 XOBJECTS = $(SOURCES_ML:.ml=.cmx)
 @HAVE_OCAMLOPT_FALSE@OBJECTS = $(BOBJECTS)
 @HAVE_OCAMLOPT_TRUE@OBJECTS = $(XOBJECTS)
+@HAVE_OCAMLOPT_FALSE@BEST = c
+@HAVE_OCAMLOPT_TRUE@BEST = opt
 OCAMLPACKAGES = -package unix,str
 OCAMLFLAGS = -warn-error CDEFLMPSUVXYZ
 SUFFIXES = .cmo .cmi .cmx .ml .mli .mll .mly
@@ -1466,7 +1468,7 @@ uninstall-man: uninstall-man8
 
 
 febootstrap: $(OBJECTS)
-	$(OCAMLFIND) $(OCAMLBEST) $(OCAMLFLAGS) $(OCAMLPACKAGES) -linkpkg \
+	$(OCAMLFIND) $(BEST) $(OCAMLFLAGS) $(OCAMLPACKAGES) -linkpkg \
 	  $^ -o $@
 
 .mli.cmi:
@@ -1484,12 +1486,12 @@ depend: .depend
 	mv $@-t $@
 config.cmo:
 config.cmx:
-febootstrap_utils.cmi:
-febootstrap_utils.cmo: febootstrap_utils.cmi
-febootstrap_utils.cmx: febootstrap_utils.cmi
 febootstrap_cmdline.cmi:
 febootstrap_cmdline.cmo: config.cmo febootstrap_cmdline.cmi
 febootstrap_cmdline.cmx: config.cmx febootstrap_cmdline.cmi
+febootstrap_utils.cmi:
+febootstrap_utils.cmo: febootstrap_cmdline.cmi febootstrap_utils.cmi
+febootstrap_utils.cmx: febootstrap_cmdline.cmx febootstrap_utils.cmi
 febootstrap_package_handlers.cmi:
 febootstrap_package_handlers.cmo: febootstrap_utils.cmi \
     febootstrap_cmdline.cmi febootstrap_package_handlers.cmi

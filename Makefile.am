@@ -24,10 +24,10 @@ SUBDIRS = lib helper
 # Note these must be in build dependency order.
 SOURCES = \
 	config.ml \
-	febootstrap_utils.mli \
-	febootstrap_utils.ml \
 	febootstrap_cmdline.mli \
 	febootstrap_cmdline.ml \
+	febootstrap_utils.mli \
+	febootstrap_utils.ml \
 	febootstrap_package_handlers.mli \
 	febootstrap_package_handlers.ml \
 	febootstrap_yum_rpm.ml \
@@ -58,15 +58,17 @@ XOBJECTS = $(SOURCES_ML:.ml=.cmx)
 
 if !HAVE_OCAMLOPT
 OBJECTS = $(BOBJECTS)
+BEST    = c
 else
 OBJECTS = $(XOBJECTS)
+BEST    = opt
 endif
 
 OCAMLPACKAGES = -package unix,str
 OCAMLFLAGS = -warn-error CDEFLMPSUVXYZ
 
 febootstrap: $(OBJECTS)
-	$(OCAMLFIND) $(OCAMLBEST) $(OCAMLFLAGS) $(OCAMLPACKAGES) -linkpkg \
+	$(OCAMLFIND) $(BEST) $(OCAMLFLAGS) $(OCAMLPACKAGES) -linkpkg \
 	  $^ -o $@
 
 .mli.cmi:
