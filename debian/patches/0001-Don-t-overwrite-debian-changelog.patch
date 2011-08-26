@@ -7,7 +7,7 @@ Subject: Don't overwrite debian/changelog
  1 files changed, 0 insertions(+), 1 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index c8164a5..07c13ec 100644
+index 1ba8e99..95f3759 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -99,7 +99,6 @@ fi

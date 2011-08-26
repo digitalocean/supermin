@@ -1,4 +1,2 @@
 0001-Don-t-overwrite-debian-changelog.patch
-0002-febootstrap-supermin-helper-Replace-objcopy-call-for.patch
-0003-fix-for-architectures-without-native-OCaml-compiler.patch
-0004-autogenerate.patch
+0002-autogenerate.patch
