@@ -16,7 +16,7 @@
 @SET_MAKE@
 
 # febootstrap Makefile.am
-# (C) Copyright 2010 Red Hat Inc.
+# (C) Copyright 2009-2011 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -54,10 +54,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = febootstrap-supermin-helper$(EXEEXT)
-noinst_PROGRAMS = init$(EXEEXT)
-subdir = helper
-DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+DIST_COMMON = $(srcdir)/.depend $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(srcdir)/config.ml.in
+subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/asm-underscore.m4 \
@@ -113,43 +112,8 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = config.ml
 CONFIG_CLEAN_VPATH_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man8dir)"
-PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
-am_febootstrap_supermin_helper_OBJECTS =  \
-	febootstrap_supermin_helper-appliance.$(OBJEXT) \
-	febootstrap_supermin_helper-checksum.$(OBJEXT) \
-	febootstrap_supermin_helper-cpio.$(OBJEXT) \
-	febootstrap_supermin_helper-ext2.$(OBJEXT) \
-	febootstrap_supermin_helper-ext2cpio.$(OBJEXT) \
-	febootstrap_supermin_helper-ext2initrd.$(OBJEXT) \
-	febootstrap_supermin_helper-kernel.$(OBJEXT) \
-	febootstrap_supermin_helper-main.$(OBJEXT) \
-	febootstrap_supermin_helper-utils.$(OBJEXT)
-febootstrap_supermin_helper_OBJECTS =  \
-	$(am_febootstrap_supermin_helper_OBJECTS)
-am__DEPENDENCIES_1 =
-febootstrap_supermin_helper_DEPENDENCIES = ext2init.o \
-	$(am__DEPENDENCIES_1)
-febootstrap_supermin_helper_LINK = $(CCLD) \
-	$(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
-am_init_OBJECTS = init-init.$(OBJEXT)
-init_OBJECTS = $(am_init_OBJECTS)
-init_LDADD = $(LDADD)
-init_LINK = $(CCLD) $(init_CFLAGS) $(CFLAGS) $(init_LDFLAGS) \
-	$(LDFLAGS) -o $@
-DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
-depcomp = $(SHELL) $(top_srcdir)/depcomp
-am__depfiles_maybe = depfiles
-am__mv = mv -f
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(febootstrap_supermin_helper_SOURCES) $(init_SOURCES)
-DIST_SOURCES = $(febootstrap_supermin_helper_SOURCES) $(init_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -171,12 +135,13 @@ am__nobase_list = $(am__nobase_strip_setup); \
 am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man8dir)"
+SCRIPTS = $(bin_SCRIPTS)
+DIST_SOURCES =
 man8dir = $(mandir)/man8
 NROFF = nroff
 MANS = $(man_MANS)
 DATA = $(noinst_DATA)
-ETAGS = etags
-CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
@@ -813,43 +778,49 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-febootstrap_supermin_helper_SOURCES = \
-	helper.h \
-	appliance.c \
-	checksum.c \
-	cpio.c \
-	ext2.c \
-	ext2cpio.c \
-	ext2initrd.c \
-	ext2internal.h \
-	kernel.c \
-	main.c \
-	utils.c
 
-febootstrap_supermin_helper_CFLAGS = -Wall -I../lib
-febootstrap_supermin_helper_LDADD = \
-	ext2init.o -lext2fs -lcom_err $(LTLIBINTL) -L../lib -lgnu
+# Note these must be in build dependency order.
+SOURCES = \
+	config.ml \
+	febootstrap_cmdline.mli \
+	febootstrap_cmdline.ml \
+	febootstrap_utils.mli \
+	febootstrap_utils.ml \
+	febootstrap_package_handlers.mli \
+	febootstrap_package_handlers.ml \
+	febootstrap_yum_rpm.ml \
+	febootstrap_debian.ml \
+	febootstrap_pacman.ml \
+	febootstrap.ml
 
-init_SOURCES = init.c
-init_CFLAGS = -static
-init_LDFLAGS = -static
-CLEANFILES = ext2init.S
-man_MANS = \
-	febootstrap-supermin-helper.8
-
-@HAVE_PERLDOC_TRUE@noinst_DATA = \
-@HAVE_PERLDOC_TRUE@	$(top_builddir)/html/febootstrap-supermin-helper.8.html
-
+CLEANFILES = *~ *.cmi *.cmo *.cmx *.o febootstrap
 EXTRA_DIST = \
-	febootstrap-supermin-helper.8 \
-	febootstrap-supermin-helper.pod \
-	bin2s.pl
+	febootstrap.8 \
+	febootstrap.pod \
+	$(SOURCES)
+
+man_MANS = \
+	febootstrap.8
+
+bin_SCRIPTS = febootstrap
+SOURCES_ML = $(filter %.ml,$(SOURCES))
+BOBJECTS = $(SOURCES_ML:.ml=.cmo)
+XOBJECTS = $(SOURCES_ML:.ml=.cmx)
+@HAVE_OCAMLOPT_FALSE@OBJECTS = $(BOBJECTS)
+@HAVE_OCAMLOPT_TRUE@OBJECTS = $(XOBJECTS)
+@HAVE_OCAMLOPT_FALSE@BEST = c
+@HAVE_OCAMLOPT_TRUE@BEST = opt
+OCAMLPACKAGES = -package unix,str
+OCAMLFLAGS = -warn-error CDEFLMPSUVXYZ
+SUFFIXES = .cmo .cmi .cmx .ml .mli .mll .mly
+@HAVE_PERLDOC_TRUE@noinst_DATA = \
+@HAVE_PERLDOC_TRUE@	../html/febootstrap.8.html
 
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .o .obj
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
+.SUFFIXES: .cmo .cmi .cmx .ml .mli .mll .mly
+$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(srcdir)/.depend $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -858,9 +829,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign helper/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign helper/Makefile
+	  $(AUTOMAKE) --foreign src/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -879,223 +850,42 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-install-binPROGRAMS: $(bin_PROGRAMS)
+config.ml: $(top_builddir)/config.status $(srcdir)/config.ml.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
-	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
-	for p in $$list; do echo "$$p $$p"; done | \
-	sed 's/$(EXEEXT)$$//' | \
-	while read p p1; do if test -f $$p; \
-	  then echo "$$p"; echo "$$p"; else :; fi; \
+	@list='$(bin_SCRIPTS)'; test -n "$(bindir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  if test -f "$$d$$p"; then echo "$$d$$p"; echo "$$p"; else :; fi; \
 	done | \
-	sed -e 'p;s,.*/,,;n;h' -e 's|.*|.|' \
-	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
-	sed 'N;N;N;s,\n, ,g' | \
-	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
+	sed -e 'p;s,.*/,,;n' \
+	    -e 'h;s|.*|.|' \
+	    -e 'p;x;s,.*/,,;$(transform)' | sed 'N;N;N;s,\n, ,g' | \
+	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1; } \
 	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
-	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
-	    else { print "f", $$3 "/" $$4, $$1; } } \
+	    if ($$2 == $$4) { files[d] = files[d] " " $$1; \
+	      if (++n[d] == $(am__install_max)) { \
+		print "f", d, files[d]; n[d] = 0; files[d] = "" } } \
+	    else { print "f", d "/" $$4, $$1 } } \
 	  END { for (d in files) print "f", d, files[d] }' | \
 	while read type dir files; do \
-	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
-	    test -z "$$files" || { \
-	      echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(bindir)$$dir'"; \
-	      $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
-	    } \
+	     if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+	     test -z "$$files" || { \
+	       echo " $(INSTALL_SCRIPT) $$files '$(DESTDIR)$(bindir)$$dir'"; \
+	       $(INSTALL_SCRIPT) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
+	     } \
 	; done
 
-uninstall-binPROGRAMS:
+uninstall-binSCRIPTS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
+	@list='$(bin_SCRIPTS)'; test -n "$(bindir)" || exit 0; \
 	files=`for p in $$list; do echo "$$p"; done | \
-	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
-	      -e 's/$$/$(EXEEXT)/' `; \
+	       sed -e 's,.*/,,;$(transform)'`; \
 	test -n "$$list" || exit 0; \
 	echo " ( cd '$(DESTDIR)$(bindir)' && rm -f" $$files ")"; \
 	cd "$(DESTDIR)$(bindir)" && rm -f $$files
-
-clean-binPROGRAMS:
-	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-
-clean-noinstPROGRAMS:
-	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
-febootstrap-supermin-helper$(EXEEXT): $(febootstrap_supermin_helper_OBJECTS) $(febootstrap_supermin_helper_DEPENDENCIES) 
-	@rm -f febootstrap-supermin-helper$(EXEEXT)
-	$(febootstrap_supermin_helper_LINK) $(febootstrap_supermin_helper_OBJECTS) $(febootstrap_supermin_helper_LDADD) $(LIBS)
-init$(EXEEXT): $(init_OBJECTS) $(init_DEPENDENCIES) 
-	@rm -f init$(EXEEXT)
-	$(init_LINK) $(init_OBJECTS) $(init_LDADD) $(LIBS)
-
-mostlyclean-compile:
-	-rm -f *.$(OBJEXT)
-
-distclean-compile:
-	-rm -f *.tab.c
-
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-appliance.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-checksum.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-cpio.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-ext2.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-ext2cpio.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-ext2initrd.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-kernel.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-utils.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/init-init.Po@am__quote@
-
-.c.o:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c $<
-
-.c.obj:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-febootstrap_supermin_helper-appliance.o: appliance.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-appliance.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-appliance.Tpo -c -o febootstrap_supermin_helper-appliance.o `test -f 'appliance.c' || echo '$(srcdir)/'`appliance.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-appliance.Tpo $(DEPDIR)/febootstrap_supermin_helper-appliance.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='appliance.c' object='febootstrap_supermin_helper-appliance.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-appliance.o `test -f 'appliance.c' || echo '$(srcdir)/'`appliance.c
-
-febootstrap_supermin_helper-appliance.obj: appliance.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-appliance.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-appliance.Tpo -c -o febootstrap_supermin_helper-appliance.obj `if test -f 'appliance.c'; then $(CYGPATH_W) 'appliance.c'; else $(CYGPATH_W) '$(srcdir)/appliance.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-appliance.Tpo $(DEPDIR)/febootstrap_supermin_helper-appliance.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='appliance.c' object='febootstrap_supermin_helper-appliance.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-appliance.obj `if test -f 'appliance.c'; then $(CYGPATH_W) 'appliance.c'; else $(CYGPATH_W) '$(srcdir)/appliance.c'; fi`
-
-febootstrap_supermin_helper-checksum.o: checksum.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-checksum.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-checksum.Tpo -c -o febootstrap_supermin_helper-checksum.o `test -f 'checksum.c' || echo '$(srcdir)/'`checksum.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-checksum.Tpo $(DEPDIR)/febootstrap_supermin_helper-checksum.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='checksum.c' object='febootstrap_supermin_helper-checksum.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-checksum.o `test -f 'checksum.c' || echo '$(srcdir)/'`checksum.c
-
-febootstrap_supermin_helper-checksum.obj: checksum.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-checksum.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-checksum.Tpo -c -o febootstrap_supermin_helper-checksum.obj `if test -f 'checksum.c'; then $(CYGPATH_W) 'checksum.c'; else $(CYGPATH_W) '$(srcdir)/checksum.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-checksum.Tpo $(DEPDIR)/febootstrap_supermin_helper-checksum.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='checksum.c' object='febootstrap_supermin_helper-checksum.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-checksum.obj `if test -f 'checksum.c'; then $(CYGPATH_W) 'checksum.c'; else $(CYGPATH_W) '$(srcdir)/checksum.c'; fi`
-
-febootstrap_supermin_helper-cpio.o: cpio.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-cpio.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-cpio.Tpo -c -o febootstrap_supermin_helper-cpio.o `test -f 'cpio.c' || echo '$(srcdir)/'`cpio.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-cpio.Tpo $(DEPDIR)/febootstrap_supermin_helper-cpio.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cpio.c' object='febootstrap_supermin_helper-cpio.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-cpio.o `test -f 'cpio.c' || echo '$(srcdir)/'`cpio.c
-
-febootstrap_supermin_helper-cpio.obj: cpio.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-cpio.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-cpio.Tpo -c -o febootstrap_supermin_helper-cpio.obj `if test -f 'cpio.c'; then $(CYGPATH_W) 'cpio.c'; else $(CYGPATH_W) '$(srcdir)/cpio.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-cpio.Tpo $(DEPDIR)/febootstrap_supermin_helper-cpio.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cpio.c' object='febootstrap_supermin_helper-cpio.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-cpio.obj `if test -f 'cpio.c'; then $(CYGPATH_W) 'cpio.c'; else $(CYGPATH_W) '$(srcdir)/cpio.c'; fi`
-
-febootstrap_supermin_helper-ext2.o: ext2.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-ext2.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-ext2.Tpo -c -o febootstrap_supermin_helper-ext2.o `test -f 'ext2.c' || echo '$(srcdir)/'`ext2.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-ext2.Tpo $(DEPDIR)/febootstrap_supermin_helper-ext2.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2.c' object='febootstrap_supermin_helper-ext2.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-ext2.o `test -f 'ext2.c' || echo '$(srcdir)/'`ext2.c
-
-febootstrap_supermin_helper-ext2.obj: ext2.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-ext2.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-ext2.Tpo -c -o febootstrap_supermin_helper-ext2.obj `if test -f 'ext2.c'; then $(CYGPATH_W) 'ext2.c'; else $(CYGPATH_W) '$(srcdir)/ext2.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-ext2.Tpo $(DEPDIR)/febootstrap_supermin_helper-ext2.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2.c' object='febootstrap_supermin_helper-ext2.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-ext2.obj `if test -f 'ext2.c'; then $(CYGPATH_W) 'ext2.c'; else $(CYGPATH_W) '$(srcdir)/ext2.c'; fi`
-
-febootstrap_supermin_helper-ext2cpio.o: ext2cpio.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-ext2cpio.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-ext2cpio.Tpo -c -o febootstrap_supermin_helper-ext2cpio.o `test -f 'ext2cpio.c' || echo '$(srcdir)/'`ext2cpio.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-ext2cpio.Tpo $(DEPDIR)/febootstrap_supermin_helper-ext2cpio.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2cpio.c' object='febootstrap_supermin_helper-ext2cpio.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-ext2cpio.o `test -f 'ext2cpio.c' || echo '$(srcdir)/'`ext2cpio.c
-
-febootstrap_supermin_helper-ext2cpio.obj: ext2cpio.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-ext2cpio.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-ext2cpio.Tpo -c -o febootstrap_supermin_helper-ext2cpio.obj `if test -f 'ext2cpio.c'; then $(CYGPATH_W) 'ext2cpio.c'; else $(CYGPATH_W) '$(srcdir)/ext2cpio.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-ext2cpio.Tpo $(DEPDIR)/febootstrap_supermin_helper-ext2cpio.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2cpio.c' object='febootstrap_supermin_helper-ext2cpio.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-ext2cpio.obj `if test -f 'ext2cpio.c'; then $(CYGPATH_W) 'ext2cpio.c'; else $(CYGPATH_W) '$(srcdir)/ext2cpio.c'; fi`
-
-febootstrap_supermin_helper-ext2initrd.o: ext2initrd.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-ext2initrd.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-ext2initrd.Tpo -c -o febootstrap_supermin_helper-ext2initrd.o `test -f 'ext2initrd.c' || echo '$(srcdir)/'`ext2initrd.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-ext2initrd.Tpo $(DEPDIR)/febootstrap_supermin_helper-ext2initrd.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2initrd.c' object='febootstrap_supermin_helper-ext2initrd.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-ext2initrd.o `test -f 'ext2initrd.c' || echo '$(srcdir)/'`ext2initrd.c
-
-febootstrap_supermin_helper-ext2initrd.obj: ext2initrd.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-ext2initrd.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-ext2initrd.Tpo -c -o febootstrap_supermin_helper-ext2initrd.obj `if test -f 'ext2initrd.c'; then $(CYGPATH_W) 'ext2initrd.c'; else $(CYGPATH_W) '$(srcdir)/ext2initrd.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-ext2initrd.Tpo $(DEPDIR)/febootstrap_supermin_helper-ext2initrd.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2initrd.c' object='febootstrap_supermin_helper-ext2initrd.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-ext2initrd.obj `if test -f 'ext2initrd.c'; then $(CYGPATH_W) 'ext2initrd.c'; else $(CYGPATH_W) '$(srcdir)/ext2initrd.c'; fi`
-
-febootstrap_supermin_helper-kernel.o: kernel.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-kernel.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-kernel.Tpo -c -o febootstrap_supermin_helper-kernel.o `test -f 'kernel.c' || echo '$(srcdir)/'`kernel.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-kernel.Tpo $(DEPDIR)/febootstrap_supermin_helper-kernel.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kernel.c' object='febootstrap_supermin_helper-kernel.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-kernel.o `test -f 'kernel.c' || echo '$(srcdir)/'`kernel.c
-
-febootstrap_supermin_helper-kernel.obj: kernel.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-kernel.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-kernel.Tpo -c -o febootstrap_supermin_helper-kernel.obj `if test -f 'kernel.c'; then $(CYGPATH_W) 'kernel.c'; else $(CYGPATH_W) '$(srcdir)/kernel.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-kernel.Tpo $(DEPDIR)/febootstrap_supermin_helper-kernel.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kernel.c' object='febootstrap_supermin_helper-kernel.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-kernel.obj `if test -f 'kernel.c'; then $(CYGPATH_W) 'kernel.c'; else $(CYGPATH_W) '$(srcdir)/kernel.c'; fi`
-
-febootstrap_supermin_helper-main.o: main.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-main.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-main.Tpo -c -o febootstrap_supermin_helper-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-main.Tpo $(DEPDIR)/febootstrap_supermin_helper-main.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='main.c' object='febootstrap_supermin_helper-main.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
-
-febootstrap_supermin_helper-main.obj: main.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-main.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-main.Tpo -c -o febootstrap_supermin_helper-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-main.Tpo $(DEPDIR)/febootstrap_supermin_helper-main.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='main.c' object='febootstrap_supermin_helper-main.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
-
-febootstrap_supermin_helper-utils.o: utils.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-utils.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-utils.Tpo -c -o febootstrap_supermin_helper-utils.o `test -f 'utils.c' || echo '$(srcdir)/'`utils.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-utils.Tpo $(DEPDIR)/febootstrap_supermin_helper-utils.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utils.c' object='febootstrap_supermin_helper-utils.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-utils.o `test -f 'utils.c' || echo '$(srcdir)/'`utils.c
-
-febootstrap_supermin_helper-utils.obj: utils.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-utils.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-utils.Tpo -c -o febootstrap_supermin_helper-utils.obj `if test -f 'utils.c'; then $(CYGPATH_W) 'utils.c'; else $(CYGPATH_W) '$(srcdir)/utils.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-utils.Tpo $(DEPDIR)/febootstrap_supermin_helper-utils.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utils.c' object='febootstrap_supermin_helper-utils.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-utils.obj `if test -f 'utils.c'; then $(CYGPATH_W) 'utils.c'; else $(CYGPATH_W) '$(srcdir)/utils.c'; fi`
-
-init-init.o: init.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(init_CFLAGS) $(CFLAGS) -MT init-init.o -MD -MP -MF $(DEPDIR)/init-init.Tpo -c -o init-init.o `test -f 'init.c' || echo '$(srcdir)/'`init.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/init-init.Tpo $(DEPDIR)/init-init.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='init.c' object='init-init.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(init_CFLAGS) $(CFLAGS) -c -o init-init.o `test -f 'init.c' || echo '$(srcdir)/'`init.c
-
-init-init.obj: init.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(init_CFLAGS) $(CFLAGS) -MT init-init.obj -MD -MP -MF $(DEPDIR)/init-init.Tpo -c -o init-init.obj `if test -f 'init.c'; then $(CYGPATH_W) 'init.c'; else $(CYGPATH_W) '$(srcdir)/init.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/init-init.Tpo $(DEPDIR)/init-init.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='init.c' object='init-init.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(init_CFLAGS) $(CFLAGS) -c -o init-init.obj `if test -f 'init.c'; then $(CYGPATH_W) 'init.c'; else $(CYGPATH_W) '$(srcdir)/init.c'; fi`
 install-man8: $(man_MANS)
 	@$(NORMAL_INSTALL)
 	test -z "$(man8dir)" || $(MKDIR_P) "$(DESTDIR)$(man8dir)"
@@ -1134,58 +924,12 @@ uninstall-man8:
 	test -z "$$files" || { \
 	  echo " ( cd '$(DESTDIR)$(man8dir)' && rm -f" $$files ")"; \
 	  cd "$(DESTDIR)$(man8dir)" && rm -f $$files; }
-
-ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
-	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
-	unique=`for i in $$list; do \
-	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-	  done | \
-	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
-	      END { if (nonempty) { for (i in files) print i; }; }'`; \
-	mkid -fID $$unique
 tags: TAGS
+TAGS:
 
-TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
-		$(TAGS_FILES) $(LISP)
-	set x; \
-	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
-	unique=`for i in $$list; do \
-	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-	  done | \
-	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
-	      END { if (nonempty) { for (i in files) print i; }; }'`; \
-	shift; \
-	if test -z "$(ETAGS_ARGS)$$*$$unique"; then :; else \
-	  test -n "$$unique" || unique=$$empty_fix; \
-	  if test $$# -gt 0; then \
-	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
-	      "$$@" $$unique; \
-	  else \
-	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
-	      $$unique; \
-	  fi; \
-	fi
 ctags: CTAGS
-CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
-		$(TAGS_FILES) $(LISP)
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
-	unique=`for i in $$list; do \
-	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-	  done | \
-	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
-	      END { if (nonempty) { for (i in files) print i; }; }'`; \
-	test -z "$(CTAGS_ARGS)$$unique" \
-	  || $(CTAGS) $(CTAGSFLAGS) $(AM_CTAGSFLAGS) $(CTAGS_ARGS) \
-	     $$unique
+CTAGS:
 
-GTAGS:
-	here=`$(am__cd) $(top_builddir) && pwd` \
-	  && $(am__cd) $(top_srcdir) \
-	  && gtags -i $(GTAGS_ARGS) "$$here"
-
-distclean-tags:
-	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
 	@list='$(MANS)'; if test -n "$$list"; then \
@@ -1232,7 +976,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(PROGRAMS) $(MANS) $(DATA)
+all-am: Makefile $(SCRIPTS) $(MANS) $(DATA)
 installdirs:
 	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man8dir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
@@ -1265,14 +1009,11 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic clean-noinstPROGRAMS \
-	mostlyclean-am
+clean-am: clean-generic mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
-distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-tags
+distclean-am: clean-am distclean-generic
 
 dvi: dvi-am
 
@@ -1292,7 +1033,7 @@ install-dvi: install-dvi-am
 
 install-dvi-am:
 
-install-exec-am: install-binPROGRAMS
+install-exec-am: install-binSCRIPTS
 
 install-html: install-html-am
 
@@ -1315,13 +1056,12 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic
+mostlyclean-am: mostlyclean-generic
 
 pdf: pdf-am
 
@@ -1331,50 +1071,86 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-man
+uninstall-am: uninstall-binSCRIPTS uninstall-man
 
 uninstall-man: uninstall-man8
 
 .MAKE: install-am install-strip
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-noinstPROGRAMS ctags distclean \
-	distclean-compile distclean-generic distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-binPROGRAMS install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-man8 install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic pdf pdf-am \
-	ps ps-am tags uninstall uninstall-am uninstall-binPROGRAMS \
+.PHONY: all all-am check check-am clean clean-generic distclean \
+	distclean-generic distdir dvi dvi-am html html-am info info-am \
+	install install-am install-binSCRIPTS install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-man8 install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
+	pdf-am ps ps-am uninstall uninstall-am uninstall-binSCRIPTS \
 	uninstall-man uninstall-man8
 
 
-ext2init.o: ext2init.S
-	$(CC) -o $@ -c $<
+febootstrap: $(OBJECTS)
+	$(OCAMLFIND) $(BEST) $(OCAMLFLAGS) $(OCAMLPACKAGES) -linkpkg \
+	  $^ -o $@
 
-ext2init.S: init
-	strip --strip-all $<
-	@file $< | grep -isq static || \
-	  (echo "*** error: init is not staticly linked"; exit 1)
-	./bin2s.pl $< $@
+.mli.cmi:
+	$(OCAMLFIND) ocamlc $(OCAMLFLAGS) $(OCAMLPACKAGES) -c $< -o $@
+.ml.cmo:
+	$(OCAMLFIND) ocamlc $(OCAMLFLAGS) $(OCAMLPACKAGES) -c $< -o $@
+.ml.cmx:
+	$(OCAMLFIND) ocamlopt $(OCAMLFLAGS) $(OCAMLPACKAGES) -c $< -o $@
 
-@HAVE_PERLDOC_TRUE@febootstrap-supermin-helper.8: febootstrap-supermin-helper.pod
+depend: .depend
+
+.depend: $(SOURCES)
+	rm -f $@ $@-t
+	$(OCAMLFIND) ocamldep $^ > $@-t
+	mv $@-t $@
+config.cmo:
+config.cmx:
+febootstrap_cmdline.cmi:
+febootstrap_cmdline.cmo: config.cmo febootstrap_cmdline.cmi
+febootstrap_cmdline.cmx: config.cmx febootstrap_cmdline.cmi
+febootstrap_utils.cmi:
+febootstrap_utils.cmo: febootstrap_cmdline.cmi febootstrap_utils.cmi
+febootstrap_utils.cmx: febootstrap_cmdline.cmx febootstrap_utils.cmi
+febootstrap_package_handlers.cmi:
+febootstrap_package_handlers.cmo: febootstrap_utils.cmi \
+    febootstrap_cmdline.cmi febootstrap_package_handlers.cmi
+febootstrap_package_handlers.cmx: febootstrap_utils.cmx \
+    febootstrap_cmdline.cmx febootstrap_package_handlers.cmi
+febootstrap_yum_rpm.cmo: febootstrap_utils.cmi \
+    febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
+febootstrap_yum_rpm.cmx: febootstrap_utils.cmx \
+    febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
+febootstrap_debian.cmo: febootstrap_utils.cmi \
+    febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
+febootstrap_debian.cmx: febootstrap_utils.cmx \
+    febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
+febootstrap_pacman.cmo: febootstrap_utils.cmi \
+    febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
+febootstrap_pacman.cmx: febootstrap_utils.cmx \
+    febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
+febootstrap.cmo: febootstrap_utils.cmi febootstrap_package_handlers.cmi \
+    febootstrap_cmdline.cmi config.cmo
+febootstrap.cmx: febootstrap_utils.cmx febootstrap_package_handlers.cmx \
+    febootstrap_cmdline.cmx config.cmx
+
+@HAVE_PERLDOC_TRUE@febootstrap.8: febootstrap.pod
 @HAVE_PERLDOC_TRUE@	pod2man \
 @HAVE_PERLDOC_TRUE@	  --section 8 \
 @HAVE_PERLDOC_TRUE@	  -c "Virtualization Support" \
 @HAVE_PERLDOC_TRUE@	  --release "$(PACKAGE_NAME)-$(PACKAGE_VERSION)" \
 @HAVE_PERLDOC_TRUE@	  $< > $@
 
-@HAVE_PERLDOC_TRUE@$(top_builddir)/html/febootstrap-supermin-helper.8.html: febootstrap-supermin-helper.pod
-@HAVE_PERLDOC_TRUE@	mkdir -p $(top_builddir)/html
-@HAVE_PERLDOC_TRUE@	cd $(top_builddir) && pod2html \
+@HAVE_PERLDOC_TRUE@../html/febootstrap.8.html: febootstrap.pod
+@HAVE_PERLDOC_TRUE@	mkdir -p ../html
+@HAVE_PERLDOC_TRUE@	pod2html \
 @HAVE_PERLDOC_TRUE@	  --css 'pod.css' \
-@HAVE_PERLDOC_TRUE@	  --htmldir html \
-@HAVE_PERLDOC_TRUE@	  --outfile html/febootstrap-supermin-helper.8.html \
-@HAVE_PERLDOC_TRUE@	  helper/febootstrap-supermin-helper.pod
+@HAVE_PERLDOC_TRUE@	  --htmldir ../html \
+@HAVE_PERLDOC_TRUE@	  --outfile ../html/febootstrap.8.html \
+@HAVE_PERLDOC_TRUE@	  febootstrap.pod
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

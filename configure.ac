@@ -17,7 +17,7 @@ dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 dnl
 dnl Written by Richard W.M. Jones <rjones@redhat.com>
 
-AC_INIT(febootstrap,3.9)
+AC_INIT(febootstrap,3.10)
 AM_INIT_AUTOMAKE
 
 dnl Check for basic C environment.
@@ -62,7 +62,23 @@ AC_CHECK_PROG(YUMDOWNLOADER,[yumdownloader],[yumdownloader],[no])
 
 dnl For Debian handler.
 AC_CHECK_PROG(APTITUDE,[aptitude],[aptitude],[no])
+AC_CHECK_PROG(APT_CACHE,[apt-cache],[apt-cache],[no])
 AC_CHECK_PROG(DPKG,[dpkg],[dpkg],[no])
+
+dnl Include workaround for broken apt-cache depends --recurse (Ubuntu 10.04)?
+if test "x$APT_CACHE" != "xno"; then
+    AC_MSG_CHECKING([if apt-cache depends --recurse is broken])
+    if ! $APT_CACHE depends --recurse -i bash | grep -q '^libc6$'; then
+        AC_MSG_RESULT([yes])
+        APT_CACHE_DEPENDS_RECURSE_BROKEN=true
+    else
+        AC_MSG_RESULT([no])
+        APT_CACHE_DEPENDS_RECURSE_BROKEN=false
+    fi
+else
+    APT_CACHE_DEPENDS_RECURSE_BROKEN=false
+fi
+AC_SUBST([APT_CACHE_DEPENDS_RECURSE_BROKEN])
 
 dnl For ArchLinux handler.
 AC_CHECK_PROG(PACMAN,[pacman],[pacman],[no])
@@ -98,9 +114,10 @@ if test "x$GAWK" = "xno" ; then
 fi
 
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_FILES([config.ml
+AC_CONFIG_FILES([Makefile
         debian/changelog
-        Makefile
+        helper/Makefile
         lib/Makefile
-        helper/Makefile])
+        src/config.ml
+        src/Makefile])
 AC_OUTPUT
