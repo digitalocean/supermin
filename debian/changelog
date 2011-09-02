@@ -1,3 +1,9 @@
+febootstrap (3.10-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Hilko Bengen <bengen@debian.org>  Fri, 02 Sep 2011 09:01:19 +0200
+
 febootstrap (3.9-1) unstable; urgency=low
 
   * New upstream version
