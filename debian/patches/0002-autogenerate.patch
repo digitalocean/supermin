@@ -3,80 +3,28 @@ Date: Fri, 26 Aug 2011 19:43:08 +0200
 Subject: autogenerate
 
 ---
- Makefile.in        |    9 +++------
- configure          |    3 +--
- helper/Makefile.in |    4 ++--
- 3 files changed, 6 insertions(+), 10 deletions(-)
+ configure |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile.in b/Makefile.in
-index cd6b763..223f7e3 100644
---- a/Makefile.in
-+++ b/Makefile.in
-@@ -57,9 +57,8 @@ host_triplet = @host@
- DIST_COMMON = README $(am__configure_deps) $(srcdir)/.depend \
- 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
- 	$(srcdir)/config.h.in $(srcdir)/config.ml.in \
--	$(top_srcdir)/configure $(top_srcdir)/debian/changelog.in \
--	COPYING INSTALL compile config.guess config.sub depcomp \
--	install-sh missing
-+	$(top_srcdir)/configure COPYING INSTALL compile config.guess \
-+	config.sub depcomp install-sh missing
- subdir = .
- ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
- am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
-@@ -118,7 +117,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
-  configure.lineno config.status.lineno
- mkinstalldirs = $(install_sh) -d
- CONFIG_HEADER = config.h
--CONFIG_CLEAN_FILES = config.ml debian/changelog
-+CONFIG_CLEAN_FILES = config.ml
- CONFIG_CLEAN_VPATH_FILES =
- am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
- am__vpath_adj = case $$p in \
-@@ -943,8 +942,6 @@ distclean-hdr:
- 	-rm -f config.h stamp-h1
- config.ml: $(top_builddir)/config.status $(srcdir)/config.ml.in
- 	cd $(top_builddir) && $(SHELL) ./config.status $@
--debian/changelog: $(top_builddir)/config.status $(top_srcdir)/debian/changelog.in
--	cd $(top_builddir) && $(SHELL) ./config.status $@
- install-binSCRIPTS: $(bin_SCRIPTS)
- 	@$(NORMAL_INSTALL)
- 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
 diff --git a/configure b/configure
-index 311f5af..62e34ed 100755
+index c35e9c8..2281ac7 100755
 --- a/configure
 +++ b/configure
-@@ -19107,7 +19107,7 @@ fi
+@@ -19164,7 +19164,7 @@ fi
  
  ac_config_headers="$ac_config_headers config.h"
  
--ac_config_files="$ac_config_files config.ml debian/changelog Makefile lib/Makefile helper/Makefile"
-+ac_config_files="$ac_config_files config.ml Makefile lib/Makefile helper/Makefile"
+-ac_config_files="$ac_config_files Makefile debian/changelog helper/Makefile lib/Makefile src/config.ml src/Makefile"
++ac_config_files="$ac_config_files Makefile helper/Makefile lib/Makefile src/config.ml src/Makefile"
  
  cat >confcache <<\_ACEOF
  # This file is a shell script that caches the results of configure
-@@ -19885,7 +19885,6 @@ do
+@@ -19942,7 +19942,6 @@ do
      "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
      "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
-     "config.ml") CONFIG_FILES="$CONFIG_FILES config.ml" ;;
--    "debian/changelog") CONFIG_FILES="$CONFIG_FILES debian/changelog" ;;
      "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-     "lib/Makefile") CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
+-    "debian/changelog") CONFIG_FILES="$CONFIG_FILES debian/changelog" ;;
      "helper/Makefile") CONFIG_FILES="$CONFIG_FILES helper/Makefile" ;;
-diff --git a/helper/Makefile.in b/helper/Makefile.in
-index 6715de4..e6c0b32 100644
---- a/helper/Makefile.in
-+++ b/helper/Makefile.in
-@@ -856,9 +856,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
- 	      exit 1;; \
- 	  esac; \
- 	done; \
--	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign helper/Makefile'; \
-+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu helper/Makefile'; \
- 	$(am__cd) $(top_srcdir) && \
--	  $(AUTOMAKE) --foreign helper/Makefile
-+	  $(AUTOMAKE) --gnu helper/Makefile
- .PRECIOUS: Makefile
- Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
- 	@case '$?' in \
+     "lib/Makefile") CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
+     "src/config.ml") CONFIG_FILES="$CONFIG_FILES src/config.ml" ;;
 -- 

@@ -7,15 +7,15 @@ Subject: Don't overwrite debian/changelog
  1 files changed, 0 insertions(+), 1 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 1ba8e99..95f3759 100644
+index 46039da..587ae71 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -99,7 +99,6 @@ fi
+@@ -115,7 +115,6 @@ fi
  
  AC_CONFIG_HEADERS([config.h])
- AC_CONFIG_FILES([config.ml
+ AC_CONFIG_FILES([Makefile
 -        debian/changelog
-         Makefile
+         helper/Makefile
          lib/Makefile
-         helper/Makefile])
+         src/config.ml
 -- 
