@@ -30,13 +30,19 @@ let tmpdir = tmpdir ()
 
 let debian_detect () =
   file_exists "/etc/debian_version" &&
-    Config.aptitude <> "no" && Config.dpkg <> "no"
+    Config.aptitude <> "no" && Config.apt_cache <> "no" && Config.dpkg <> "no"
 
-let debian_resolve_dependencies_and_download names =
+let rec debian_resolve_dependencies_and_download names =
   let cmd =
-    sprintf "apt-cache depends --recurse -i %s | grep -v '^[<[:space:]]'"
+    sprintf "%s depends --recurse -i %s | grep -v '^[<[:space:]]'"
+      Config.apt_cache
       (String.concat " " (List.map Filename.quote names)) in
   let pkgs = run_command_get_lines cmd in
+  let pkgs =
+    if Config.apt_cache_depends_recurse_broken then
+      workaround_broken_apt_cache_depends_recurse (sort_uniq pkgs)
+    else
+      pkgs in
 
   (* Exclude packages matching [--exclude] regexps on the command line. *)
   let pkgs =
@@ -47,8 +53,9 @@ let debian_resolve_dependencies_and_download names =
 
   (* Download the packages. *)
   let cmd =
-    sprintf "umask 0000; cd %s && aptitude download %s"
+    sprintf "umask 0000; cd %s && %s download %s"
       (Filename.quote tmpdir)
+      Config.aptitude
       (String.concat " " (List.map Filename.quote pkgs)) in
   run_command cmd;
 
@@ -75,6 +82,29 @@ let debian_resolve_dependencies_and_download names =
   ) pkgs in
 
   List.sort compare pkgs
+
+(* On Ubuntu 10.04 LTS, apt-cache depends --recurse is broken.  It
+ * doesn't return the full list of dependencies.  Therefore recurse
+ * into these dependencies one by one until we reach a fixpoint.
+ *)
+and workaround_broken_apt_cache_depends_recurse names =
+  debug "workaround for broken 'apt-cache depends --recurse' command:\n  %s"
+    (String.concat " " names);
+
+  let names' =
+    List.map (
+      fun name ->
+        let cmd =
+          sprintf "%s depends --recurse -i %s | grep -v '^[<[:space:]]'"
+            Config.apt_cache (Filename.quote name) in
+        run_command_get_lines cmd
+    ) names in
+  let names' = List.flatten names' in
+  let names' = sort_uniq names' in
+  if names <> names' then
+    workaround_broken_apt_cache_depends_recurse names'
+  else
+    names
 
 let debian_list_files pkg =
   debug "unpacking %s ..." pkg;

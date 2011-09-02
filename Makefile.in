@@ -16,7 +16,7 @@
 @SET_MAKE@
 
 # febootstrap Makefile.am
-# (C) Copyright 2009-2010 Red Hat Inc.
+# (C) Copyright 2009-2011 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,8 +33,6 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # Written by Richard W.M. Jones <rjones@redhat.com>
-
-
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -54,13 +52,12 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-DIST_COMMON = README $(am__configure_deps) $(srcdir)/.depend \
-	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/config.h.in $(srcdir)/config.ml.in \
+subdir = .
+DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(top_srcdir)/configure $(top_srcdir)/debian/changelog.in \
 	COPYING INSTALL compile config.guess config.sub depcomp \
 	install-sh missing
-subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/asm-underscore.m4 \
@@ -118,31 +115,9 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = config.ml debian/changelog
+CONFIG_CLEAN_FILES = debian/changelog
 CONFIG_CLEAN_VPATH_FILES =
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
-am__install_max = 40
-am__nobase_strip_setup = \
-  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
-am__nobase_strip = \
-  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
-am__nobase_list = $(am__nobase_strip_setup); \
-  for p in $$list; do echo "$$p $$p"; done | \
-  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
-  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
-    if (++n[$$2] == $(am__install_max)) \
-      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
-    END { for (dir in files) print dir, files[dir] }'
-am__base_list = \
-  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
-  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man8dir)"
-SCRIPTS = $(bin_SCRIPTS)
+SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -151,10 +126,6 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	install-pdf-recursive install-ps-recursive install-recursive \
 	installcheck-recursive installdirs-recursive pdf-recursive \
 	ps-recursive uninstall-recursive
-man8dir = $(mandir)/man8
-NROFF = nroff
-MANS = $(man_MANS)
-DATA = $(noinst_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
@@ -205,6 +176,8 @@ ALLOCA_H = @ALLOCA_H@
 AMTAR = @AMTAR@
 APPLE_UNIVERSAL_BUILD = @APPLE_UNIVERSAL_BUILD@
 APTITUDE = @APTITUDE@
+APT_CACHE = @APT_CACHE@
+APT_CACHE_DEPENDS_RECURSE_BROKEN = @APT_CACHE_DEPENDS_RECURSE_BROKEN@
 ASM_SYMBOL_PREFIX = @ASM_SYMBOL_PREFIX@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
@@ -833,50 +806,14 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = lib helper
-
-# Note these must be in build dependency order.
-SOURCES = \
-	config.ml \
-	febootstrap_cmdline.mli \
-	febootstrap_cmdline.ml \
-	febootstrap_utils.mli \
-	febootstrap_utils.ml \
-	febootstrap_package_handlers.mli \
-	febootstrap_package_handlers.ml \
-	febootstrap_yum_rpm.ml \
-	febootstrap_debian.ml \
-	febootstrap_pacman.ml \
-	febootstrap.ml
-
-CLEANFILES = *~ *.cmi *.cmo *.cmx *.o febootstrap $(HTMLFILES) \
-	pod2*.tmp
+SUBDIRS = lib src helper
 EXTRA_DIST = \
 	.gitignore \
 	.gitmodules \
 	autogen.sh \
-	febootstrap.8 \
-	febootstrap.pod \
 	html/pod.css \
 	m4/gnulib-cache.m4 \
 	$(SOURCES)
-
-man_MANS = \
-	febootstrap.8
-
-bin_SCRIPTS = febootstrap
-SOURCES_ML = $(filter %.ml,$(SOURCES))
-BOBJECTS = $(SOURCES_ML:.ml=.cmo)
-XOBJECTS = $(SOURCES_ML:.ml=.cmx)
-@HAVE_OCAMLOPT_FALSE@OBJECTS = $(BOBJECTS)
-@HAVE_OCAMLOPT_TRUE@OBJECTS = $(XOBJECTS)
-@HAVE_OCAMLOPT_FALSE@BEST = c
-@HAVE_OCAMLOPT_TRUE@BEST = opt
-OCAMLPACKAGES = -package unix,str
-OCAMLFLAGS = -warn-error CDEFLMPSUVXYZ
-SUFFIXES = .cmo .cmi .cmx .ml .mli .mll .mly
-@HAVE_PERLDOC_TRUE@noinst_DATA = \
-@HAVE_PERLDOC_TRUE@	html/febootstrap.8.html
 
 
 # Maintainer website update.
@@ -885,14 +822,14 @@ HTMLFILES = \
 	html/febootstrap-supermin-helper.8.html
 
 WEBSITEDIR = $(HOME)/d/redhat/websites/libguestfs
+CLEANFILES = $(HTMLFILES) pod2*.tmp
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .cmo .cmi .cmx .ml .mli .mll .mly
 am--refresh:
 	@:
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(srcdir)/.depend $(am__configure_deps)
+$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -941,82 +878,8 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-config.ml: $(top_builddir)/config.status $(srcdir)/config.ml.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 debian/changelog: $(top_builddir)/config.status $(top_srcdir)/debian/changelog.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-install-binSCRIPTS: $(bin_SCRIPTS)
-	@$(NORMAL_INSTALL)
-	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
-	@list='$(bin_SCRIPTS)'; test -n "$(bindir)" || list=; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  if test -f "$$d$$p"; then echo "$$d$$p"; echo "$$p"; else :; fi; \
-	done | \
-	sed -e 'p;s,.*/,,;n' \
-	    -e 'h;s|.*|.|' \
-	    -e 'p;x;s,.*/,,;$(transform)' | sed 'N;N;N;s,\n, ,g' | \
-	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1; } \
-	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
-	    if ($$2 == $$4) { files[d] = files[d] " " $$1; \
-	      if (++n[d] == $(am__install_max)) { \
-		print "f", d, files[d]; n[d] = 0; files[d] = "" } } \
-	    else { print "f", d "/" $$4, $$1 } } \
-	  END { for (d in files) print "f", d, files[d] }' | \
-	while read type dir files; do \
-	     if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
-	     test -z "$$files" || { \
-	       echo " $(INSTALL_SCRIPT) $$files '$(DESTDIR)$(bindir)$$dir'"; \
-	       $(INSTALL_SCRIPT) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
-	     } \
-	; done
-
-uninstall-binSCRIPTS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(bin_SCRIPTS)'; test -n "$(bindir)" || exit 0; \
-	files=`for p in $$list; do echo "$$p"; done | \
-	       sed -e 's,.*/,,;$(transform)'`; \
-	test -n "$$list" || exit 0; \
-	echo " ( cd '$(DESTDIR)$(bindir)' && rm -f" $$files ")"; \
-	cd "$(DESTDIR)$(bindir)" && rm -f $$files
-install-man8: $(man_MANS)
-	@$(NORMAL_INSTALL)
-	test -z "$(man8dir)" || $(MKDIR_P) "$(DESTDIR)$(man8dir)"
-	@list=''; test -n "$(man8dir)" || exit 0; \
-	{ for i in $$list; do echo "$$i"; done; \
-	l2='$(man_MANS)'; for i in $$l2; do echo "$$i"; done | \
-	  sed -n '/\.8[a-z]*$$/p'; \
-	} | while read p; do \
-	  if test -f $$p; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; echo "$$p"; \
-	done | \
-	sed -e 'n;s,.*/,,;p;h;s,.*\.,,;s,^[^8][0-9a-z]*$$,8,;x' \
-	      -e 's,\.[0-9a-z]*$$,,;$(transform);G;s,\n,.,' | \
-	sed 'N;N;s,\n, ,g' | { \
-	list=; while read file base inst; do \
-	  if test "$$base" = "$$inst"; then list="$$list $$file"; else \
-	    echo " $(INSTALL_DATA) '$$file' '$(DESTDIR)$(man8dir)/$$inst'"; \
-	    $(INSTALL_DATA) "$$file" "$(DESTDIR)$(man8dir)/$$inst" || exit $$?; \
-	  fi; \
-	done; \
-	for i in $$list; do echo "$$i"; done | $(am__base_list) | \
-	while read files; do \
-	  test -z "$$files" || { \
-	    echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(man8dir)'"; \
-	    $(INSTALL_DATA) $$files "$(DESTDIR)$(man8dir)" || exit $$?; }; \
-	done; }
-
-uninstall-man8:
-	@$(NORMAL_UNINSTALL)
-	@list=''; test -n "$(man8dir)" || exit 0; \
-	files=`{ for i in $$list; do echo "$$i"; done; \
-	l2='$(man_MANS)'; for i in $$l2; do echo "$$i"; done | \
-	  sed -n '/\.8[a-z]*$$/p'; \
-	} | sed -e 's,.*/,,;h;s,.*\.,,;s,^[^8][0-9a-z]*$$,8,;x' \
-	      -e 's,\.[0-9a-z]*$$,,;$(transform);G;s,\n,.,'`; \
-	test -z "$$files" || { \
-	  echo " ( cd '$(DESTDIR)$(man8dir)' && rm -f" $$files ")"; \
-	  cd "$(DESTDIR)$(man8dir)" && rm -f $$files; }
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -1154,19 +1017,6 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	@list='$(MANS)'; if test -n "$$list"; then \
-	  list=`for p in $$list; do \
-	    if test -f $$p; then d=; else d="$(srcdir)/"; fi; \
-	    if test -f "$$d$$p"; then echo "$$d$$p"; else :; fi; done`; \
-	  if test -n "$$list" && \
-	    grep 'ab help2man is required to generate this page' $$list >/dev/null; then \
-	    echo "error: found man pages containing the \`missing help2man' replacement text:" >&2; \
-	    grep -l 'ab help2man is required to generate this page' $$list | sed 's/^/         /' >&2; \
-	    echo "       to fix them, install help2man, remove and regenerate the man pages;" >&2; \
-	    echo "       typically \`make maintainer-clean' will remove them" >&2; \
-	    exit 1; \
-	  else :; fi; \
-	else :; fi
 	$(am__remove_distdir)
 	test -d "$(distdir)" || mkdir "$(distdir)"
 	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
@@ -1343,12 +1193,9 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(SCRIPTS) $(MANS) $(DATA) config.h
+all-am: Makefile config.h
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man8dir)"; do \
-	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
-	done
 install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
@@ -1396,13 +1243,13 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-man
+install-data-am:
 
 install-dvi: install-dvi-recursive
 
 install-dvi-am:
 
-install-exec-am: install-binSCRIPTS
+install-exec-am:
 
 install-html: install-html-recursive
 
@@ -1412,7 +1259,7 @@ install-info: install-info-recursive
 
 install-info-am:
 
-install-man: install-man8
+install-man:
 
 install-pdf: install-pdf-recursive
 
@@ -1442,9 +1289,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binSCRIPTS uninstall-man
-
-uninstall-man: uninstall-man8
+uninstall-am:
 
 .MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) all \
 	ctags-recursive install-am install-strip tags-recursive
@@ -1455,79 +1300,15 @@ uninstall-man: uninstall-man8
 	dist-lzma dist-shar dist-tarZ dist-xz dist-zip distcheck \
 	distclean distclean-generic distclean-hdr distclean-tags \
 	distcleancheck distdir distuninstallcheck dvi dvi-am html \
-	html-am info info-am install install-am install-binSCRIPTS \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-man8 \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-generic pdf pdf-am ps ps-am tags \
-	tags-recursive uninstall uninstall-am uninstall-binSCRIPTS \
-	uninstall-man uninstall-man8
+	html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
+	pdf-am ps ps-am tags tags-recursive uninstall uninstall-am
 
-
-febootstrap: $(OBJECTS)
-	$(OCAMLFIND) $(BEST) $(OCAMLFLAGS) $(OCAMLPACKAGES) -linkpkg \
-	  $^ -o $@
-
-.mli.cmi:
-	$(OCAMLFIND) ocamlc $(OCAMLFLAGS) $(OCAMLPACKAGES) -c $< -o $@
-.ml.cmo:
-	$(OCAMLFIND) ocamlc $(OCAMLFLAGS) $(OCAMLPACKAGES) -c $< -o $@
-.ml.cmx:
-	$(OCAMLFIND) ocamlopt $(OCAMLFLAGS) $(OCAMLPACKAGES) -c $< -o $@
-
-depend: .depend
-
-.depend: $(SOURCES)
-	rm -f $@ $@-t
-	$(OCAMLFIND) ocamldep $^ > $@-t
-	mv $@-t $@
-config.cmo:
-config.cmx:
-febootstrap_cmdline.cmi:
-febootstrap_cmdline.cmo: config.cmo febootstrap_cmdline.cmi
-febootstrap_cmdline.cmx: config.cmx febootstrap_cmdline.cmi
-febootstrap_utils.cmi:
-febootstrap_utils.cmo: febootstrap_cmdline.cmi febootstrap_utils.cmi
-febootstrap_utils.cmx: febootstrap_cmdline.cmx febootstrap_utils.cmi
-febootstrap_package_handlers.cmi:
-febootstrap_package_handlers.cmo: febootstrap_utils.cmi \
-    febootstrap_cmdline.cmi febootstrap_package_handlers.cmi
-febootstrap_package_handlers.cmx: febootstrap_utils.cmx \
-    febootstrap_cmdline.cmx febootstrap_package_handlers.cmi
-febootstrap_yum_rpm.cmo: febootstrap_utils.cmi \
-    febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
-febootstrap_yum_rpm.cmx: febootstrap_utils.cmx \
-    febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
-febootstrap_debian.cmo: febootstrap_utils.cmi \
-    febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
-febootstrap_debian.cmx: febootstrap_utils.cmx \
-    febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
-febootstrap_pacman.cmo: febootstrap_utils.cmi \
-    febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
-febootstrap_pacman.cmx: febootstrap_utils.cmx \
-    febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
-febootstrap.cmo: febootstrap_utils.cmi febootstrap_package_handlers.cmi \
-    febootstrap_cmdline.cmi config.cmo
-febootstrap.cmx: febootstrap_utils.cmx febootstrap_package_handlers.cmx \
-    febootstrap_cmdline.cmx config.cmx
-
-@HAVE_PERLDOC_TRUE@febootstrap.8: febootstrap.pod
-@HAVE_PERLDOC_TRUE@	pod2man \
-@HAVE_PERLDOC_TRUE@	  --section 8 \
-@HAVE_PERLDOC_TRUE@	  -c "Virtualization Support" \
-@HAVE_PERLDOC_TRUE@	  --release "$(PACKAGE_NAME)-$(PACKAGE_VERSION)" \
-@HAVE_PERLDOC_TRUE@	  $< > $@
-
-@HAVE_PERLDOC_TRUE@html/febootstrap.8.html: febootstrap.pod
-@HAVE_PERLDOC_TRUE@	mkdir -p html
-@HAVE_PERLDOC_TRUE@	pod2html \
-@HAVE_PERLDOC_TRUE@	  --css 'pod.css' \
-@HAVE_PERLDOC_TRUE@	  --htmldir html \
-@HAVE_PERLDOC_TRUE@	  --outfile html/febootstrap.8.html \
-@HAVE_PERLDOC_TRUE@	  febootstrap.pod
 
 website: $(HTMLFILES)
 	cp $(HTMLFILES) $(WEBSITEDIR)

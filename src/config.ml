@@ -1,6 +1,6 @@
 (* febootstrap 3
  * Copyright (C) 2009-2010 Red Hat Inc.
- * @configure_input@
+ * src/config.ml.  Generated from config.ml.in by configure.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *)
 
-let package_name = "@PACKAGE_NAME@"
-let package_version = "@PACKAGE_VERSION@"
-let yum = "@YUM@"
-let rpm = "@RPM@"
-let yumdownloader = "@YUMDOWNLOADER@"
-let aptitude = "@APTITUDE@"
-let dpkg = "@DPKG@"
-let pacman = "@PACMAN@"
-let host_cpu = "@host_cpu@"
+let package_name = "febootstrap"
+let package_version = "3.10"
+let yum = "yum"
+let rpm = "rpm"
+let yumdownloader = "yumdownloader"
+let aptitude = "no"
+let apt_cache = "no"
+let dpkg = "no"
+let apt_cache_depends_recurse_broken = false
+let pacman = "no"
+let host_cpu = "x86_64"
