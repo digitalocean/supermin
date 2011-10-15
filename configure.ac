@@ -17,7 +17,7 @@ dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 dnl
 dnl Written by Richard W.M. Jones <rjones@redhat.com>
 
-AC_INIT(febootstrap,3.10)
+AC_INIT(febootstrap,3.11)
 AM_INIT_AUTOMAKE
 
 dnl Check for basic C environment.
@@ -36,6 +36,9 @@ dnl Check support for 64 bit file offsets.
 AC_SYS_LARGEFILE
 
 gl_INIT
+
+# Define $(SED).
+AC_PROG_SED
 
 # OCaml and ocamlfind are required to compile.
 AC_PROG_OCAML
@@ -83,6 +86,9 @@ AC_SUBST([APT_CACHE_DEPENDS_RECURSE_BROKEN])
 dnl For ArchLinux handler.
 AC_CHECK_PROG(PACMAN,[pacman],[pacman],[no])
 
+dnl Support for gzipped kernel modules.
+AC_CHECK_LIB([z],[gzopen])
+
 dnl Required programs, libraries.
 AC_PATH_PROG([MKE2FS],[mke2fs],[no],
              [$PATH$PATH_SEPARATOR/sbin$PATH_SEPARATOR])
@@ -102,6 +108,7 @@ old_LIBS="$LIBS"
 AC_CHECK_LIB([ext2fs],[ext2fs_file_open2],[],[
   AC_MSG_FAILURE([libext2fs library not found (part of e2fsprogs)])
 ])
+AC_CHECK_FUNCS([ext2fs_close2])
 LIBS="$old_LIBS"
 
 AC_CHECK_HEADER([ext2fs/ext2fs.h],[],[

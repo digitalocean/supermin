@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "FEBOOTSTRAP-SUPERMIN-HELPER 8"
-.TH FEBOOTSTRAP-SUPERMIN-HELPER 8 "2011-08-19" "febootstrap-3.8" "Virtualization Support"
+.TH FEBOOTSTRAP-SUPERMIN-HELPER 8 "2011-09-14" "febootstrap-3.10" "Virtualization Support"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -165,8 +165,12 @@ the format is \f(CW\*(C`ext2\*(C'\fR.  None of these parameters are needed for
 the checksum output \f(CW\*(C`\-f checksum\*(C'\fR.
 .SH "OPTIONS"
 .IX Header "OPTIONS"
-.IP "\fB\-f fmt\fR | \fB\-\-format fmt\fR" 4
-.IX Item "-f fmt | --format fmt"
+.IP "\fB\-f fmt\fR" 4
+.IX Item "-f fmt"
+.PD 0
+.IP "\fB\-\-format fmt\fR" 4
+.IX Item "--format fmt"
+.PD
 Select the output format for the appliance.  Possible formats are:
 .RS 4
 .IP "cpio" 4
@@ -197,8 +201,12 @@ host_cpu and the \s-1UID\s0 of the current user are included in the checksum.
 .RE
 .RS 4
 .RE
-.IP "\fB\-k file\fR | \fB\-\-kmods file\fR" 4
-.IX Item "-k file | --kmods file"
+.IP "\fB\-k file\fR" 4
+.IX Item "-k file"
+.PD 0
+.IP "\fB\-\-kmods file\fR" 4
+.IX Item "--kmods file"
+.PD
 If this option is specified, then \f(CW\*(C`file\*(C'\fR should be a list of
 wildcards matching kernel module names, eg:
 .Sp
@@ -216,8 +224,16 @@ automatically.
 If this option is not specified, then every kernel module from the
 host will be included.  This is safer, but can produce rather large
 appliances which need a lot more memory to boot.
-.IP "\fB\-u user\fR | \fB\-\-user user\fR | \fB\-g group\fR | \fB\-\-group group\fR" 4
-.IX Item "-u user | --user user | -g group | --group group"
+.IP "\fB\-u user\fR" 4
+.IX Item "-u user"
+.PD 0
+.IP "\fB\-\-user user\fR" 4
+.IX Item "--user user"
+.IP "\fB\-g group\fR" 4
+.IX Item "-g group"
+.IP "\fB\-\-group group\fR" 4
+.IX Item "--group group"
+.PD
 Run febootstrap-supermin-helper as an alternate user and/or group.
 \&\f(CW\*(C`user\*(C'\fR and \f(CW\*(C`group\*(C'\fR can be specified as either a name, which will
 be resolved using the system name service, or a uid/gid.  Use of these

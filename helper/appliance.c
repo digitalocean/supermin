@@ -197,6 +197,9 @@ static void
 add_kernel_modules (const char *whitelist_file, const char *modpath,
                     struct writer *writer)
 {
+  if (verbose)
+    print_timestamped_message ("adding kernel modules");
+
   char **whitelist = NULL;
   if (whitelist_file != NULL)
     whitelist = load_file (whitelist_file);
@@ -281,7 +284,9 @@ add_hostfiles (const char *hostfiles_file, struct writer *writer)
     if (strchr (hostfile, '*') || strchr (hostfile, '?')) {
       char *dirname = xstrdup (hostfile);
       char *patt = strrchr (dirname, '/');
-      assert (patt);
+      if (!patt)
+        error (EXIT_FAILURE, 0, "%s: line %zu: invalid pattern\n(is this file a supermin appliance hostfiles file?)",
+               hostfiles_file, i+1);
       *patt++ = '\0';
 
       char **files = read_dir (dirname);

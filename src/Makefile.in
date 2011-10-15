@@ -702,6 +702,7 @@ REPLACE_WCTOB = @REPLACE_WCTOB@
 REPLACE_WCWIDTH = @REPLACE_WCWIDTH@
 REPLACE_WRITE = @REPLACE_WRITE@
 RPM = @RPM@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SIG_ATOMIC_T_SUFFIX = @SIG_ATOMIC_T_SUFFIX@
@@ -1105,37 +1106,30 @@ depend: .depend
 
 .depend: $(SOURCES)
 	rm -f $@ $@-t
-	$(OCAMLFIND) ocamldep $^ > $@-t
+	$(OCAMLFIND) ocamldep $^ | \
+	  $(SED) 's/ *$$//' | \
+	  $(SED) -e :a -e '/ *\\$$/N; s/ *\\\n */ /; ta' | \
+	  sort > $@-t
 	mv $@-t $@
 config.cmo:
 config.cmx:
 febootstrap_cmdline.cmi:
 febootstrap_cmdline.cmo: config.cmo febootstrap_cmdline.cmi
 febootstrap_cmdline.cmx: config.cmx febootstrap_cmdline.cmi
+febootstrap.cmo: febootstrap_utils.cmi febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
+febootstrap.cmx: febootstrap_utils.cmx febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
+febootstrap_debian.cmo: febootstrap_utils.cmi febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
+febootstrap_debian.cmx: febootstrap_utils.cmx febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
+febootstrap_package_handlers.cmi:
+febootstrap_package_handlers.cmo: febootstrap_utils.cmi febootstrap_cmdline.cmi febootstrap_package_handlers.cmi
+febootstrap_package_handlers.cmx: febootstrap_utils.cmx febootstrap_cmdline.cmx febootstrap_package_handlers.cmi
+febootstrap_pacman.cmo: febootstrap_utils.cmi febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
+febootstrap_pacman.cmx: febootstrap_utils.cmx febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
 febootstrap_utils.cmi:
 febootstrap_utils.cmo: febootstrap_cmdline.cmi febootstrap_utils.cmi
 febootstrap_utils.cmx: febootstrap_cmdline.cmx febootstrap_utils.cmi
-febootstrap_package_handlers.cmi:
-febootstrap_package_handlers.cmo: febootstrap_utils.cmi \
-    febootstrap_cmdline.cmi febootstrap_package_handlers.cmi
-febootstrap_package_handlers.cmx: febootstrap_utils.cmx \
-    febootstrap_cmdline.cmx febootstrap_package_handlers.cmi
-febootstrap_yum_rpm.cmo: febootstrap_utils.cmi \
-    febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
-febootstrap_yum_rpm.cmx: febootstrap_utils.cmx \
-    febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
-febootstrap_debian.cmo: febootstrap_utils.cmi \
-    febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
-febootstrap_debian.cmx: febootstrap_utils.cmx \
-    febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
-febootstrap_pacman.cmo: febootstrap_utils.cmi \
-    febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
-febootstrap_pacman.cmx: febootstrap_utils.cmx \
-    febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
-febootstrap.cmo: febootstrap_utils.cmi febootstrap_package_handlers.cmi \
-    febootstrap_cmdline.cmi config.cmo
-febootstrap.cmx: febootstrap_utils.cmx febootstrap_package_handlers.cmx \
-    febootstrap_cmdline.cmx config.cmx
+febootstrap_yum_rpm.cmo: febootstrap_utils.cmi febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
+febootstrap_yum_rpm.cmx: febootstrap_utils.cmx febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
 
 @HAVE_PERLDOC_TRUE@febootstrap.8: febootstrap.pod
 @HAVE_PERLDOC_TRUE@	pod2man \
