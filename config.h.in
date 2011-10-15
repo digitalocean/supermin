@@ -266,6 +266,9 @@
 /* Define to 1 if you have the <errno.h> header file. */
 #undef HAVE_ERRNO_H
 
+/* Define to 1 if you have the `ext2fs_close2' function. */
+#undef HAVE_EXT2FS_CLOSE2
+
 /* Define to 1 if you have the `fchdir' function. */
 #undef HAVE_FCHDIR
 
@@ -331,6 +334,9 @@
 
 /* Define to 1 if you have the `ext2fs' library (-lext2fs). */
 #undef HAVE_LIBEXT2FS
+
+/* Define to 1 if you have the `z' library (-lz). */
+#undef HAVE_LIBZ
 
 /* Define to 1 if the system has the type `long long int'. */
 #undef HAVE_LONG_LONG_INT

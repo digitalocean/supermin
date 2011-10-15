@@ -18,7 +18,7 @@
  *)
 
 let package_name = "febootstrap"
-let package_version = "3.10"
+let package_version = "3.11"
 let yum = "yum"
 let rpm = "rpm"
 let yumdownloader = "yumdownloader"

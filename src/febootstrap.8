@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "FEBOOTSTRAP 8"
-.TH FEBOOTSTRAP 8 "2011-08-19" "febootstrap-3.9" "Virtualization Support"
+.TH FEBOOTSTRAP 8 "2011-09-23" "febootstrap-3.10" "Virtualization Support"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -214,6 +214,17 @@ output directory then they will be overwritten.
 .IX Item "--save-temps"
 Don't remove temporary files and directories on exit.  This is useful
 for debugging.
+.IP "\fB\-\-use\-installed\fR" 4
+.IX Item "--use-installed"
+If packages are already installed, use the contents (from the local
+filesystem) instead of downloading them.
+.Sp
+Note that this can cause malformed appliances if local files have been
+changed from what was originally in the package.  This is particularly
+a problem for configuration files.
+.Sp
+However this option is useful in some controlled situations: for
+example when using febootstrap inside a freshly installed chroot.
 .IP "\fB\-v\fR" 4
 .IX Item "-v"
 .PD 0
