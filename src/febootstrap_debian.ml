@@ -1,5 +1,5 @@
 (* febootstrap 3
- * Copyright (C) 2009-2010 Red Hat Inc.
+ * Copyright (C) 2009-2011 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,16 +28,24 @@ open Febootstrap_cmdline
 (* Create a temporary directory for use by all the functions in this file. *)
 let tmpdir = tmpdir ()
 
-let installed_pkgs =
-  run_command_get_lines "dpkg-query --show --showformat='${Package}\\n'"
-
 let debian_detect () =
   file_exists "/etc/debian_version" &&
     Config.aptitude <> "no" && Config.apt_cache <> "no" && Config.dpkg <> "no"
 
+let installed_pkgs = ref []
+
+let debian_init () =
+  installed_pkgs :=
+    run_command_get_lines "dpkg-query --show --showformat='${Package}\\n'"
+
+let get_installed_pkgs () =
+  match !installed_pkgs with
+    | [] -> assert false
+    | pkgs -> pkgs
+
 let rec debian_resolve_dependencies_and_download names =
   let cmd =
-    sprintf "%s depends --recurse -i %s | grep -v '^[<[:space:]]'"
+    sprintf "%s depends --recurse -i %s | grep -v '^[<[:space:]]' | grep -v :i386"
       Config.apt_cache
       (String.concat " " (List.map Filename.quote names)) in
   let pkgs = run_command_get_lines cmd in
@@ -54,13 +62,16 @@ let rec debian_resolve_dependencies_and_download names =
         not (List.exists (fun re -> Str.string_match re name 0) excludes)
     ) pkgs in
 
-  let present_pkgs, download_pkgs = List.partition (
-    fun pkg -> List.exists ((=) pkg) installed_pkgs
-  ) pkgs in
+  let present_pkgs, download_pkgs =
+    if not use_installed then
+      [], pkgs
+    else
+      List.partition (
+	fun pkg -> List.exists ((=) pkg) (get_installed_pkgs ())
+      ) pkgs in
 
-  debug "wanted packages (present / download): %s / %s\n"
-    (String.concat " " present_pkgs)
-    (String.concat " " download_pkgs);
+  debug "packages already present: %s" (String.concat " " present_pkgs);
+  debug "wanted packages to download: %s" (String.concat " " download_pkgs);
 
   (* Download the packages. *)
   if (List.length download_pkgs > 0)
@@ -181,15 +192,16 @@ let debian_list_files_installed pkg =
   ) lines in
   files
 
-let debian_list_files ?(use_installed=false) pkg =
-  if use_installed && List.exists ((=) pkg) installed_pkgs then
+let debian_list_files pkg =
+  if use_installed && List.exists ((=) pkg) (get_installed_pkgs ()) then
     debian_list_files_installed pkg
   else
     debian_list_files_downloaded pkg
 
 (* Easy because we already unpacked the archive above. *)
-let debian_get_file_from_package ?(use_installed=false) pkg file =
-  if use_installed && List.exists (fun p -> p = pkg) installed_pkgs then
+let debian_get_file_from_package pkg file =
+  if use_installed && List.exists (fun p -> p = pkg) (get_installed_pkgs ())
+  then
     file
   else
     tmpdir // pkg ^ ".d" // file
@@ -197,6 +209,7 @@ let debian_get_file_from_package ?(use_installed=false) pkg file =
 let () =
   let ph = {
     ph_detect = debian_detect;
+    ph_init = debian_init;
     ph_resolve_dependencies_and_download =
       debian_resolve_dependencies_and_download;
     ph_list_files = debian_list_files;
