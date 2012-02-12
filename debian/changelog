@@ -1,3 +1,10 @@
+febootstrap (3.12-2) unstable; urgency=low
+
+  * [6a9d6c8] Rebased patch queue, added workaround for duplicate entries
+    in package list produced by apt in Ubuntu 12.04
+
+ -- Hilko Bengen <bengen@debian.org>  Sun, 12 Feb 2012 18:15:30 +0100
+
 febootstrap (3.12-1) unstable; urgency=low
 
   * New upstream version
