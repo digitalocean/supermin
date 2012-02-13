@@ -1,3 +1,9 @@
+febootstrap (3.13-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Hilko Bengen <bengen@debian.org>  Mon, 13 Feb 2012 19:47:58 +0100
+
 febootstrap (3.12-2) unstable; urgency=low
 
   * [6a9d6c8] Rebased patch queue, added workaround for duplicate entries
