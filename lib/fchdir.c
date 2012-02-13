@@ -1,5 +1,5 @@
 /* fchdir replacement.
-   Copyright (C) 2006-2010 Free Software Foundation, Inc.
+   Copyright (C) 2006-2012 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,17 +29,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "dosname.h"
+#include "filenamecat.h"
+
 #ifndef REPLACE_OPEN_DIRECTORY
 # define REPLACE_OPEN_DIRECTORY 0
-#endif
-
-#ifndef HAVE_CANONICALIZE_FILE_NAME
-# if GNULIB_CANONICALIZE || GNULIB_CANONICALIZE_LGPL
-#  define HAVE_CANONICALIZE_FILE_NAME 1
-# else
-#  define HAVE_CANONICALIZE_FILE_NAME 0
-#  define canonicalize_file_name(name) NULL
-# endif
 #endif
 
 /* This replacement assumes that a directory is not renamed while opened
@@ -90,36 +84,26 @@ ensure_dirs_slot (size_t fd)
   return true;
 }
 
-/* Return the canonical name of DIR in malloc'd storage.  */
+/* Return an absolute name of DIR in malloc'd storage.  */
 static char *
 get_name (char const *dir)
 {
+  char *cwd;
   char *result;
-  if (REPLACE_OPEN_DIRECTORY || !HAVE_CANONICALIZE_FILE_NAME)
-    {
-      /* The function canonicalize_file_name has not yet been ported
-         to mingw, with all its drive letter and backslash quirks.
-         Fortunately, getcwd is reliable in this case, but we ensure
-         we can get back to where we started before using it.  Treat
-         "." as a special case, as it is frequently encountered.  */
-      char *cwd = getcwd (NULL, 0);
-      int saved_errno;
-      if (dir[0] == '.' && dir[1] == '\0')
-        return cwd;
-      if (chdir (cwd))
-        return NULL;
-      result = chdir (dir) ? NULL : getcwd (NULL, 0);
-      saved_errno = errno;
-      if (chdir (cwd))
-        abort ();
-      free (cwd);
-      errno = saved_errno;
-    }
-  else
-    {
-      /* Avoid changing the directory.  */
-      result = canonicalize_file_name (dir);
-    }
+  int saved_errno;
+
+  if (IS_ABSOLUTE_FILE_NAME (dir))
+    return strdup (dir);
+
+  /* We often encounter "."; treat it as a special case.  */
+  cwd = getcwd (NULL, 0);
+  if (!cwd || (dir[0] == '.' && dir[1] == '\0'))
+    return cwd;
+
+  result = mfile_name_concat (cwd, dir, NULL);
+  saved_errno = errno;
+  free (cwd);
+  errno = saved_errno;
   return result;
 }
 
@@ -211,69 +195,6 @@ _gl_directory_name (int fd)
   else
     errno = EBADF;
   return NULL;
-}
-
-#if REPLACE_OPEN_DIRECTORY
-/* Return stat information about FD in STATBUF.  Needed when
-   rpl_open() used a dummy file to work around an open() that can't
-   normally visit directories.  */
-# undef fstat
-int
-rpl_fstat (int fd, struct stat *statbuf)
-{
-  if (0 <= fd && fd < dirs_allocated && dirs[fd].name != NULL)
-    return stat (dirs[fd].name, statbuf);
-  return fstat (fd, statbuf);
-}
-#endif
-
-/* Override opendir() and closedir(), to keep track of the open file
-   descriptors.  Needed because there is a function dirfd().  */
-
-int
-rpl_closedir (DIR *dp)
-#undef closedir
-{
-  int fd = dirfd (dp);
-  int retval = closedir (dp);
-
-  if (retval >= 0)
-    _gl_unregister_fd (fd);
-  return retval;
-}
-
-DIR *
-rpl_opendir (const char *filename)
-#undef opendir
-{
-  DIR *dp;
-
-  dp = opendir (filename);
-  if (dp != NULL)
-    {
-      int fd = dirfd (dp);
-      if (0 <= fd && _gl_register_fd (fd, filename) != fd)
-        {
-          int saved_errno = errno;
-          closedir (dp);
-          errno = saved_errno;
-          return NULL;
-        }
-    }
-  return dp;
-}
-
-/* Override dup(), to keep track of open file descriptors.  */
-
-int
-rpl_dup (int oldfd)
-#undef dup
-{
-  int newfd = dup (oldfd);
-
-  if (0 <= newfd)
-    newfd = _gl_register_dup (oldfd, newfd);
-  return newfd;
 }
 
 

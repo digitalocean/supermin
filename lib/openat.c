@@ -1,5 +1,5 @@
 /* provide a replacement openat function
-   Copyright (C) 2004-2010 Free Software Foundation, Inc.
+   Copyright (C) 2004-2012 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,22 +16,39 @@
 
 /* written by Jim Meyering */
 
+/* If the user's config.h happens to include <fcntl.h>, let it include only
+   the system's <fcntl.h> here, so that orig_openat doesn't recurse to
+   rpl_openat.  */
+#define __need_system_fcntl_h
 #include <config.h>
+
+/* Get the original definition of open.  It might be defined as a macro.  */
+#include <fcntl.h>
+#include <sys/types.h>
+#undef __need_system_fcntl_h
+
+#if HAVE_OPENAT
+static inline int
+orig_openat (int fd, char const *filename, int flags, mode_t mode)
+{
+  return openat (fd, filename, flags, mode);
+}
+#endif
+
+/* Write "fcntl.h" here, not <fcntl.h>, otherwise OSF/1 5.1 DTK cc eliminates
+   this include because of the preliminary #include <fcntl.h> above.  */
+#include "fcntl.h"
 
 #include "openat.h"
 
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 #include <sys/stat.h>
-
-#include "dirname.h" /* solely for definition of IS_ABSOLUTE_FILE_NAME */
-#include "openat-priv.h"
-#include "save-cwd.h"
+#include <errno.h>
 
 #if HAVE_OPENAT
-
-# undef openat
 
 /* Like openat, but work around Solaris 9 bugs with trailing slash.  */
 int
@@ -53,7 +70,7 @@ rpl_openat (int dfd, char const *filename, int flags, ...)
       va_end (arg);
     }
 
-#if OPEN_TRAILING_SLASH_BUG
+# if OPEN_TRAILING_SLASH_BUG
   /* If the filename ends in a slash and one of O_CREAT, O_WRONLY, O_RDWR
      is specified, then fail.
      Rationale: POSIX <http://www.opengroup.org/susv3/basedefs/xbd_chap04.html>
@@ -84,11 +101,11 @@ rpl_openat (int dfd, char const *filename, int flags, ...)
           return -1;
         }
     }
-#endif
+# endif
 
-  fd = openat (dfd, filename, flags, mode);
+  fd = orig_openat (dfd, filename, flags, mode);
 
-#if OPEN_TRAILING_SLASH_BUG
+# if OPEN_TRAILING_SLASH_BUG
   /* If the filename ends in a slash and fd does not refer to a directory,
      then fail.
      Rationale: POSIX <http://www.opengroup.org/susv3/basedefs/xbd_chap04.html>
@@ -117,12 +134,16 @@ rpl_openat (int dfd, char const *filename, int flags, ...)
             }
         }
     }
-#endif
+# endif
 
   return fd;
 }
 
 #else /* !HAVE_OPENAT */
+
+# include "dosname.h" /* solely for definition of IS_ABSOLUTE_FILE_NAME */
+# include "openat-priv.h"
+# include "save-cwd.h"
 
 /* Replacement for Solaris' openat function.
    <http://www.google.com/search?q=openat+site:docs.sun.com>
@@ -159,7 +180,7 @@ openat (int fd, char const *file, int flags, ...)
    directory argument.
 
    If a previous attempt to restore the current working directory
-   failed, then we must not even try to access a `.'-relative name.
+   failed, then we must not even try to access a '.'-relative name.
    It is the caller's responsibility not to call this function
    in that case.  */
 
