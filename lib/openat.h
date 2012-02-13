@@ -1,5 +1,5 @@
 /* provide a replacement openat function
-   Copyright (C) 2004-2006, 2008-2010 Free Software Foundation, Inc.
+   Copyright (C) 2004-2006, 2008-2012 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,19 +23,8 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <dirent.h>
 #include <unistd.h>
 #include <stdbool.h>
-
-#ifndef __attribute__
-# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8)
-#  define __attribute__(x) /* empty */
-# endif
-#endif
-
-#ifndef ATTRIBUTE_NORETURN
-# define ATTRIBUTE_NORETURN __attribute__ ((__noreturn__))
-#endif
 
 #if !HAVE_OPENAT
 
@@ -51,12 +40,15 @@ bool openat_needs_fchdir (void);
 
 #endif
 
-void openat_restore_fail (int) ATTRIBUTE_NORETURN;
-void openat_save_fail (int) ATTRIBUTE_NORETURN;
+_Noreturn void openat_restore_fail (int);
+_Noreturn void openat_save_fail (int);
 
 /* Using these function names makes application code
    slightly more readable than it would be with
    fchownat (..., 0) or fchownat (..., AT_SYMLINK_NOFOLLOW).  */
+
+#if GNULIB_FCHOWNAT
+
 static inline int
 chownat (int fd, char const *file, uid_t owner, gid_t group)
 {
@@ -68,6 +60,10 @@ lchownat (int fd, char const *file, uid_t owner, gid_t group)
 {
   return fchownat (fd, file, owner, group, AT_SYMLINK_NOFOLLOW);
 }
+
+#endif
+
+#if GNULIB_FCHMODAT
 
 static inline int
 chmodat (int fd, char const *file, mode_t mode)
@@ -81,6 +77,10 @@ lchmodat (int fd, char const *file, mode_t mode)
   return fchmodat (fd, file, mode, AT_SYMLINK_NOFOLLOW);
 }
 
+#endif
+
+#if GNULIB_FSTATAT
+
 static inline int
 statat (int fd, char const *name, struct stat *st)
 {
@@ -93,22 +93,12 @@ lstatat (int fd, char const *name, struct stat *st)
   return fstatat (fd, name, st, AT_SYMLINK_NOFOLLOW);
 }
 
-#if GNULIB_FACCESSAT
+#endif
+
 /* For now, there are no wrappers named laccessat or leuidaccessat,
    since gnulib doesn't support faccessat(,AT_SYMLINK_NOFOLLOW) and
-   since access rights on symlinks are of limited utility.  */
-
-static inline int
-accessat (int fd, char const *file, int mode)
-{
-  return faccessat (fd, file, mode, 0);
-}
-
-static inline int
-euidaccessat (int fd, char const *file, int mode)
-{
-  return faccessat (fd, file, mode, AT_EACCESS);
-}
-#endif
+   since access rights on symlinks are of limited utility.  Likewise,
+   wrappers are not provided for accessat or euidaccessat, so as to
+   avoid dragging in -lgen on some platforms.  */
 
 #endif /* _GL_HEADER_OPENAT */

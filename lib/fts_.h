@@ -1,6 +1,6 @@
 /* Traverse a file hierarchy.
 
-   Copyright (C) 2004-2010 Free Software Foundation, Inc.
+   Copyright (C) 2004-2012 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
  * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
@@ -67,6 +67,7 @@
 
 # include <stddef.h>
 # include <sys/types.h>
+# include <dirent.h>
 # include <sys/stat.h>
 # include "i-ring.h"
 
@@ -97,8 +98,8 @@ typedef struct {
      The lazy way (which works only with FTS_PHYSICAL),
      with which one may process a directory that is a
      part of the cycle several times before detecting the cycle.
-     The `tight' way, whereby fts uses more memory (proportional
-     to number of `active' directories, aka distance from root
+     The "tight" way, whereby fts uses more memory (proportional
+     to number of "active" directories, aka distance from root
      of current tree to current directory -- see active_dir_ht)
      to detect any cycle right away.  For example, du must use
      this option to avoid counting disk space in a cycle multiple
@@ -142,7 +143,9 @@ typedef struct {
      dirent.d_type data.  */
 # define FTS_DEFER_STAT         0x0400
 
-# define FTS_OPTIONMASK 0x07ff          /* valid user option mask */
+# define FTS_NOATIME    0x0800          /* use O_NOATIME during traversal */
+
+# define FTS_OPTIONMASK 0x0fff          /* valid user option mask */
 
 # define FTS_NAMEONLY   0x1000          /* (private) child names only */
 # define FTS_STOP       0x2000          /* (private) unrecoverable error */
@@ -189,6 +192,9 @@ typedef struct _ftsent {
         struct _ftsent *fts_cycle;      /* cycle node */
         struct _ftsent *fts_parent;     /* parent directory */
         struct _ftsent *fts_link;       /* next file in directory */
+        DIR *fts_dirp;                  /* Dir pointer for any directory
+                                           containing more entries than we
+                                           read at one time.  */
         long fts_number;                /* local numeric value */
         void *fts_pointer;              /* local address value */
         char *fts_accpath;              /* access file name */

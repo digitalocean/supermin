@@ -1,5 +1,5 @@
 /* Convenience header for conditional use of GNU <libintl.h>.
-   Copyright (C) 1995-1998, 2000-2002, 2004-2006, 2009-2010 Free Software
+   Copyright (C) 1995-1998, 2000-2002, 2004-2006, 2009-2012 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -54,7 +54,7 @@
    it now, to make later inclusions of <libintl.h> a NOP.  */
 #if defined(__cplusplus) && defined(__GNUG__) && (__GNUC__ >= 3)
 # include <cstdlib>
-# if (__GLIBC__ >= 2) || _GLIBCXX_HAVE_LIBINTL_H
+# if (__GLIBC__ >= 2 && !defined __UCLIBC__) || _GLIBCXX_HAVE_LIBINTL_H
 #  include <libintl.h>
 # endif
 #endif
@@ -91,6 +91,12 @@
 # define bind_textdomain_codeset(Domainname, Codeset) \
     ((void) (Domainname), (const char *) (Codeset))
 
+#endif
+
+/* Prefer gnulib's setlocale override over libintl's setlocale override.  */
+#ifdef GNULIB_defined_setlocale
+# undef setlocale
+# define setlocale rpl_setlocale
 #endif
 
 /* A pseudo function call that serves as a marker for the automated
@@ -179,7 +185,7 @@ npgettext_aux (const char *domain,
 #include <string.h>
 
 #define _LIBGETTEXT_HAVE_VARIABLE_SIZE_ARRAYS \
-  (((__GNUC__ >= 3 || __GNUG__ >= 2) && !__STRICT_ANSI__) \
+  (((__GNUC__ >= 3 || __GNUG__ >= 2) && !defined __STRICT_ANSI__) \
    /* || __STDC_VERSION__ >= 199901L */ )
 
 #if !_LIBGETTEXT_HAVE_VARIABLE_SIZE_ARRAYS
