@@ -1,3 +1,9 @@
+febootstrap (3.14-2) unstable; urgency=low
+
+  * [9df4595] Added upstream patch that fixes a libext2fs-related segfault
+
+ -- Hilko Bengen <bengen@debian.org>  Wed, 04 Apr 2012 20:31:29 +0200
+
 febootstrap (3.14-1) unstable; urgency=low
 
   * New upstream version
