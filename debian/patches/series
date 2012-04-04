@@ -1,2 +1,3 @@
 0001-Don-t-overwrite-debian-changelog.patch
 0002-autogenerate.patch
+0003-Pass-EXT2_FLAG_64BITS-when-creating-the-ext2-filesys.patch

@@ -1,0 +1,27 @@
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Fri, 30 Mar 2012 14:21:33 +0100
+Subject: Pass EXT2_FLAG_64BITS when creating the ext2 filesystem
+ (RHBZ#808421).
+
+---
+ helper/ext2.c |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/helper/ext2.c b/helper/ext2.c
+index 56ad5e5..67ca4df 100644
+--- a/helper/ext2.c
++++ b/helper/ext2.c
+@@ -91,8 +91,12 @@ ext2_start (const char *hostcpu, const char *appliance,
+     print_timestamped_message ("finished mke2fs");
+ 
+   /* Open the filesystem. */
++  int fs_flags = EXT2_FLAG_RW;
++#ifdef EXT2_FLAG_64BITS
++  fs_flags |= EXT2_FLAG_64BITS;
++#endif
+   errcode_t err =
+-    ext2fs_open (appliance, EXT2_FLAG_RW, 0, 0, unix_io_manager, &fs);
++    ext2fs_open (appliance, fs_flags, 0, 0, unix_io_manager, &fs);
+   if (err != 0)
+     error (EXIT_FAILURE, 0, "ext2fs_open: %s", error_message (err));
+ 
