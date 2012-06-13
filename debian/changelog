@@ -1,3 +1,12 @@
+febootstrap (3.15-1) unstable; urgency=low
+
+  * New upstream version
+  * [74d808a] Removed libext2fs-related patch that has been integrated
+    upstream
+  * [0a63302] Bumped Standards-Version
+
+ -- Hilko Bengen <bengen@debian.org>  Wed, 13 Jun 2012 18:33:36 +0200
+
 febootstrap (3.14-2) unstable; urgency=low
 
   * [9df4595] Added upstream patch that fixes a libext2fs-related segfault

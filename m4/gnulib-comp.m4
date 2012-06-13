@@ -69,6 +69,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module fcntl-h:
   # Code from module fcntl-safer:
   # Code from module fd-hook:
+  # Code from module fdopendir:
   # Code from module filename:
   # Code from module filenamecat-lgpl:
   # Code from module filevercmp:
@@ -136,6 +137,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module strerror-override:
   # Code from module string:
   # Code from module sys_stat:
+  # Code from module sys_types:
   # Code from module time:
   # Code from module unistd:
   # Code from module unistd-safer:
@@ -233,6 +235,12 @@ gl_FCNTL_MODULE_INDICATOR([fcntl])
 gl_FCNTL_H
 gl_FCNTL_SAFER
 gl_MODULE_INDICATOR([fcntl-safer])
+gl_FUNC_FDOPENDIR
+if test $HAVE_FDOPENDIR = 0 || test $REPLACE_FDOPENDIR = 1; then
+  AC_LIBOBJ([fdopendir])
+fi
+gl_DIRENT_MODULE_INDICATOR([fdopendir])
+gl_MODULE_INDICATOR([fdopendir])
 gl_FILE_NAME_CONCAT_LGPL
 AC_REQUIRE([AC_C_INLINE])
 gl_FLOAT_H
@@ -287,6 +295,7 @@ AC_SUBST([LTLIBINTL])
 gl_I_RING
 gl_INLINE
 gl_INTTYPES_INCOMPLETE
+AC_REQUIRE([gl_LARGEFILE])
 gl_FUNC_LSTAT
 if test $REPLACE_LSTAT = 1; then
   AC_LIBOBJ([lstat])
@@ -399,6 +408,8 @@ if test -n "$ERRNO_H" || test $REPLACE_STRERROR_0 = 1; then
 fi
 gl_HEADER_STRING_H
 gl_HEADER_SYS_STAT_H
+AC_PROG_MKDIR_P
+gl_SYS_TYPES_H
 AC_PROG_MKDIR_P
 gl_HEADER_TIME_H
 gl_UNISTD_H
@@ -607,6 +618,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/fd-hook.c
   lib/fd-hook.h
   lib/fd-safer.c
+  lib/fdopendir.c
   lib/filename.h
   lib/filenamecat-lgpl.c
   lib/filenamecat.h
@@ -688,6 +700,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/string.in.h
   lib/stripslash.c
   lib/sys_stat.in.h
+  lib/sys_types.in.h
   lib/time.in.h
   lib/unistd--.h
   lib/unistd-safer.h
@@ -734,6 +747,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/fcntl-safer.m4
   m4/fcntl.m4
   m4/fcntl_h.m4
+  m4/fdopendir.m4
   m4/filenamecat.m4
   m4/float_h.m4
   m4/fstat.m4
@@ -762,6 +776,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/msvc-nothrow.m4
   m4/multiarch.m4
   m4/nocrash.m4
+  m4/off_t.m4
   m4/onceonly.m4
   m4/open.m4
   m4/openat.m4
@@ -790,6 +805,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/string_h.m4
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
+  m4/sys_types_h.m4
   m4/time_h.m4
   m4/unistd-safer.m4
   m4/unistd_h.m4

@@ -9,7 +9,7 @@ Build-Depends: debhelper (>= 7.4.15), autotools-dev, automake, m4, gawk, pkg-con
  ocaml-nox, ocaml-findlib, dh-ocaml,
  perl-doc,
  comerr-dev, e2fslibs-dev
-Standards-Version: 3.9.2
+Standards-Version: 3.9.3
 Homepage: http://people.redhat.com/~rjones/febootstrap/
 Vcs-Git: git://git.debian.org/git/pkg-libvirt/febootstrap.git
 Vcs-Browser: http://git.debian.org/?p=pkg-libvirt/febootstrap.git

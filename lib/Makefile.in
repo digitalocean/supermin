@@ -76,10 +76,11 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/extensions.m4 $(top_srcdir)/m4/fchdir.m4 \
 	$(top_srcdir)/m4/fcntl-o.m4 $(top_srcdir)/m4/fcntl-safer.m4 \
 	$(top_srcdir)/m4/fcntl.m4 $(top_srcdir)/m4/fcntl_h.m4 \
-	$(top_srcdir)/m4/filenamecat.m4 $(top_srcdir)/m4/float_h.m4 \
-	$(top_srcdir)/m4/fstat.m4 $(top_srcdir)/m4/fts.m4 \
-	$(top_srcdir)/m4/getcwd.m4 $(top_srcdir)/m4/getdtablesize.m4 \
-	$(top_srcdir)/m4/getopt.m4 $(top_srcdir)/m4/gnulib-common.m4 \
+	$(top_srcdir)/m4/fdopendir.m4 $(top_srcdir)/m4/filenamecat.m4 \
+	$(top_srcdir)/m4/float_h.m4 $(top_srcdir)/m4/fstat.m4 \
+	$(top_srcdir)/m4/fts.m4 $(top_srcdir)/m4/getcwd.m4 \
+	$(top_srcdir)/m4/getdtablesize.m4 $(top_srcdir)/m4/getopt.m4 \
+	$(top_srcdir)/m4/gnulib-common.m4 \
 	$(top_srcdir)/m4/gnulib-comp.m4 $(top_srcdir)/m4/i-ring.m4 \
 	$(top_srcdir)/m4/include_next.m4 $(top_srcdir)/m4/inline.m4 \
 	$(top_srcdir)/m4/intmax_t.m4 $(top_srcdir)/m4/inttypes.m4 \
@@ -91,28 +92,29 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/msvc-inval.m4 \
 	$(top_srcdir)/m4/msvc-nothrow.m4 $(top_srcdir)/m4/multiarch.m4 \
 	$(top_srcdir)/m4/nocrash.m4 $(top_srcdir)/m4/ocaml.m4 \
-	$(top_srcdir)/m4/onceonly.m4 $(top_srcdir)/m4/open.m4 \
-	$(top_srcdir)/m4/openat.m4 $(top_srcdir)/m4/opendir.m4 \
-	$(top_srcdir)/m4/pathmax.m4 $(top_srcdir)/m4/printf.m4 \
-	$(top_srcdir)/m4/raise.m4 $(top_srcdir)/m4/readdir.m4 \
-	$(top_srcdir)/m4/realloc.m4 $(top_srcdir)/m4/safe-read.m4 \
-	$(top_srcdir)/m4/safe-write.m4 $(top_srcdir)/m4/save-cwd.m4 \
-	$(top_srcdir)/m4/signal_h.m4 $(top_srcdir)/m4/size_max.m4 \
-	$(top_srcdir)/m4/ssize_t.m4 $(top_srcdir)/m4/stat.m4 \
-	$(top_srcdir)/m4/stdarg.m4 $(top_srcdir)/m4/stdbool.m4 \
-	$(top_srcdir)/m4/stddef_h.m4 $(top_srcdir)/m4/stdint.m4 \
-	$(top_srcdir)/m4/stdint_h.m4 $(top_srcdir)/m4/stdio_h.m4 \
-	$(top_srcdir)/m4/stdlib_h.m4 $(top_srcdir)/m4/strdup.m4 \
-	$(top_srcdir)/m4/strerror.m4 $(top_srcdir)/m4/string_h.m4 \
-	$(top_srcdir)/m4/sys_socket_h.m4 \
-	$(top_srcdir)/m4/sys_stat_h.m4 $(top_srcdir)/m4/time_h.m4 \
-	$(top_srcdir)/m4/unistd-safer.m4 $(top_srcdir)/m4/unistd_h.m4 \
-	$(top_srcdir)/m4/vasnprintf.m4 $(top_srcdir)/m4/vasprintf.m4 \
-	$(top_srcdir)/m4/warn-on-use.m4 $(top_srcdir)/m4/wchar_h.m4 \
-	$(top_srcdir)/m4/wchar_t.m4 $(top_srcdir)/m4/wint_t.m4 \
-	$(top_srcdir)/m4/write.m4 $(top_srcdir)/m4/xalloc.m4 \
-	$(top_srcdir)/m4/xsize.m4 $(top_srcdir)/m4/xstrtol.m4 \
-	$(top_srcdir)/m4/xvasprintf.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/off_t.m4 $(top_srcdir)/m4/onceonly.m4 \
+	$(top_srcdir)/m4/open.m4 $(top_srcdir)/m4/openat.m4 \
+	$(top_srcdir)/m4/opendir.m4 $(top_srcdir)/m4/pathmax.m4 \
+	$(top_srcdir)/m4/printf.m4 $(top_srcdir)/m4/raise.m4 \
+	$(top_srcdir)/m4/readdir.m4 $(top_srcdir)/m4/realloc.m4 \
+	$(top_srcdir)/m4/safe-read.m4 $(top_srcdir)/m4/safe-write.m4 \
+	$(top_srcdir)/m4/save-cwd.m4 $(top_srcdir)/m4/signal_h.m4 \
+	$(top_srcdir)/m4/size_max.m4 $(top_srcdir)/m4/ssize_t.m4 \
+	$(top_srcdir)/m4/stat.m4 $(top_srcdir)/m4/stdarg.m4 \
+	$(top_srcdir)/m4/stdbool.m4 $(top_srcdir)/m4/stddef_h.m4 \
+	$(top_srcdir)/m4/stdint.m4 $(top_srcdir)/m4/stdint_h.m4 \
+	$(top_srcdir)/m4/stdio_h.m4 $(top_srcdir)/m4/stdlib_h.m4 \
+	$(top_srcdir)/m4/strdup.m4 $(top_srcdir)/m4/strerror.m4 \
+	$(top_srcdir)/m4/string_h.m4 $(top_srcdir)/m4/sys_socket_h.m4 \
+	$(top_srcdir)/m4/sys_stat_h.m4 $(top_srcdir)/m4/sys_types_h.m4 \
+	$(top_srcdir)/m4/time_h.m4 $(top_srcdir)/m4/unistd-safer.m4 \
+	$(top_srcdir)/m4/unistd_h.m4 $(top_srcdir)/m4/vasnprintf.m4 \
+	$(top_srcdir)/m4/vasprintf.m4 $(top_srcdir)/m4/warn-on-use.m4 \
+	$(top_srcdir)/m4/wchar_h.m4 $(top_srcdir)/m4/wchar_t.m4 \
+	$(top_srcdir)/m4/wint_t.m4 $(top_srcdir)/m4/write.m4 \
+	$(top_srcdir)/m4/xalloc.m4 $(top_srcdir)/m4/xsize.m4 \
+	$(top_srcdir)/m4/xstrtol.m4 $(top_srcdir)/m4/xvasprintf.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -298,7 +300,6 @@ GNULIB_GETLOADAVG = @GNULIB_GETLOADAVG@
 GNULIB_GETLOGIN = @GNULIB_GETLOGIN@
 GNULIB_GETLOGIN_R = @GNULIB_GETLOGIN_R@
 GNULIB_GETPAGESIZE = @GNULIB_GETPAGESIZE@
-GNULIB_GETS = @GNULIB_GETS@
 GNULIB_GETSUBOPT = @GNULIB_GETSUBOPT@
 GNULIB_GETUSERSHELL = @GNULIB_GETUSERSHELL@
 GNULIB_GL_UNISTD_H_GETOPT = @GNULIB_GL_UNISTD_H_GETOPT@
@@ -725,6 +726,7 @@ NEXT_AS_FIRST_DIRECTIVE_STDIO_H = @NEXT_AS_FIRST_DIRECTIVE_STDIO_H@
 NEXT_AS_FIRST_DIRECTIVE_STDLIB_H = @NEXT_AS_FIRST_DIRECTIVE_STDLIB_H@
 NEXT_AS_FIRST_DIRECTIVE_STRING_H = @NEXT_AS_FIRST_DIRECTIVE_STRING_H@
 NEXT_AS_FIRST_DIRECTIVE_SYS_STAT_H = @NEXT_AS_FIRST_DIRECTIVE_SYS_STAT_H@
+NEXT_AS_FIRST_DIRECTIVE_SYS_TYPES_H = @NEXT_AS_FIRST_DIRECTIVE_SYS_TYPES_H@
 NEXT_AS_FIRST_DIRECTIVE_TIME_H = @NEXT_AS_FIRST_DIRECTIVE_TIME_H@
 NEXT_AS_FIRST_DIRECTIVE_UNISTD_H = @NEXT_AS_FIRST_DIRECTIVE_UNISTD_H@
 NEXT_AS_FIRST_DIRECTIVE_WCHAR_H = @NEXT_AS_FIRST_DIRECTIVE_WCHAR_H@
@@ -742,6 +744,7 @@ NEXT_STDIO_H = @NEXT_STDIO_H@
 NEXT_STDLIB_H = @NEXT_STDLIB_H@
 NEXT_STRING_H = @NEXT_STRING_H@
 NEXT_SYS_STAT_H = @NEXT_SYS_STAT_H@
+NEXT_SYS_TYPES_H = @NEXT_SYS_TYPES_H@
 NEXT_TIME_H = @NEXT_TIME_H@
 NEXT_UNISTD_H = @NEXT_UNISTD_H@
 NEXT_WCHAR_H = @NEXT_WCHAR_H@
@@ -806,6 +809,7 @@ REPLACE_FSTAT = @REPLACE_FSTAT@
 REPLACE_FSTATAT = @REPLACE_FSTATAT@
 REPLACE_FTELL = @REPLACE_FTELL@
 REPLACE_FTELLO = @REPLACE_FTELLO@
+REPLACE_FTRUNCATE = @REPLACE_FTRUNCATE@
 REPLACE_FUTIMENS = @REPLACE_FUTIMENS@
 REPLACE_GETCWD = @REPLACE_GETCWD@
 REPLACE_GETDELIM = @REPLACE_GETDELIM@
@@ -925,6 +929,8 @@ UNISTD_H_HAVE_WINSOCK2_H = @UNISTD_H_HAVE_WINSOCK2_H@
 UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS = @UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS@
 VERSION = @VERSION@
 WCHAR_T_SUFFIX = @WCHAR_T_SUFFIX@
+WINDOWS_64_BIT_OFF_T = @WINDOWS_64_BIT_OFF_T@
+WINDOWS_64_BIT_ST_SIZE = @WINDOWS_64_BIT_ST_SIZE@
 WINT_T_SUFFIX = @WINT_T_SUFFIX@
 YUM = @YUM@
 YUMDOWNLOADER = @YUMDOWNLOADER@
@@ -993,23 +999,24 @@ EXTRA_DIST = alloca.in.h openat-priv.h openat-proc.c chdir-long.c \
 	cycle-check.h dev-ino.h dirent.in.h dirent--.h dirent-safer.h \
 	dirfd.c dirname.h dosname.h dup.c dup2.c errno.in.h error.c \
 	error.h exitfail.h fchdir.c fcntl.c fcntl.in.h fcntl--.h \
-	fcntl-safer.h fd-hook.h filename.h filenamecat.h filevercmp.h \
-	float.c float.in.h itold.c fstat.c fts-cycle.c fts.c fts_.h \
-	getcwd-lgpl.c getdtablesize.c getopt.c getopt.in.h getopt1.c \
-	getopt_int.h hash.h i-ring.h intprops.h inttypes.in.h lstat.c \
-	malloc.c memchr.c memchr.valgrind mempcpy.c memrchr.c \
-	msvc-inval.c msvc-inval.h msvc-nothrow.c msvc-nothrow.h open.c \
-	openat-priv.h openat.c openat.h fcntl--.h fcntl-safer.h \
-	dirent-private.h opendir.c pathmax.h raise.c dirent-private.h \
-	readdir.c realloc.c safe-read.c safe-write.h same-inode.h \
-	save-cwd.h signal.in.h $(top_srcdir)/./snippet/_Noreturn.h \
+	fcntl-safer.h fd-hook.h fdopendir.c filename.h filenamecat.h \
+	filevercmp.h float.c float.in.h itold.c fstat.c fts-cycle.c \
+	fts.c fts_.h getcwd-lgpl.c getdtablesize.c getopt.c \
+	getopt.in.h getopt1.c getopt_int.h hash.h i-ring.h intprops.h \
+	inttypes.in.h lstat.c malloc.c memchr.c memchr.valgrind \
+	mempcpy.c memrchr.c msvc-inval.c msvc-inval.h msvc-nothrow.c \
+	msvc-nothrow.h open.c openat-priv.h openat.c openat.h \
+	fcntl--.h fcntl-safer.h dirent-private.h opendir.c pathmax.h \
+	raise.c dirent-private.h readdir.c realloc.c safe-read.c \
+	safe-write.h same-inode.h save-cwd.h signal.in.h \
+	$(top_srcdir)/./snippet/_Noreturn.h \
 	$(top_srcdir)/./snippet/arg-nonnull.h \
 	$(top_srcdir)/./snippet/c++defs.h \
 	$(top_srcdir)/./snippet/warn-on-use.h stat.c stdarg.in.h \
 	stdbool.in.h stddef.in.h stdint.in.h stdio.in.h stdlib.in.h \
 	strdup.c strerror.c strerror-override.c strerror-override.h \
-	string.in.h sys_stat.in.h time.in.h unistd.in.h unistd--.h \
-	unistd-safer.h asnprintf.c float+.h printf-args.c \
+	string.in.h sys_stat.in.h sys_types.in.h time.in.h unistd.in.h \
+	unistd--.h unistd-safer.h asnprintf.c float+.h printf-args.c \
 	printf-args.h printf-parse.c printf-parse.h vasnprintf.c \
 	vasnprintf.h asprintf.c vasprintf.c verify.h wchar.in.h \
 	write.c xalloc.h xalloc-oversized.h xstrtol.h xalloc.h
@@ -1026,7 +1033,8 @@ EXTRA_DIST = alloca.in.h openat-priv.h openat-proc.c chdir-long.c \
 BUILT_SOURCES = $(ALLOCA_H) dirent.h $(ERRNO_H) fcntl.h $(FLOAT_H) \
 	$(GETOPT_H) inttypes.h signal.h arg-nonnull.h c++defs.h \
 	warn-on-use.h $(STDARG_H) $(STDBOOL_H) $(STDDEF_H) $(STDINT_H) \
-	stdio.h stdlib.h string.h sys/stat.h time.h unistd.h wchar.h
+	stdio.h stdlib.h string.h sys/stat.h sys/types.h time.h \
+	unistd.h wchar.h
 SUFFIXES = 
 MOSTLYCLEANFILES = core *.stackdump alloca.h alloca.h-t dirent.h \
 	dirent.h-t errno.h errno.h-t fcntl.h fcntl.h-t float.h \
@@ -1035,8 +1043,8 @@ MOSTLYCLEANFILES = core *.stackdump alloca.h alloca.h-t dirent.h \
 	warn-on-use.h warn-on-use.h-t stdarg.h stdarg.h-t stdbool.h \
 	stdbool.h-t stddef.h stddef.h-t stdint.h stdint.h-t stdio.h \
 	stdio.h-t stdlib.h stdlib.h-t string.h string.h-t sys/stat.h \
-	sys/stat.h-t time.h time.h-t unistd.h unistd.h-t wchar.h \
-	wchar.h-t
+	sys/stat.h-t sys/types.h sys/types.h-t time.h time.h-t \
+	unistd.h unistd.h-t wchar.h wchar.h-t
 MOSTLYCLEANDIRS = sys
 CLEANFILES = 
 DISTCLEANFILES = 
@@ -1055,12 +1063,12 @@ libgnu_a_SOURCES = bitrotate.h c-ctype.h c-ctype.c cloexec.c \
 libgnu_a_LIBADD = $(gl_LIBOBJS)
 libgnu_a_DEPENDENCIES = $(gl_LIBOBJS)
 EXTRA_libgnu_a_SOURCES = openat-proc.c chdir-long.c close.c closedir.c \
-	dirfd.c dup.c dup2.c error.c fchdir.c fcntl.c float.c itold.c \
-	fstat.c fts-cycle.c fts.c getcwd-lgpl.c getdtablesize.c \
-	getopt.c getopt1.c lstat.c malloc.c memchr.c mempcpy.c \
-	memrchr.c msvc-inval.c msvc-nothrow.c open.c openat.c \
-	opendir.c raise.c readdir.c realloc.c safe-read.c stat.c \
-	strdup.c strerror.c strerror-override.c asnprintf.c \
+	dirfd.c dup.c dup2.c error.c fchdir.c fcntl.c fdopendir.c \
+	float.c itold.c fstat.c fts-cycle.c fts.c getcwd-lgpl.c \
+	getdtablesize.c getopt.c getopt1.c lstat.c malloc.c memchr.c \
+	mempcpy.c memrchr.c msvc-inval.c msvc-nothrow.c open.c \
+	openat.c opendir.c raise.c readdir.c realloc.c safe-read.c \
+	stat.c strdup.c strerror.c strerror-override.c asnprintf.c \
 	printf-args.c printf-parse.c vasnprintf.c asprintf.c \
 	vasprintf.c write.c
 
@@ -1150,6 +1158,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fcntl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fd-hook.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fd-safer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fdopendir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filenamecat-lgpl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filevercmp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/float.Po@am__quote@
@@ -1887,7 +1896,6 @@ stdio.h: stdio.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) 
 	      -e 's/@''GNULIB_GETCHAR''@/$(GNULIB_GETCHAR)/g' \
 	      -e 's/@''GNULIB_GETDELIM''@/$(GNULIB_GETDELIM)/g' \
 	      -e 's/@''GNULIB_GETLINE''@/$(GNULIB_GETLINE)/g' \
-	      -e 's/@''GNULIB_GETS''@/$(GNULIB_GETS)/g' \
 	      -e 's/@''GNULIB_OBSTACK_PRINTF''@/$(GNULIB_OBSTACK_PRINTF)/g' \
 	      -e 's/@''GNULIB_OBSTACK_PRINTF_POSIX''@/$(GNULIB_OBSTACK_PRINTF_POSIX)/g' \
 	      -e 's/@''GNULIB_PCLOSE''@/$(GNULIB_PCLOSE)/g' \
@@ -2166,6 +2174,7 @@ sys/stat.h: sys_stat.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNU
 	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
 	      -e 's|@''NEXT_SYS_STAT_H''@|$(NEXT_SYS_STAT_H)|g' \
+	      -e 's|@''WINDOWS_64_BIT_ST_SIZE''@|$(WINDOWS_64_BIT_ST_SIZE)|g' \
 	      -e 's/@''GNULIB_FCHMODAT''@/$(GNULIB_FCHMODAT)/g' \
 	      -e 's/@''GNULIB_FSTAT''@/$(GNULIB_FSTAT)/g' \
 	      -e 's/@''GNULIB_FSTATAT''@/$(GNULIB_FSTATAT)/g' \
@@ -2203,6 +2212,22 @@ sys/stat.h: sys_stat.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNU
 	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
 	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
 	      < $(srcdir)/sys_stat.in.h; \
+	} > $@-t && \
+	mv $@-t $@
+
+# We need the following in order to create <sys/types.h> when the system
+# doesn't have one that works with the given compiler.
+sys/types.h: sys_types.in.h $(top_builddir)/config.status
+	$(AM_V_at)$(MKDIR_P) sys
+	$(AM_V_GEN)rm -f $@-t $@ && \
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
+	  sed -e 's|@''GUARD_PREFIX''@|GL|g' \
+	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
+	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
+	      -e 's|@''NEXT_SYS_TYPES_H''@|$(NEXT_SYS_TYPES_H)|g' \
+	      -e 's|@''WINDOWS_64_BIT_OFF_T''@|$(WINDOWS_64_BIT_OFF_T)|g' \
+	      < $(srcdir)/sys_types.in.h; \
 	} > $@-t && \
 	mv $@-t $@
 
@@ -2250,6 +2275,7 @@ unistd.h: unistd.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H
 	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
 	      -e 's|@''NEXT_UNISTD_H''@|$(NEXT_UNISTD_H)|g' \
+	      -e 's|@''WINDOWS_64_BIT_OFF_T''@|$(WINDOWS_64_BIT_OFF_T)|g' \
 	      -e 's/@''GNULIB_CHDIR''@/$(GNULIB_CHDIR)/g' \
 	      -e 's/@''GNULIB_CHOWN''@/$(GNULIB_CHOWN)/g' \
 	      -e 's/@''GNULIB_CLOSE''@/$(GNULIB_CLOSE)/g' \
@@ -2348,6 +2374,7 @@ unistd.h: unistd.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H
 	      -e 's|@''REPLACE_DUP''@|$(REPLACE_DUP)|g' \
 	      -e 's|@''REPLACE_DUP2''@|$(REPLACE_DUP2)|g' \
 	      -e 's|@''REPLACE_FCHOWNAT''@|$(REPLACE_FCHOWNAT)|g' \
+	      -e 's|@''REPLACE_FTRUNCATE''@|$(REPLACE_FTRUNCATE)|g' \
 	      -e 's|@''REPLACE_GETCWD''@|$(REPLACE_GETCWD)|g' \
 	      -e 's|@''REPLACE_GETDOMAINNAME''@|$(REPLACE_GETDOMAINNAME)|g' \
 	      -e 's|@''REPLACE_GETLOGIN_R''@|$(REPLACE_GETLOGIN_R)|g' \
