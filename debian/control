@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Debian Libvirt Maintainers <pkg-libvirt-maintainers@lists.alioth.debian.org>
 Uploaders: Hilko Bengen <bengen@debian.org>
 DM-Upload-Allowed: yes
-Build-Depends: debhelper (>= 7.4.15), autotools-dev, automake, m4, gawk, pkg-config,
+Build-Depends: debhelper (>= 9), autotools-dev, automake, m4, gawk, pkg-config,
  aptitude,
  ocaml-nox, ocaml-findlib, dh-ocaml,
  perl-doc,

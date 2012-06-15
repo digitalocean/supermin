@@ -1,3 +1,10 @@
+febootstrap (3.17-1) unstable; urgency=low
+
+  * New upstream version
+  * [6944d1f] Switch to compat level 9 for hardening flags
+
+ -- Hilko Bengen <bengen@debian.org>  Fri, 15 Jun 2012 09:25:22 +0200
+
 febootstrap (3.15-1) unstable; urgency=low
 
   * New upstream version
