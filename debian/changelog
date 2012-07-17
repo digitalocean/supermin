@@ -1,3 +1,11 @@
+febootstrap (3.18-1) unstable; urgency=low
+
+  * New upstream version
+  * [a14cc5b] Removed autoreconf patch in favor of dh-autoreconf
+  * [c4c52a0] Rebased patch
+
+ -- Hilko Bengen <bengen@debian.org>  Tue, 17 Jul 2012 20:20:48 +0200
+
 febootstrap (3.17-1) unstable; urgency=low
 
   * New upstream version
