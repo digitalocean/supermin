@@ -17,7 +17,7 @@ dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 dnl
 dnl Written by Richard W.M. Jones <rjones@redhat.com>
 
-AC_INIT([febootstrap],[3.17])
+AC_INIT([febootstrap],[3.18])
 AM_INIT_AUTOMAKE
 
 dnl Check for basic C environment.
@@ -102,6 +102,23 @@ if test "x$MKE2FS" = "xno" ; then
 fi
 AC_DEFINE_UNQUOTED([MKE2FS],["$MKE2FS"],
   [Full path to the mke2fs program.])
+
+dnl RHEL 5 mke2fs needed -T <fs> instead of -t <fs>.  Unhelpfully
+dnl the --help output doesn't mention this, so we have to test it.
+AC_MSG_CHECKING([$MKE2FS -t or -T])
+rm -f conftest.img
+dd if=/dev/zero of=conftest.img bs=1024 count=1024 >&AS_MESSAGE_LOG_FD 2>&1
+if $MKE2FS -t ext2 -F -q conftest.img >&AS_MESSAGE_LOG_FD 2>&1 ; then
+  MKE2FS_T_OPTION=-t
+elif $MKE2FS -T ext2 -F -q conftest.img >&AS_MESSAGE_LOG_FD 2>&1 ; then
+  MKE2FS_T_OPTION=-T
+else
+  AC_MSG_ERROR([$MKE2FS cannot create filesystems])
+fi
+rm conftest.img
+AC_MSG_RESULT([$MKE2FS_T_OPTION])
+AC_DEFINE_UNQUOTED([MKE2FS_T_OPTION],["$MKE2FS_T_OPTION"],
+  [mke2fs option used to specify filesystem type (usually "-t")])
 
 dnl ext2fs, com_err.
 PKG_CHECK_MODULES([EXT2FS], [ext2fs])

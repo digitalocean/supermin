@@ -1006,6 +1006,9 @@
 /* Full path to the mke2fs program. */
 #undef MKE2FS
 
+/* mke2fs option used to specify filesystem type (usually "-t") */
+#undef MKE2FS_T_OPTION
+
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 #undef NO_MINUS_C_MINUS_O
 
