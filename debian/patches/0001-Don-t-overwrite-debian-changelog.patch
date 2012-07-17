@@ -4,13 +4,13 @@ Subject: Don't overwrite debian/changelog
 
 ---
  configure.ac |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
+ 1 file changed, 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index ec08fb8..bdc30ee 100644
+index ba5d2ed..00e82c9 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -122,7 +122,6 @@ fi
+@@ -138,7 +138,6 @@ fi
  
  AC_CONFIG_HEADERS([config.h])
  AC_CONFIG_FILES([Makefile
