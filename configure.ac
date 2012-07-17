@@ -17,7 +17,7 @@ dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 dnl
 dnl Written by Richard W.M. Jones <rjones@redhat.com>
 
-AC_INIT([febootstrap],[3.14])
+AC_INIT([febootstrap],[3.15])
 AM_INIT_AUTOMAKE
 
 dnl Check for basic C environment.
@@ -38,7 +38,12 @@ AC_SYS_LARGEFILE
 gl_INIT
 
 # Define $(SED).
-AC_PROG_SED
+m4_ifdef([AC_PROG_SED],[
+    AC_PROG_SED
+],[
+    dnl ... else hope for the best
+    AC_SUBST([SED], "sed")
+])
 
 # OCaml and ocamlfind are required to compile.
 AC_PROG_OCAML
