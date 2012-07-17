@@ -8,4 +8,7 @@ override_dh_auto_build:
 	dh_auto_build
 
 %:
-	dh $@ --with=ocaml,autotools-dev
+	dh $@ --with=ocaml,autoreconf
+
+override_dh_autoreconf:
+	AUTOMAKE='automake --foreign --add-missing' dh_autoreconf
