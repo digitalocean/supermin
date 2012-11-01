@@ -38,12 +38,14 @@
 
 struct timeval start_t;
 int verbose = 0;
+int copy_kernel = 0;
 
 enum { HELP_OPTION = CHAR_MAX + 1 };
 
 static const char *options = "f:g:k:u:vV";
 static const struct option long_options[] = {
   { "help", 0, 0, HELP_OPTION },
+  { "copy-kernel", 0, 0, 0 },
   { "format", required_argument, 0, 'f' },
   { "group", 0, 0, 'g' },
   { "kmods", required_argument, 0, 'k' },
@@ -79,6 +81,8 @@ usage (FILE *f, const char *progname)
           "       Display this help text and exit.\n"
           "  -f cpio|ext2|checksum | --format cpio|ext2|checksum\n"
           "       Specify output format (default: cpio).\n"
+          "  --copy-kernel\n"
+          "       Copy the kernel instead of symlinking to it.\n"
           "  -u user\n"
           "       The user name or uid the appliance will run as. Use of this\n"
           "       option requires root privileges.\n"
@@ -97,27 +101,26 @@ usage (FILE *f, const char *progname)
 static uid_t
 parseuser (const char *id, const char *progname)
 {
-
   struct passwd *pwd;
+  int saved_errno;
 
   errno = 0;
   pwd = getpwnam (id);
 
   if (NULL == pwd) {
-    if (errno != 0) {
-      fprintf (stderr, "Error looking up user: %m\n");
-      exit (EXIT_FAILURE);
-    }
+    saved_errno = errno;
 
     long val;
     int err = xstrtol (id, NULL, 10, &val, "");
-    if (err != LONGINT_OK) {
-        fprintf (stderr, "%s is not a valid user name or uid\n", id);
-        usage (stderr, progname);
-        exit (EXIT_FAILURE);
-    }
+    if (err == LONGINT_OK)
+      return (uid_t) val;
 
-    return (uid_t) val;
+    fprintf (stderr, "%s: -u option: %s is not a valid user name or uid",
+             progname, id);
+    if (saved_errno != 0)
+      fprintf (stderr, " (getpwnam error: %s)", strerror (saved_errno));
+    fprintf (stderr, "\n");
+    exit (EXIT_FAILURE);
   }
 
   return pwd->pw_uid;
@@ -126,27 +129,26 @@ parseuser (const char *id, const char *progname)
 static gid_t
 parsegroup (const char *id, const char *progname)
 {
-
   struct group *grp;
+  int saved_errno;
 
   errno = 0;
   grp = getgrnam (id);
 
   if (NULL == grp) {
-    if (errno != 0) {
-      fprintf (stderr, "Error looking up group: %m\n");
-      exit (EXIT_FAILURE);
-    }
+    saved_errno = errno;
 
     long val;
     int err = xstrtol (id, NULL, 10, &val, "");
-    if (err != LONGINT_OK) {
-        fprintf (stderr, "%s is not a valid group name or gid\n", id);
-        usage (stderr, progname);
-        exit (EXIT_FAILURE);
-    }
+    if (err == LONGINT_OK)
+      return (gid_t) val;
 
-    return (gid_t) val;
+    fprintf (stderr, "%s: -g option: %s is not a valid group name or gid",
+             progname, id);
+    if (saved_errno != 0)
+      fprintf (stderr, " (getgrnam error: %s)", strerror (saved_errno));
+    fprintf (stderr, "\n");
+    exit (EXIT_FAILURE);
   }
 
   return grp->gr_gid;
@@ -166,13 +168,24 @@ main (int argc, char *argv[])
 
   /* Command line arguments. */
   for (;;) {
-    int c = getopt_long (argc, argv, options, long_options, NULL);
+    int option_index;
+    int c = getopt_long (argc, argv, options, long_options, &option_index);
     if (c == -1) break;
 
     switch (c) {
     case HELP_OPTION:
       usage (stdout, argv[0]);
       exit (EXIT_SUCCESS);
+
+    case 0:                     /* options which are long only */
+      if (strcmp (long_options[option_index].name, "copy-kernel") == 0) {
+        copy_kernel = 1;
+      } else {
+        fprintf (stderr, "%s: unknown long option: %s (%d)\n",
+                 argv[0], long_options[option_index].name, option_index);
+        exit (EXIT_FAILURE);
+      }
+      break;
 
     case 'f':
       format = optarg;

@@ -52,6 +52,10 @@ if verbose:
 yb = yum.YumBase ()
 yb.preconf.debuglevel = verbose
 yb.preconf.errorlevel = verbose
+try:
+    yb.prerepoconf.multi_progressbar = None
+except:
+    pass
 if %s:
     yb.preconf.fn = %S
 try:
@@ -127,10 +131,6 @@ if verbose:
       ) pkgs
     )
     else pkgs in
-
-  (* Drop the kernel package to save time. *)
-  let pkgs =
-    List.filter (function ("kernel",_,_,_,_) -> false | _ -> true) pkgs in
 
   (* Exclude packages matching [--exclude] regexps on the command line. *)
   let pkgs =
