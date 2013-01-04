@@ -26,7 +26,7 @@ let save_temps = ref false
 let use_installed = ref false
 let verbose = ref false
 let warnings = ref true
-let yum_config = ref None
+let packager_config = ref None
 
 let print_version () =
   printf "%s %s\n" Config.package_name Config.package_version;
@@ -35,8 +35,19 @@ let print_version () =
 let add_exclude re =
   excludes := Str.regexp re :: !excludes
 
-let set_yum_config str =
-  yum_config := Some str
+let set_packager_config filename =
+  (* Need to check that the file exists, and make the path absolute. *)
+  let filename =
+    if Filename.is_relative filename then
+      Filename.concat (Sys.getcwd ()) filename
+    else filename in
+  if not (Sys.file_exists filename) then (
+    eprintf "febootstrap: --packager-config: %s: file does not exist\n"
+      filename;
+    exit 1
+  );
+
+  packager_config := Some filename
 
 let argspec = Arg.align [
   "--exclude", Arg.String add_exclude,
@@ -47,12 +58,14 @@ let argspec = Arg.align [
     " Suppress warnings";
   "-o", Arg.Set_string outputdir,
     "outputdir Set output directory (default: \".\")";
+  "--packager-config", Arg.String set_packager_config,
+    "file Set alternate package manager configuration file";
   "--save-temp", Arg.Set save_temps,
-    " Don't delete temporary files and directories on exit.";
+    " Don't delete temporary files and directories on exit";
   "--save-temps", Arg.Set save_temps,
-    " Don't delete temporary files and directories on exit.";
+    " Don't delete temporary files and directories on exit";
   "--use-installed", Arg.Set use_installed,
-    " Inspect already installed packages for determining contents.";
+    " Use already installed packages for package contents";
   "-v", Arg.Set verbose,
     " Enable verbose output";
   "--verbose", Arg.Set verbose,
@@ -61,8 +74,8 @@ let argspec = Arg.align [
     " Print package name and version, and exit";
   "--version", Arg.Unit print_version,
     " Print package name and version, and exit";
-  "--yum-config", Arg.String set_yum_config,
-    "file Set alternate yum configuration file";
+  "--yum-config", Arg.String set_packager_config,
+    "file Deprecated alias for `--packager-config file'";
 ]
 let anon_fn str =
   packages := str :: !packages
@@ -70,7 +83,7 @@ let anon_fn str =
 let usage_msg =
   "\
 febootstrap - bootstrapping tool for creating supermin appliances
-Copyright (C) 2009-2010 Red Hat Inc.
+Copyright (C) 2009-2013 Red Hat Inc.
 
 Usage:
  febootstrap [-o OUTPUTDIR] --names LIST OF PKGS ...
@@ -95,6 +108,6 @@ let save_temps = !save_temps
 let use_installed = !use_installed
 let verbose = !verbose
 let warnings = !warnings
-let yum_config = !yum_config
+let packager_config = !packager_config
 
 let debug fs = ksprintf (fun str -> if verbose then print_endline str) fs
