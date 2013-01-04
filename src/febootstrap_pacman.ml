@@ -52,17 +52,22 @@ let pacman_resolve_dependencies_and_download names =
   (* Download the packages. I could use wget `pacman -Sp`, but this
    * narrows the pacman -Sy window
    *)
+
   List.iter (
     fun pkg ->
       let cmd =
-        sprintf "umask 0000; cd %s && mkdir -p var/lib/pacman && fakeroot pacman -Syw --noconfirm --cachedir=$(pwd) --root=$(pwd) %s"
+        sprintf "umask 0000; cd %s && mkdir -p var/lib/pacman && fakeroot pacman%s -Syw --noconfirm --cachedir=$(pwd) --root=$(pwd) %s"
         (Filename.quote tmpdir)
+	(match packager_config with
+         | None -> ""
+         | Some filename -> " --config " ^ filename)
         pkg in
       if Sys.command cmd <> 0 then (
           (* The package is not in the main repos, check the aur *)
           let cmd =
-            sprintf "umask 0000; cd %s && wget http://aur.archlinux.org/packages/%s/%s.tar.gz && tar xf %s.tar.gz && cd %s && makepkg && mv %s-*.pkg.tar.xz %s"
+            sprintf "umask 0000; cd %s && wget https://aur.archlinux.org/packages/%s/%s/%s.tar.gz && tar xf %s.tar.gz && cd %s && makepkg && mv %s-*.pkg.tar.xz %s"
             (Filename.quote tmpdir)
+            (String.sub pkg 0 2)
             pkg
             pkg
             pkg
