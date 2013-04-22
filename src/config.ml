@@ -18,7 +18,7 @@
  *)
 
 let package_name = "supermin"
-let package_version = "4.1.0"
+let package_version = "4.1.1"
 let yum = "yum"
 let rpm = "rpm"
 let yumdownloader = "yumdownloader"
