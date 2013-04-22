@@ -1,4 +1,4 @@
-Source: febootstrap
+Source: supermin
 Section: admin
 Priority: optional
 Maintainer: Debian Libvirt Maintainers <pkg-libvirt-maintainers@lists.alioth.debian.org>
@@ -16,7 +16,7 @@ Homepage: http://people.redhat.com/~rjones/febootstrap/
 Vcs-Git: git://git.debian.org/git/pkg-libvirt/febootstrap.git
 Vcs-Browser: http://git.debian.org/?p=pkg-libvirt/febootstrap.git
 
-Package: febootstrap
+Package: supermin
 Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends}, aptitude, cpio
 Description: tool for building supermin appliances.
@@ -24,3 +24,11 @@ Description: tool for building supermin appliances.
  tiny appliances [similar to virtual machines], usually around 100KB
  in size, which get fully instantiated on-the-fly in a fraction of a
  second when one of them is booted.
+
+Package: febootstrap
+Architecture: all
+Section: oldlibs
+Priority: extra
+Depends: supermin (>= ${source:Version}), ${misc:Depends}
+Description: transitional package to deal with package renames.
+ The febootstrap tool was renamed to supermin.

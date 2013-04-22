@@ -1,0 +1,4 @@
+usr/share/man/man8/supermin-helper.8.gz usr/share/man/man8/febootstrap-supermin-helper.8.gz
+usr/share/man/man8/supermin.8.gz        usr/share/man/man8/febootstrap.8.gz
+usr/bin/supermin        usr/bin/febootstrap
+usr/bin/supermin-helper usr/bin/febootstrap-supermin-helper

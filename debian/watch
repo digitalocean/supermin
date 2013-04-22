@@ -1,2 +1,2 @@
 version=3
-http://people.redhat.com/~rjones/febootstrap/files/febootstrap-([\d\.]+)\.tar\.gz
+http://libguestfs.org/download/supermin/ supermin-([\d\.]+)\.tar\.gz
