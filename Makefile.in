@@ -14,8 +14,8 @@
 
 @SET_MAKE@
 
-# febootstrap Makefile.am
-# (C) Copyright 2009-2011 Red Hat Inc.
+# supermin Makefile.am
+# (C) Copyright 2009-2013 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -71,9 +71,8 @@ host_triplet = @host@
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/configure $(top_srcdir)/debian/changelog.in \
-	COPYING TODO compile config.guess config.sub depcomp \
-	install-sh missing
+	$(top_srcdir)/configure COPYING INSTALL TODO compile \
+	config.guess config.sub depcomp install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/chdir-long.m4 \
@@ -133,7 +132,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = debian/changelog
+CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 SOURCES =
 DIST_SOURCES =
@@ -1011,8 +1010,8 @@ EXTRA_DIST = \
 
 # Maintainer website update.
 HTMLFILES = \
-	html/febootstrap.8.html \
-	html/febootstrap-supermin-helper.8.html
+	html/supermin.8.html \
+	html/supermin-helper.8.html
 
 WEBSITEDIR = $(HOME)/d/redhat/websites/libguestfs
 CLEANFILES = $(HTMLFILES) pod2*.tmp
@@ -1069,8 +1068,6 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-debian/changelog: $(top_builddir)/config.status $(top_srcdir)/debian/changelog.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.

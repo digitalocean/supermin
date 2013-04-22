@@ -14,8 +14,8 @@
 
 @SET_MAKE@
 
-# febootstrap Makefile.am
-# (C) Copyright 2009-2011 Red Hat Inc.
+# supermin Makefile.am
+# (C) Copyright 2009-2013 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -974,27 +974,27 @@ top_srcdir = @top_srcdir@
 # Note these must be in build dependency order.
 SOURCES = \
 	config.ml \
-	febootstrap_cmdline.mli \
-	febootstrap_cmdline.ml \
-	febootstrap_utils.mli \
-	febootstrap_utils.ml \
-	febootstrap_package_handlers.mli \
-	febootstrap_package_handlers.ml \
-	febootstrap_yum_rpm.ml \
-	febootstrap_debian.ml \
-	febootstrap_pacman.ml \
-	febootstrap.ml
+	supermin_cmdline.mli \
+	supermin_cmdline.ml \
+	supermin_utils.mli \
+	supermin_utils.ml \
+	supermin_package_handlers.mli \
+	supermin_package_handlers.ml \
+	supermin_yum_rpm.ml \
+	supermin_debian.ml \
+	supermin_pacman.ml \
+	supermin.ml
 
-CLEANFILES = *~ *.cmi *.cmo *.cmx *.o febootstrap
+CLEANFILES = *~ *.cmi *.cmo *.cmx *.o supermin
 EXTRA_DIST = \
-	febootstrap.8 \
-	febootstrap.pod \
+	supermin.8 \
+	supermin.pod \
 	$(SOURCES)
 
 man_MANS = \
-	febootstrap.8
+	supermin.8
 
-bin_SCRIPTS = febootstrap
+bin_SCRIPTS = supermin
 SOURCES_ML = $(filter %.ml,$(SOURCES))
 BOBJECTS = $(SOURCES_ML:.ml=.cmo)
 XOBJECTS = $(SOURCES_ML:.ml=.cmx)
@@ -1006,7 +1006,7 @@ OCAMLPACKAGES = -package unix,str
 OCAMLFLAGS = -warn-error CDEFLMPSUVXYZ
 SUFFIXES = .cmo .cmi .cmx .ml .mli .mll .mly
 @HAVE_PERLDOC_TRUE@noinst_DATA = \
-@HAVE_PERLDOC_TRUE@	../html/febootstrap.8.html
+@HAVE_PERLDOC_TRUE@	../html/supermin.8.html
 
 all: all-am
 
@@ -1296,7 +1296,7 @@ uninstall-man: uninstall-man8
 	uninstall-man uninstall-man8
 
 
-febootstrap: $(OBJECTS)
+supermin: $(OBJECTS)
 	$(OCAMLFIND) $(BEST) $(OCAMLFLAGS) $(OCAMLPACKAGES) -linkpkg \
 	  $^ -o $@
 
@@ -1319,38 +1319,38 @@ depend: .depend
 	mv $@-t $@
 config.cmo:
 config.cmx:
-febootstrap_cmdline.cmi:
-febootstrap_cmdline.cmo: config.cmo febootstrap_cmdline.cmi
-febootstrap_cmdline.cmx: config.cmx febootstrap_cmdline.cmi
-febootstrap.cmo: febootstrap_utils.cmi febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
-febootstrap.cmx: febootstrap_utils.cmx febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
-febootstrap_debian.cmo: febootstrap_utils.cmi febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
-febootstrap_debian.cmx: febootstrap_utils.cmx febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
-febootstrap_package_handlers.cmi:
-febootstrap_package_handlers.cmo: febootstrap_utils.cmi febootstrap_cmdline.cmi febootstrap_package_handlers.cmi
-febootstrap_package_handlers.cmx: febootstrap_utils.cmx febootstrap_cmdline.cmx febootstrap_package_handlers.cmi
-febootstrap_pacman.cmo: febootstrap_utils.cmi febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
-febootstrap_pacman.cmx: febootstrap_utils.cmx febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
-febootstrap_utils.cmi:
-febootstrap_utils.cmo: febootstrap_cmdline.cmi febootstrap_utils.cmi
-febootstrap_utils.cmx: febootstrap_cmdline.cmx febootstrap_utils.cmi
-febootstrap_yum_rpm.cmo: febootstrap_utils.cmi febootstrap_package_handlers.cmi febootstrap_cmdline.cmi config.cmo
-febootstrap_yum_rpm.cmx: febootstrap_utils.cmx febootstrap_package_handlers.cmx febootstrap_cmdline.cmx config.cmx
+supermin_cmdline.cmi:
+supermin_cmdline.cmo: config.cmo supermin_cmdline.cmi
+supermin_cmdline.cmx: config.cmx supermin_cmdline.cmi
+supermin.cmo: supermin_utils.cmi supermin_package_handlers.cmi supermin_cmdline.cmi config.cmo
+supermin.cmx: supermin_utils.cmx supermin_package_handlers.cmx supermin_cmdline.cmx config.cmx
+supermin_debian.cmo: supermin_utils.cmi supermin_package_handlers.cmi supermin_cmdline.cmi config.cmo
+supermin_debian.cmx: supermin_utils.cmx supermin_package_handlers.cmx supermin_cmdline.cmx config.cmx
+supermin_package_handlers.cmi:
+supermin_package_handlers.cmo: supermin_utils.cmi supermin_cmdline.cmi supermin_package_handlers.cmi
+supermin_package_handlers.cmx: supermin_utils.cmx supermin_cmdline.cmx supermin_package_handlers.cmi
+supermin_pacman.cmo: supermin_utils.cmi supermin_package_handlers.cmi supermin_cmdline.cmi config.cmo
+supermin_pacman.cmx: supermin_utils.cmx supermin_package_handlers.cmx supermin_cmdline.cmx config.cmx
+supermin_utils.cmi:
+supermin_utils.cmo: supermin_cmdline.cmi supermin_utils.cmi
+supermin_utils.cmx: supermin_cmdline.cmx supermin_utils.cmi
+supermin_yum_rpm.cmo: supermin_utils.cmi supermin_package_handlers.cmi supermin_cmdline.cmi config.cmo
+supermin_yum_rpm.cmx: supermin_utils.cmx supermin_package_handlers.cmx supermin_cmdline.cmx config.cmx
 
-@HAVE_PERLDOC_TRUE@febootstrap.8: febootstrap.pod
+@HAVE_PERLDOC_TRUE@supermin.8: supermin.pod
 @HAVE_PERLDOC_TRUE@	pod2man \
 @HAVE_PERLDOC_TRUE@	  --section 8 \
 @HAVE_PERLDOC_TRUE@	  -c "Virtualization Support" \
 @HAVE_PERLDOC_TRUE@	  --release "$(PACKAGE_NAME)-$(PACKAGE_VERSION)" \
 @HAVE_PERLDOC_TRUE@	  $< > $@
 
-@HAVE_PERLDOC_TRUE@../html/febootstrap.8.html: febootstrap.pod
+@HAVE_PERLDOC_TRUE@../html/supermin.8.html: supermin.pod
 @HAVE_PERLDOC_TRUE@	mkdir -p ../html
 @HAVE_PERLDOC_TRUE@	pod2html \
 @HAVE_PERLDOC_TRUE@	  --css 'pod.css' \
 @HAVE_PERLDOC_TRUE@	  --htmldir ../html \
-@HAVE_PERLDOC_TRUE@	  --outfile ../html/febootstrap.8.html \
-@HAVE_PERLDOC_TRUE@	  febootstrap.pod
+@HAVE_PERLDOC_TRUE@	  --outfile ../html/supermin.8.html \
+@HAVE_PERLDOC_TRUE@	  supermin.pod
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

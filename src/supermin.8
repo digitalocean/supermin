@@ -123,49 +123,49 @@
 .rm #[ #] #H #V #F C
 .\" ========================================================================
 .\"
-.IX Title "FEBOOTSTRAP 8"
-.TH FEBOOTSTRAP 8 "2012-12-22" "febootstrap-3.20" "Virtualization Support"
+.IX Title "SUPERMIN 8"
+.TH SUPERMIN 8 "2013-02-05" "supermin-4.1.0" "Virtualization Support"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
 .nh
 .SH "NAME"
-febootstrap \- Bootstrapping tool for creating supermin appliances
+supermin \- Tool for creating supermin appliances
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
 .Vb 2
-\& febootstrap [\-o OUTPUTDIR] \-\-names LIST OF PKGS ...
-\& febootstrap [\-o OUTPUTDIR] PKG FILE NAMES ...
+\& supermin [\-o OUTPUTDIR] \-\-names LIST OF PKGS ...
+\& supermin [\-o OUTPUTDIR] PKG FILE NAMES ...
 .Ve
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
-febootstrap is a tool for building supermin appliances.  These are
+Supermin is a tool for building supermin appliances.  These are
 tiny appliances (similar to virtual machines), usually around 100KB in
 size, which get fully instantiated on-the-fly in a fraction of a
 second when you need to boot one of them.
 .PP
-Originally \*(L"fe\*(R" in febootstrap stood for \*(L"Fedora\*(R", but this tool is
+Originally \*(L"fe\*(R" in \*(L"febootstrap\*(R" stood for \*(L"Fedora\*(R", but this tool is
 now distro-independent and can build supermin appliances for several
 popular Linux distros, and adding support for others is reasonably
-easy.
+easy.  For this reason, starting with version 4, we have renamed the
+tool \*(L"supermin\*(R".
 .PP
-Note that this manual page documents febootstrap 3.x which is a
-complete rewrite and quite different from version 2.x.  If you are
-looking for the febootstrap 2.x tools, then this is not the right
-place.
+Note that this manual page documents supermin 4.x which is a complete
+rewrite and quite different from febootstrap 2.x.  If you are looking
+for the febootstrap 2.x tools, then this is not the right place.
 .SS "\s-1BASIC\s0 \s-1OPERATION\s0"
 .IX Subsection "BASIC OPERATION"
-There are two modes for using febootstrap.  With the \fI\-\-names\fR
-parameter, febootstrap takes a list of package names and creates a
+There are two modes for using supermin.  With the \fI\-\-names\fR
+parameter, supermin takes a list of package names and creates a
 supermin appliance containing those packages and all dependencies that
-those packages require.  In this mode febootstrap usually needs
+those packages require.  In this mode supermin usually needs
 network access because it may need to consult package repositories in
 order to work out dependencies and download packages.
 .PP
-Without \fI\-\-names\fR, febootstrap takes a list of packages (ie.
+Without \fI\-\-names\fR, supermin takes a list of packages (ie.
 filenames of locally available packages).  This package set must be
 complete and consistent with no dependencies outside the set of
-packages you provide.  In this mode febootstrap does not require any
+packages you provide.  In this mode supermin does not require any
 network access.  It works by looking at the package files themselves.
 .PP
 By \*(L"package\*(R" we mean the \s-1RPM\s0, \s-1DEB\s0, (etc.) package.  A package name
@@ -174,14 +174,14 @@ or some abbreviation (eg. \f(CW\*(C`coreutils\*(C'\fR).  The precise format of t
 name and what abbreviations are allowed depends on the package
 manager.
 .PP
-The supermin appliance that febootstrap writes consists of two files
+The supermin appliance that supermin writes consists of two files
 called \f(CW\*(C`hostfiles\*(C'\fR and \f(CW\*(C`base.img\*(C'\fR (see \*(L"\s-1SUPERMIN\s0 \s-1APPLIANCES\s0\*(R"
 below).  By default these are written to the current directory.  If
 you specify the \fI\-o \s-1OUTPUTDIR\s0\fR option then these files are written to
 the named directory instead (traditionally this directory is named
 \&\f(CW\*(C`supermin.d\*(C'\fR but you can call it whatever you want).
 .PP
-In all cases febootstrap can only build a supermin appliance which is
+In all cases supermin can only build a supermin appliance which is
 identical in distro, version and architecture to the host.  It does
 \&\fInot\fR do cross-builds.
 .SH "OPTIONS"
@@ -199,7 +199,7 @@ times on the command line.
 .IP "\fB\-\-names\fR" 4
 .IX Item "--names"
 Provide a list of package names, instead of providing packages
-directly.  In this mode febootstrap may require network access.  See
+directly.  In this mode supermin may require network access.  See
 \&\*(L"\s-1BASIC\s0 \s-1OPERATION\s0\*(R" above.
 .IP "\fB\-\-no\-warnings\fR" 4
 .IX Item "--no-warnings"
@@ -234,7 +234,7 @@ changed from what was originally in the package.  This is particularly
 a problem for configuration files.
 .Sp
 However this option is useful in some controlled situations: for
-example when using febootstrap inside a freshly installed chroot.
+example when using supermin inside a freshly installed chroot.
 .IP "\fB\-v\fR" 4
 .IX Item "-v"
 .PD 0
@@ -302,7 +302,7 @@ Note that unlike \f(CW\*(C`hostfiles\*(C'\fR, paths and directories in the base 
 don't need to have any relationship to the host filesystem.
 .SS "\s-1RECONSTRUCTING\s0 \s-1THE\s0 \s-1APPLIANCE\s0"
 .IX Subsection "RECONSTRUCTING THE APPLIANCE"
-The separate tool \fIfebootstrap\-supermin\-helper\fR\|(8) is used to
+The separate tool \fIsupermin\-helper\fR\|(8) is used to
 reconstruct an appliance from the hostfiles and base image files.
 .PP
 This program in fact iterates recursively over the files and
@@ -315,7 +315,7 @@ directories passed to it.  A common layout is:
 \& supermin.d/hostfiles
 .Ve
 .PP
-and then invoking febootstrap-supermin-helper with just the
+and then invoking supermin-helper with just the
 \&\f(CW\*(C`supermin.d\*(C'\fR directory path as an argument.
 .PP
 In this way extra files can be added to the appliance just by creating
@@ -326,7 +326,7 @@ files will appear in the appliance.
 \fI\s-1DIRECTORIES\s0 \s-1BEFORE\s0 \s-1FILES\s0\fR
 .IX Subsection "DIRECTORIES BEFORE FILES"
 .PP
-In order for febootstrap-supermin-helper to run quickly, it does not
+In order for supermin-helper to run quickly, it does not
 know how to create directories automatically.  Inside hostfiles and
 the cpio files, directories must be specified before any files that
 they contain.  For example:
@@ -342,7 +342,7 @@ It is fine to list the same directory name multiple times.
 \fI\s-1LEXICOGRAPHICAL\s0 \s-1ORDER\s0\fR
 .IX Subsection "LEXICOGRAPHICAL ORDER"
 .PP
-febootstrap-supermin-helper visits the supermin control files in
+supermin-helper visits the supermin control files in
 lexicographical order.  Thus in the example above, in the order
 \&\f(CW\*(C`base.img\*(C'\fR \-> \f(CW\*(C`extra.img\*(C'\fR \-> \f(CW\*(C`hostfiles\*(C'\fR.
 .PP
@@ -394,17 +394,17 @@ supermin appliance.  When the appliance is instantiated, the kernel
 modules from the host kernel are copied in, and it is booted using the
 host kernel.
 .PP
-febootstrap-supermin-helper is able to choose the best host kernel
+supermin-helper is able to choose the best host kernel
 available to boot the appliance.  Users can override this by setting
-environment variables (see \fIfebootstrap\-supermin\-helper\fR\|(8)).
+environment variables (see \fIsupermin\-helper\fR\|(8)).
 .SS "\s-1BOOTING\s0 \s-1AND\s0 \s-1CACHING\s0 \s-1THE\s0 \s-1SUPERMIN\s0 \s-1APPLIANCE\s0"
 .IX Subsection "BOOTING AND CACHING THE SUPERMIN APPLIANCE"
 For fastest boot times you should cache the output of
-febootstrap-supermin-helper.  See the libguestfs source file
+supermin-helper.  See the libguestfs source file
 \&\f(CW\*(C`src/appliance.c\*(C'\fR for an example of how this is done.
 .SS "\s-1ENFORCING\s0 \s-1AVAILABILITY\s0 \s-1OF\s0 \s-1HOSTFILES\s0"
 .IX Subsection "ENFORCING AVAILABILITY OF HOSTFILES"
-febootstrap-supermin-helper builds the appliance by copying in host
+supermin-helper builds the appliance by copying in host
 files as listed in \f(CW\*(C`hostfiles\*(C'\fR.  For this to work those host files
 must be available.  We usually enforce this by adding requirements
 (eg. \s-1RPM\s0 \f(CW\*(C`Requires:\*(C'\fR lines) on the package that uses the supermin
@@ -412,8 +412,8 @@ appliance, so that package cannot be installed without pulling in the
 dependent packages and thus making sure the host files are available.
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
-\&\fIfebootstrap\-supermin\-helper\fR\|(8),
-<http://people.redhat.com/~rjones/febootstrap/>,
+\&\fIsupermin\-helper\fR\|(8),
+<http://people.redhat.com/~rjones/supermin/>,
 \&\fIguestfs\fR\|(3),
 <http://libguestfs.org/>.
 .SH "AUTHORS"

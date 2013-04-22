@@ -1,5 +1,5 @@
-(* febootstrap 3
- * Copyright (C) 2009-2010 Red Hat Inc.
+(* supermin 4
+ * Copyright (C) 2009-2013 Red Hat Inc.
  * src/config.ml.  Generated from config.ml.in by configure.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,8 +17,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *)
 
-let package_name = "febootstrap"
-let package_version = "3.21"
+let package_name = "supermin"
+let package_version = "4.1.0"
 let yum = "yum"
 let rpm = "rpm"
 let yumdownloader = "yumdownloader"
