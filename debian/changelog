@@ -1,3 +1,11 @@
+supermin (4.1.1-1) unstable; urgency=low
+
+  * New renamed upstream version
+  * Introduced transitional package
+  * configure.ac patch is no longer needed
+
+ -- Hilko Bengen <bengen@debian.org>  Mon, 22 Apr 2013 21:52:31 +0200
+
 febootstrap (3.21-1) unstable; urgency=low
 
   * New upstream version
