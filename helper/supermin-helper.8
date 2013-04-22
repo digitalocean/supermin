@@ -123,29 +123,28 @@
 .rm #[ #] #H #V #F C
 .\" ========================================================================
 .\"
-.IX Title "FEBOOTSTRAP-SUPERMIN-HELPER 8"
-.TH FEBOOTSTRAP-SUPERMIN-HELPER 8 "2012-12-03" "febootstrap-3.20" "Virtualization Support"
+.IX Title "SUPERMIN-HELPER 8"
+.TH SUPERMIN-HELPER 8 "2013-02-05" "supermin-4.1.0" "Virtualization Support"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
 .nh
 .SH "NAME"
-febootstrap\-supermin\-helper \- Reconstruct initramfs from supermin appliance.
+supermin\-helper \- Reconstruct initramfs from supermin appliance.
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
 .Vb 2
-\& febootstrap\-supermin\-helper supermin.img hostfiles.txt host_cpu kernel initrd
-\& febootstrap\-supermin\-helper input [...] host_cpu kernel initrd
+\& supermin\-helper supermin.img hostfiles.txt host_cpu kernel initrd
+\& supermin\-helper input [...] host_cpu kernel initrd
 \&
-\& febootstrap\-supermin\-helper \-f ext2 input [...] host_cpu kernel initrd appliance
+\& supermin\-helper \-f ext2 input [...] host_cpu kernel initrd appliance
 \&
-\& febootstrap\-supermin\-helper \-f checksum input [...] host_cpu
+\& supermin\-helper \-f checksum input [...] host_cpu
 .Ve
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
-\&\fIfebootstrap-supermin-helper\fR reconstructs a bootable kernel and
-initramfs from a supermin appliance.  First you should be familiar
-with \fIfebootstrap\fR\|(8).
+\&\fIsupermin-helper\fR reconstructs a bootable kernel and initramfs from a
+supermin appliance.  First you should be familiar with \fIsupermin\fR\|(8).
 .SH "PARAMETERS"
 .IX Header "PARAMETERS"
 Of the required parameters, the first few are \fIinput\fR files, and the
@@ -240,16 +239,16 @@ appliances which need a lot more memory to boot.
 .IP "\fB\-\-group group\fR" 4
 .IX Item "--group group"
 .PD
-Run febootstrap-supermin-helper as an alternate user and/or group.
-\&\f(CW\*(C`user\*(C'\fR and \f(CW\*(C`group\*(C'\fR can be specified as either a name, which will
-be resolved using the system name service, or a uid/gid.  Use of these
-options requires root privileges.
+Run supermin-helper as an alternate user and/or group.  \f(CW\*(C`user\*(C'\fR and
+\&\f(CW\*(C`group\*(C'\fR can be specified as either a name, which will be resolved
+using the system name service, or a uid/gid.  Use of these options
+requires root privileges.
 .Sp
-Use of these options is required if running febootstrap-supermin-helper
-as root with the effective uid/gid set to non-root.  Bash will reset
-the effective uid/gid to the real uid/gid when invoked.  As
-febootstrap-supermin-helper uses bash in parts, this will result in the
-creation of an appliance with a mixture of ownerships.
+Use of these options is required if running supermin-helper as root
+with the effective uid/gid set to non-root.  Bash will reset the
+effective uid/gid to the real uid/gid when invoked.  As
+supermin-helper uses bash in parts, this will result in the creation
+of an appliance with a mixture of ownerships.
 .SH "SPEED"
 .IX Header "SPEED"
 In libguestfs, on a mid-range Intel-based \s-1PC\s0, we reconstruct the
@@ -265,8 +264,8 @@ list the kernel modules you really need.
 Minimize the appliance, removing as much extraneous junk as possible.
 .SH "ENVIRONMENT VARIABLES"
 .IX Header "ENVIRONMENT VARIABLES"
-.IP "\s-1FEBOOTSTRAP_KERNEL\s0" 4
-.IX Item "FEBOOTSTRAP_KERNEL"
+.IP "\s-1SUPERMIN_KERNEL\s0" 4
+.IX Item "SUPERMIN_KERNEL"
 If this environment variable is set, then automatic selection of the
 kernel is bypassed and this kernel is used.
 .Sp
@@ -274,27 +273,27 @@ The environment variable should point to a kernel file,
 eg. \f(CW\*(C`/boot/vmlinuz\-3.0.x86_64\*(C'\fR
 .Sp
 The corresponding module path is guessed from the kernel name, but you
-can override that by setting \f(CW\*(C`FEBOOTSTRAP_MODULES\*(C'\fR.
-.IP "\s-1FEBOOTSTRAP_MODULES\s0" 4
-.IX Item "FEBOOTSTRAP_MODULES"
-If \f(CW\*(C`FEBOOTSTRAP_KERNEL\*(C'\fR and \f(CW\*(C`FEBOOTSTRAP_MODULES\*(C'\fR are both set, then
+can override that by setting \f(CW\*(C`SUPERMIN_MODULES\*(C'\fR.
+.IP "\s-1SUPERMIN_MODULES\s0" 4
+.IX Item "SUPERMIN_MODULES"
+If \f(CW\*(C`SUPERMIN_KERNEL\*(C'\fR and \f(CW\*(C`SUPERMIN_MODULES\*(C'\fR are both set, then
 automatic selection of the kernel is bypassed and the kernel and
 module path are set to these values.
 .Sp
 The environment variable should point to a module directory,
 eg. \f(CW\*(C`/lib/modules/3.0.x86_64/\*(C'\fR
 .Sp
-This has no effect if \f(CW\*(C`FEBOOTSTRAP_KERNEL\*(C'\fR is not set.
+This has no effect if \f(CW\*(C`SUPERMIN_KERNEL\*(C'\fR is not set.
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
-\&\fIfebootstrap\fR\|(8).
+\&\fIsupermin\fR\|(8).
 .SH "AUTHORS"
 .IX Header "AUTHORS"
 Richard W.M. Jones <rjones @ redhat . com>
 .SH "COPYRIGHT"
 .IX Header "COPYRIGHT"
-(C) Copyright 2009\-2011 Red Hat Inc.,
-<http://people.redhat.com/~rjones/febootstrap>.
+(C) Copyright 2009\-2013 Red Hat Inc.,
+<http://people.redhat.com/~rjones/supermin>.
 .PP
 This program is free software; you can redistribute it and/or modify
 it under the terms of the \s-1GNU\s0 General Public License as published by

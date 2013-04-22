@@ -14,8 +14,8 @@
 
 @SET_MAKE@
 
-# febootstrap Makefile.am
-# (C) Copyright 2010 Red Hat Inc.
+# supermin Makefile.am
+# (C) Copyright 2010-2013 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = febootstrap-supermin-helper$(EXEEXT)
+bin_PROGRAMS = supermin-helper$(EXEEXT)
 noinst_PROGRAMS = init$(EXEEXT)
 subdir = helper
 DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -136,30 +136,24 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man8dir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
-am_febootstrap_supermin_helper_OBJECTS =  \
-	febootstrap_supermin_helper-appliance.$(OBJEXT) \
-	febootstrap_supermin_helper-checksum.$(OBJEXT) \
-	febootstrap_supermin_helper-cpio.$(OBJEXT) \
-	febootstrap_supermin_helper-ext2.$(OBJEXT) \
-	febootstrap_supermin_helper-ext2cpio.$(OBJEXT) \
-	febootstrap_supermin_helper-ext2initrd.$(OBJEXT) \
-	febootstrap_supermin_helper-kernel.$(OBJEXT) \
-	febootstrap_supermin_helper-main.$(OBJEXT) \
-	febootstrap_supermin_helper-utils.$(OBJEXT)
-febootstrap_supermin_helper_OBJECTS =  \
-	$(am_febootstrap_supermin_helper_OBJECTS)
-am__DEPENDENCIES_1 =
-febootstrap_supermin_helper_DEPENDENCIES = ext2init.o \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
-febootstrap_supermin_helper_LINK = $(CCLD) \
-	$(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
 am_init_OBJECTS = init-init.$(OBJEXT)
 init_OBJECTS = $(am_init_OBJECTS)
 init_LDADD = $(LDADD)
 init_LINK = $(CCLD) $(init_CFLAGS) $(CFLAGS) $(init_LDFLAGS) \
 	$(LDFLAGS) -o $@
+am_supermin_helper_OBJECTS = supermin_helper-appliance.$(OBJEXT) \
+	supermin_helper-checksum.$(OBJEXT) \
+	supermin_helper-cpio.$(OBJEXT) supermin_helper-ext2.$(OBJEXT) \
+	supermin_helper-ext2cpio.$(OBJEXT) \
+	supermin_helper-ext2initrd.$(OBJEXT) \
+	supermin_helper-kernel.$(OBJEXT) \
+	supermin_helper-main.$(OBJEXT) supermin_helper-utils.$(OBJEXT)
+supermin_helper_OBJECTS = $(am_supermin_helper_OBJECTS)
+am__DEPENDENCIES_1 =
+supermin_helper_DEPENDENCIES = ext2init.o $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+supermin_helper_LINK = $(CCLD) $(supermin_helper_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -168,8 +162,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(febootstrap_supermin_helper_SOURCES) $(init_SOURCES)
-DIST_SOURCES = $(febootstrap_supermin_helper_SOURCES) $(init_SOURCES)
+SOURCES = $(init_SOURCES) $(supermin_helper_SOURCES)
+DIST_SOURCES = $(init_SOURCES) $(supermin_helper_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -1007,7 +1001,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-febootstrap_supermin_helper_SOURCES = \
+supermin_helper_SOURCES = \
 	helper.h \
 	appliance.c \
 	checksum.c \
@@ -1020,10 +1014,10 @@ febootstrap_supermin_helper_SOURCES = \
 	main.c \
 	utils.c
 
-febootstrap_supermin_helper_CFLAGS = \
+supermin_helper_CFLAGS = \
 	-Wall $(EXT2FS_CFLAGS) $(COM_ERR_CFLAGS) -I../lib
 
-febootstrap_supermin_helper_LDADD = \
+supermin_helper_LDADD = \
 	ext2init.o $(EXT2FS_LIBS) $(COM_ERR_LIBS) \
 	$(LTLIBINTL) -L../lib -lgnu
 
@@ -1032,14 +1026,14 @@ init_CFLAGS = -static
 init_LDFLAGS = -static
 CLEANFILES = ext2init.S
 man_MANS = \
-	febootstrap-supermin-helper.8
+	supermin-helper.8
 
 @HAVE_PERLDOC_TRUE@noinst_DATA = \
-@HAVE_PERLDOC_TRUE@	$(top_builddir)/html/febootstrap-supermin-helper.8.html
+@HAVE_PERLDOC_TRUE@	$(top_builddir)/html/supermin-helper.8.html
 
 EXTRA_DIST = \
-	febootstrap-supermin-helper.8 \
-	febootstrap-supermin-helper.pod \
+	supermin-helper.8 \
+	supermin-helper.pod \
 	bin2s.pl
 
 all: all-am
@@ -1119,12 +1113,12 @@ clean-binPROGRAMS:
 
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
-febootstrap-supermin-helper$(EXEEXT): $(febootstrap_supermin_helper_OBJECTS) $(febootstrap_supermin_helper_DEPENDENCIES) $(EXTRA_febootstrap_supermin_helper_DEPENDENCIES) 
-	@rm -f febootstrap-supermin-helper$(EXEEXT)
-	$(febootstrap_supermin_helper_LINK) $(febootstrap_supermin_helper_OBJECTS) $(febootstrap_supermin_helper_LDADD) $(LIBS)
 init$(EXEEXT): $(init_OBJECTS) $(init_DEPENDENCIES) $(EXTRA_init_DEPENDENCIES) 
 	@rm -f init$(EXEEXT)
 	$(init_LINK) $(init_OBJECTS) $(init_LDADD) $(LIBS)
+supermin-helper$(EXEEXT): $(supermin_helper_OBJECTS) $(supermin_helper_DEPENDENCIES) $(EXTRA_supermin_helper_DEPENDENCIES) 
+	@rm -f supermin-helper$(EXEEXT)
+	$(supermin_helper_LINK) $(supermin_helper_OBJECTS) $(supermin_helper_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -1132,16 +1126,16 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-appliance.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-checksum.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-cpio.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-ext2.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-ext2cpio.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-ext2initrd.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-kernel.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/febootstrap_supermin_helper-utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/init-init.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin_helper-appliance.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin_helper-checksum.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin_helper-cpio.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin_helper-ext2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin_helper-ext2cpio.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin_helper-ext2initrd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin_helper-kernel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin_helper-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin_helper-utils.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -1157,132 +1151,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
-febootstrap_supermin_helper-appliance.o: appliance.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-appliance.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-appliance.Tpo -c -o febootstrap_supermin_helper-appliance.o `test -f 'appliance.c' || echo '$(srcdir)/'`appliance.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-appliance.Tpo $(DEPDIR)/febootstrap_supermin_helper-appliance.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='appliance.c' object='febootstrap_supermin_helper-appliance.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-appliance.o `test -f 'appliance.c' || echo '$(srcdir)/'`appliance.c
-
-febootstrap_supermin_helper-appliance.obj: appliance.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-appliance.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-appliance.Tpo -c -o febootstrap_supermin_helper-appliance.obj `if test -f 'appliance.c'; then $(CYGPATH_W) 'appliance.c'; else $(CYGPATH_W) '$(srcdir)/appliance.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-appliance.Tpo $(DEPDIR)/febootstrap_supermin_helper-appliance.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='appliance.c' object='febootstrap_supermin_helper-appliance.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-appliance.obj `if test -f 'appliance.c'; then $(CYGPATH_W) 'appliance.c'; else $(CYGPATH_W) '$(srcdir)/appliance.c'; fi`
-
-febootstrap_supermin_helper-checksum.o: checksum.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-checksum.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-checksum.Tpo -c -o febootstrap_supermin_helper-checksum.o `test -f 'checksum.c' || echo '$(srcdir)/'`checksum.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-checksum.Tpo $(DEPDIR)/febootstrap_supermin_helper-checksum.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='checksum.c' object='febootstrap_supermin_helper-checksum.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-checksum.o `test -f 'checksum.c' || echo '$(srcdir)/'`checksum.c
-
-febootstrap_supermin_helper-checksum.obj: checksum.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-checksum.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-checksum.Tpo -c -o febootstrap_supermin_helper-checksum.obj `if test -f 'checksum.c'; then $(CYGPATH_W) 'checksum.c'; else $(CYGPATH_W) '$(srcdir)/checksum.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-checksum.Tpo $(DEPDIR)/febootstrap_supermin_helper-checksum.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='checksum.c' object='febootstrap_supermin_helper-checksum.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-checksum.obj `if test -f 'checksum.c'; then $(CYGPATH_W) 'checksum.c'; else $(CYGPATH_W) '$(srcdir)/checksum.c'; fi`
-
-febootstrap_supermin_helper-cpio.o: cpio.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-cpio.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-cpio.Tpo -c -o febootstrap_supermin_helper-cpio.o `test -f 'cpio.c' || echo '$(srcdir)/'`cpio.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-cpio.Tpo $(DEPDIR)/febootstrap_supermin_helper-cpio.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cpio.c' object='febootstrap_supermin_helper-cpio.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-cpio.o `test -f 'cpio.c' || echo '$(srcdir)/'`cpio.c
-
-febootstrap_supermin_helper-cpio.obj: cpio.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-cpio.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-cpio.Tpo -c -o febootstrap_supermin_helper-cpio.obj `if test -f 'cpio.c'; then $(CYGPATH_W) 'cpio.c'; else $(CYGPATH_W) '$(srcdir)/cpio.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-cpio.Tpo $(DEPDIR)/febootstrap_supermin_helper-cpio.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cpio.c' object='febootstrap_supermin_helper-cpio.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-cpio.obj `if test -f 'cpio.c'; then $(CYGPATH_W) 'cpio.c'; else $(CYGPATH_W) '$(srcdir)/cpio.c'; fi`
-
-febootstrap_supermin_helper-ext2.o: ext2.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-ext2.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-ext2.Tpo -c -o febootstrap_supermin_helper-ext2.o `test -f 'ext2.c' || echo '$(srcdir)/'`ext2.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-ext2.Tpo $(DEPDIR)/febootstrap_supermin_helper-ext2.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2.c' object='febootstrap_supermin_helper-ext2.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-ext2.o `test -f 'ext2.c' || echo '$(srcdir)/'`ext2.c
-
-febootstrap_supermin_helper-ext2.obj: ext2.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-ext2.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-ext2.Tpo -c -o febootstrap_supermin_helper-ext2.obj `if test -f 'ext2.c'; then $(CYGPATH_W) 'ext2.c'; else $(CYGPATH_W) '$(srcdir)/ext2.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-ext2.Tpo $(DEPDIR)/febootstrap_supermin_helper-ext2.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2.c' object='febootstrap_supermin_helper-ext2.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-ext2.obj `if test -f 'ext2.c'; then $(CYGPATH_W) 'ext2.c'; else $(CYGPATH_W) '$(srcdir)/ext2.c'; fi`
-
-febootstrap_supermin_helper-ext2cpio.o: ext2cpio.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-ext2cpio.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-ext2cpio.Tpo -c -o febootstrap_supermin_helper-ext2cpio.o `test -f 'ext2cpio.c' || echo '$(srcdir)/'`ext2cpio.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-ext2cpio.Tpo $(DEPDIR)/febootstrap_supermin_helper-ext2cpio.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2cpio.c' object='febootstrap_supermin_helper-ext2cpio.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-ext2cpio.o `test -f 'ext2cpio.c' || echo '$(srcdir)/'`ext2cpio.c
-
-febootstrap_supermin_helper-ext2cpio.obj: ext2cpio.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-ext2cpio.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-ext2cpio.Tpo -c -o febootstrap_supermin_helper-ext2cpio.obj `if test -f 'ext2cpio.c'; then $(CYGPATH_W) 'ext2cpio.c'; else $(CYGPATH_W) '$(srcdir)/ext2cpio.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-ext2cpio.Tpo $(DEPDIR)/febootstrap_supermin_helper-ext2cpio.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2cpio.c' object='febootstrap_supermin_helper-ext2cpio.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-ext2cpio.obj `if test -f 'ext2cpio.c'; then $(CYGPATH_W) 'ext2cpio.c'; else $(CYGPATH_W) '$(srcdir)/ext2cpio.c'; fi`
-
-febootstrap_supermin_helper-ext2initrd.o: ext2initrd.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-ext2initrd.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-ext2initrd.Tpo -c -o febootstrap_supermin_helper-ext2initrd.o `test -f 'ext2initrd.c' || echo '$(srcdir)/'`ext2initrd.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-ext2initrd.Tpo $(DEPDIR)/febootstrap_supermin_helper-ext2initrd.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2initrd.c' object='febootstrap_supermin_helper-ext2initrd.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-ext2initrd.o `test -f 'ext2initrd.c' || echo '$(srcdir)/'`ext2initrd.c
-
-febootstrap_supermin_helper-ext2initrd.obj: ext2initrd.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-ext2initrd.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-ext2initrd.Tpo -c -o febootstrap_supermin_helper-ext2initrd.obj `if test -f 'ext2initrd.c'; then $(CYGPATH_W) 'ext2initrd.c'; else $(CYGPATH_W) '$(srcdir)/ext2initrd.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-ext2initrd.Tpo $(DEPDIR)/febootstrap_supermin_helper-ext2initrd.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2initrd.c' object='febootstrap_supermin_helper-ext2initrd.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-ext2initrd.obj `if test -f 'ext2initrd.c'; then $(CYGPATH_W) 'ext2initrd.c'; else $(CYGPATH_W) '$(srcdir)/ext2initrd.c'; fi`
-
-febootstrap_supermin_helper-kernel.o: kernel.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-kernel.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-kernel.Tpo -c -o febootstrap_supermin_helper-kernel.o `test -f 'kernel.c' || echo '$(srcdir)/'`kernel.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-kernel.Tpo $(DEPDIR)/febootstrap_supermin_helper-kernel.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kernel.c' object='febootstrap_supermin_helper-kernel.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-kernel.o `test -f 'kernel.c' || echo '$(srcdir)/'`kernel.c
-
-febootstrap_supermin_helper-kernel.obj: kernel.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-kernel.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-kernel.Tpo -c -o febootstrap_supermin_helper-kernel.obj `if test -f 'kernel.c'; then $(CYGPATH_W) 'kernel.c'; else $(CYGPATH_W) '$(srcdir)/kernel.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-kernel.Tpo $(DEPDIR)/febootstrap_supermin_helper-kernel.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kernel.c' object='febootstrap_supermin_helper-kernel.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-kernel.obj `if test -f 'kernel.c'; then $(CYGPATH_W) 'kernel.c'; else $(CYGPATH_W) '$(srcdir)/kernel.c'; fi`
-
-febootstrap_supermin_helper-main.o: main.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-main.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-main.Tpo -c -o febootstrap_supermin_helper-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-main.Tpo $(DEPDIR)/febootstrap_supermin_helper-main.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='main.c' object='febootstrap_supermin_helper-main.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
-
-febootstrap_supermin_helper-main.obj: main.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-main.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-main.Tpo -c -o febootstrap_supermin_helper-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-main.Tpo $(DEPDIR)/febootstrap_supermin_helper-main.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='main.c' object='febootstrap_supermin_helper-main.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
-
-febootstrap_supermin_helper-utils.o: utils.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-utils.o -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-utils.Tpo -c -o febootstrap_supermin_helper-utils.o `test -f 'utils.c' || echo '$(srcdir)/'`utils.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-utils.Tpo $(DEPDIR)/febootstrap_supermin_helper-utils.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utils.c' object='febootstrap_supermin_helper-utils.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-utils.o `test -f 'utils.c' || echo '$(srcdir)/'`utils.c
-
-febootstrap_supermin_helper-utils.obj: utils.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -MT febootstrap_supermin_helper-utils.obj -MD -MP -MF $(DEPDIR)/febootstrap_supermin_helper-utils.Tpo -c -o febootstrap_supermin_helper-utils.obj `if test -f 'utils.c'; then $(CYGPATH_W) 'utils.c'; else $(CYGPATH_W) '$(srcdir)/utils.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/febootstrap_supermin_helper-utils.Tpo $(DEPDIR)/febootstrap_supermin_helper-utils.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utils.c' object='febootstrap_supermin_helper-utils.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(febootstrap_supermin_helper_CFLAGS) $(CFLAGS) -c -o febootstrap_supermin_helper-utils.obj `if test -f 'utils.c'; then $(CYGPATH_W) 'utils.c'; else $(CYGPATH_W) '$(srcdir)/utils.c'; fi`
-
 init-init.o: init.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(init_CFLAGS) $(CFLAGS) -MT init-init.o -MD -MP -MF $(DEPDIR)/init-init.Tpo -c -o init-init.o `test -f 'init.c' || echo '$(srcdir)/'`init.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/init-init.Tpo $(DEPDIR)/init-init.Po
@@ -1296,6 +1164,132 @@ init-init.obj: init.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='init.c' object='init-init.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(init_CFLAGS) $(CFLAGS) -c -o init-init.obj `if test -f 'init.c'; then $(CYGPATH_W) 'init.c'; else $(CYGPATH_W) '$(srcdir)/init.c'; fi`
+
+supermin_helper-appliance.o: appliance.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-appliance.o -MD -MP -MF $(DEPDIR)/supermin_helper-appliance.Tpo -c -o supermin_helper-appliance.o `test -f 'appliance.c' || echo '$(srcdir)/'`appliance.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-appliance.Tpo $(DEPDIR)/supermin_helper-appliance.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='appliance.c' object='supermin_helper-appliance.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-appliance.o `test -f 'appliance.c' || echo '$(srcdir)/'`appliance.c
+
+supermin_helper-appliance.obj: appliance.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-appliance.obj -MD -MP -MF $(DEPDIR)/supermin_helper-appliance.Tpo -c -o supermin_helper-appliance.obj `if test -f 'appliance.c'; then $(CYGPATH_W) 'appliance.c'; else $(CYGPATH_W) '$(srcdir)/appliance.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-appliance.Tpo $(DEPDIR)/supermin_helper-appliance.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='appliance.c' object='supermin_helper-appliance.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-appliance.obj `if test -f 'appliance.c'; then $(CYGPATH_W) 'appliance.c'; else $(CYGPATH_W) '$(srcdir)/appliance.c'; fi`
+
+supermin_helper-checksum.o: checksum.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-checksum.o -MD -MP -MF $(DEPDIR)/supermin_helper-checksum.Tpo -c -o supermin_helper-checksum.o `test -f 'checksum.c' || echo '$(srcdir)/'`checksum.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-checksum.Tpo $(DEPDIR)/supermin_helper-checksum.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='checksum.c' object='supermin_helper-checksum.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-checksum.o `test -f 'checksum.c' || echo '$(srcdir)/'`checksum.c
+
+supermin_helper-checksum.obj: checksum.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-checksum.obj -MD -MP -MF $(DEPDIR)/supermin_helper-checksum.Tpo -c -o supermin_helper-checksum.obj `if test -f 'checksum.c'; then $(CYGPATH_W) 'checksum.c'; else $(CYGPATH_W) '$(srcdir)/checksum.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-checksum.Tpo $(DEPDIR)/supermin_helper-checksum.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='checksum.c' object='supermin_helper-checksum.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-checksum.obj `if test -f 'checksum.c'; then $(CYGPATH_W) 'checksum.c'; else $(CYGPATH_W) '$(srcdir)/checksum.c'; fi`
+
+supermin_helper-cpio.o: cpio.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-cpio.o -MD -MP -MF $(DEPDIR)/supermin_helper-cpio.Tpo -c -o supermin_helper-cpio.o `test -f 'cpio.c' || echo '$(srcdir)/'`cpio.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-cpio.Tpo $(DEPDIR)/supermin_helper-cpio.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cpio.c' object='supermin_helper-cpio.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-cpio.o `test -f 'cpio.c' || echo '$(srcdir)/'`cpio.c
+
+supermin_helper-cpio.obj: cpio.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-cpio.obj -MD -MP -MF $(DEPDIR)/supermin_helper-cpio.Tpo -c -o supermin_helper-cpio.obj `if test -f 'cpio.c'; then $(CYGPATH_W) 'cpio.c'; else $(CYGPATH_W) '$(srcdir)/cpio.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-cpio.Tpo $(DEPDIR)/supermin_helper-cpio.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cpio.c' object='supermin_helper-cpio.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-cpio.obj `if test -f 'cpio.c'; then $(CYGPATH_W) 'cpio.c'; else $(CYGPATH_W) '$(srcdir)/cpio.c'; fi`
+
+supermin_helper-ext2.o: ext2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-ext2.o -MD -MP -MF $(DEPDIR)/supermin_helper-ext2.Tpo -c -o supermin_helper-ext2.o `test -f 'ext2.c' || echo '$(srcdir)/'`ext2.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-ext2.Tpo $(DEPDIR)/supermin_helper-ext2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2.c' object='supermin_helper-ext2.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-ext2.o `test -f 'ext2.c' || echo '$(srcdir)/'`ext2.c
+
+supermin_helper-ext2.obj: ext2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-ext2.obj -MD -MP -MF $(DEPDIR)/supermin_helper-ext2.Tpo -c -o supermin_helper-ext2.obj `if test -f 'ext2.c'; then $(CYGPATH_W) 'ext2.c'; else $(CYGPATH_W) '$(srcdir)/ext2.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-ext2.Tpo $(DEPDIR)/supermin_helper-ext2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2.c' object='supermin_helper-ext2.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-ext2.obj `if test -f 'ext2.c'; then $(CYGPATH_W) 'ext2.c'; else $(CYGPATH_W) '$(srcdir)/ext2.c'; fi`
+
+supermin_helper-ext2cpio.o: ext2cpio.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-ext2cpio.o -MD -MP -MF $(DEPDIR)/supermin_helper-ext2cpio.Tpo -c -o supermin_helper-ext2cpio.o `test -f 'ext2cpio.c' || echo '$(srcdir)/'`ext2cpio.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-ext2cpio.Tpo $(DEPDIR)/supermin_helper-ext2cpio.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2cpio.c' object='supermin_helper-ext2cpio.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-ext2cpio.o `test -f 'ext2cpio.c' || echo '$(srcdir)/'`ext2cpio.c
+
+supermin_helper-ext2cpio.obj: ext2cpio.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-ext2cpio.obj -MD -MP -MF $(DEPDIR)/supermin_helper-ext2cpio.Tpo -c -o supermin_helper-ext2cpio.obj `if test -f 'ext2cpio.c'; then $(CYGPATH_W) 'ext2cpio.c'; else $(CYGPATH_W) '$(srcdir)/ext2cpio.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-ext2cpio.Tpo $(DEPDIR)/supermin_helper-ext2cpio.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2cpio.c' object='supermin_helper-ext2cpio.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-ext2cpio.obj `if test -f 'ext2cpio.c'; then $(CYGPATH_W) 'ext2cpio.c'; else $(CYGPATH_W) '$(srcdir)/ext2cpio.c'; fi`
+
+supermin_helper-ext2initrd.o: ext2initrd.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-ext2initrd.o -MD -MP -MF $(DEPDIR)/supermin_helper-ext2initrd.Tpo -c -o supermin_helper-ext2initrd.o `test -f 'ext2initrd.c' || echo '$(srcdir)/'`ext2initrd.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-ext2initrd.Tpo $(DEPDIR)/supermin_helper-ext2initrd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2initrd.c' object='supermin_helper-ext2initrd.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-ext2initrd.o `test -f 'ext2initrd.c' || echo '$(srcdir)/'`ext2initrd.c
+
+supermin_helper-ext2initrd.obj: ext2initrd.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-ext2initrd.obj -MD -MP -MF $(DEPDIR)/supermin_helper-ext2initrd.Tpo -c -o supermin_helper-ext2initrd.obj `if test -f 'ext2initrd.c'; then $(CYGPATH_W) 'ext2initrd.c'; else $(CYGPATH_W) '$(srcdir)/ext2initrd.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-ext2initrd.Tpo $(DEPDIR)/supermin_helper-ext2initrd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ext2initrd.c' object='supermin_helper-ext2initrd.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-ext2initrd.obj `if test -f 'ext2initrd.c'; then $(CYGPATH_W) 'ext2initrd.c'; else $(CYGPATH_W) '$(srcdir)/ext2initrd.c'; fi`
+
+supermin_helper-kernel.o: kernel.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-kernel.o -MD -MP -MF $(DEPDIR)/supermin_helper-kernel.Tpo -c -o supermin_helper-kernel.o `test -f 'kernel.c' || echo '$(srcdir)/'`kernel.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-kernel.Tpo $(DEPDIR)/supermin_helper-kernel.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kernel.c' object='supermin_helper-kernel.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-kernel.o `test -f 'kernel.c' || echo '$(srcdir)/'`kernel.c
+
+supermin_helper-kernel.obj: kernel.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-kernel.obj -MD -MP -MF $(DEPDIR)/supermin_helper-kernel.Tpo -c -o supermin_helper-kernel.obj `if test -f 'kernel.c'; then $(CYGPATH_W) 'kernel.c'; else $(CYGPATH_W) '$(srcdir)/kernel.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-kernel.Tpo $(DEPDIR)/supermin_helper-kernel.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='kernel.c' object='supermin_helper-kernel.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-kernel.obj `if test -f 'kernel.c'; then $(CYGPATH_W) 'kernel.c'; else $(CYGPATH_W) '$(srcdir)/kernel.c'; fi`
+
+supermin_helper-main.o: main.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-main.o -MD -MP -MF $(DEPDIR)/supermin_helper-main.Tpo -c -o supermin_helper-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-main.Tpo $(DEPDIR)/supermin_helper-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='main.c' object='supermin_helper-main.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
+
+supermin_helper-main.obj: main.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-main.obj -MD -MP -MF $(DEPDIR)/supermin_helper-main.Tpo -c -o supermin_helper-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-main.Tpo $(DEPDIR)/supermin_helper-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='main.c' object='supermin_helper-main.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
+
+supermin_helper-utils.o: utils.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-utils.o -MD -MP -MF $(DEPDIR)/supermin_helper-utils.Tpo -c -o supermin_helper-utils.o `test -f 'utils.c' || echo '$(srcdir)/'`utils.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-utils.Tpo $(DEPDIR)/supermin_helper-utils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utils.c' object='supermin_helper-utils.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-utils.o `test -f 'utils.c' || echo '$(srcdir)/'`utils.c
+
+supermin_helper-utils.obj: utils.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -MT supermin_helper-utils.obj -MD -MP -MF $(DEPDIR)/supermin_helper-utils.Tpo -c -o supermin_helper-utils.obj `if test -f 'utils.c'; then $(CYGPATH_W) 'utils.c'; else $(CYGPATH_W) '$(srcdir)/utils.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/supermin_helper-utils.Tpo $(DEPDIR)/supermin_helper-utils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='utils.c' object='supermin_helper-utils.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_helper_CFLAGS) $(CFLAGS) -c -o supermin_helper-utils.obj `if test -f 'utils.c'; then $(CYGPATH_W) 'utils.c'; else $(CYGPATH_W) '$(srcdir)/utils.c'; fi`
 install-man8: $(man_MANS)
 	@$(NORMAL_INSTALL)
 	@list1=''; \
@@ -1585,20 +1579,20 @@ ext2init.S: init
 	  (echo "*** error: init is not staticly linked"; exit 1)
 	./bin2s.pl $< $@
 
-@HAVE_PERLDOC_TRUE@febootstrap-supermin-helper.8: febootstrap-supermin-helper.pod
+@HAVE_PERLDOC_TRUE@supermin-helper.8: supermin-helper.pod
 @HAVE_PERLDOC_TRUE@	pod2man \
 @HAVE_PERLDOC_TRUE@	  --section 8 \
 @HAVE_PERLDOC_TRUE@	  -c "Virtualization Support" \
 @HAVE_PERLDOC_TRUE@	  --release "$(PACKAGE_NAME)-$(PACKAGE_VERSION)" \
 @HAVE_PERLDOC_TRUE@	  $< > $@
 
-@HAVE_PERLDOC_TRUE@$(top_builddir)/html/febootstrap-supermin-helper.8.html: febootstrap-supermin-helper.pod
+@HAVE_PERLDOC_TRUE@$(top_builddir)/html/supermin-helper.8.html: supermin-helper.pod
 @HAVE_PERLDOC_TRUE@	mkdir -p $(top_builddir)/html
 @HAVE_PERLDOC_TRUE@	cd $(top_builddir) && pod2html \
 @HAVE_PERLDOC_TRUE@	  --css 'pod.css' \
 @HAVE_PERLDOC_TRUE@	  --htmldir html \
-@HAVE_PERLDOC_TRUE@	  --outfile html/febootstrap-supermin-helper.8.html \
-@HAVE_PERLDOC_TRUE@	  helper/febootstrap-supermin-helper.pod
+@HAVE_PERLDOC_TRUE@	  --outfile html/supermin-helper.8.html \
+@HAVE_PERLDOC_TRUE@	  helper/supermin-helper.pod
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
