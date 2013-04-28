@@ -3,7 +3,6 @@ Section: admin
 Priority: optional
 Maintainer: Debian Libvirt Maintainers <pkg-libvirt-maintainers@lists.alioth.debian.org>
 Uploaders: Hilko Bengen <bengen@debian.org>
-DM-Upload-Allowed: yes
 Build-Depends: debhelper (>= 9),
  dh-autoreconf,
  gawk, pkg-config,
@@ -20,10 +19,11 @@ Package: supermin
 Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends}, aptitude, cpio
 Description: tool for building supermin appliances.
- febootstrap is a tool for building supermin appliances. These are
- tiny appliances [similar to virtual machines], usually around 100KB
- in size, which get fully instantiated on-the-fly in a fraction of a
- second when one of them is booted.
+ Supermin (formerly called febootstrap) is a tool for building
+ supermin appliances. These are tiny appliances, similar to virtual
+ machines, usually around 100KB in size, which get fully instantiated
+ on-the-fly in a fraction of a second when you need to boot one of
+ them.
 
 Package: febootstrap
 Architecture: all
