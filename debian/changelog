@@ -1,3 +1,10 @@
+supermin (4.1.1-2) unstable; urgency=low
+
+  * debian/control: Updated long description, removed DM-Upload-Allowed
+    header
+
+ -- Hilko Bengen <bengen@debian.org>  Sun, 28 Apr 2013 23:34:20 +0200
+
 supermin (4.1.1-1) unstable; urgency=low
 
   * New renamed upstream version
