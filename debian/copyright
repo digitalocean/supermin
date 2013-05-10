@@ -4,7 +4,7 @@ This work was packaged for Debian by:
 
 It was downloaded from:
 
-    http://people.redhat.com/~rjones/febootstrap/files/
+    http://libguestfs.org/download/supermin/
 
 Upstream Authors:
 
@@ -13,7 +13,7 @@ Upstream Authors:
 
 Copyright:
 
-    Copyright (C) 2009-2010 Red Hat Inc.
+    Copyright (C) 2009-2013 Red Hat Inc.
 
 License:
 
@@ -36,6 +36,7 @@ Public License version 2 can be found in "/usr/share/common-licenses/GPL-2".
 The Debian packaging is:
 
     Copyright (C) 2009-2010 Richard W.M. Jones <rjones@redhat.com>
+    Copyright (C) 2011-2013 Hilko Bengen <bengen@debian.org>
 
 you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

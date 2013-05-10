@@ -11,9 +11,9 @@ Build-Depends: debhelper (>= 9),
  perl-doc,
  comerr-dev, e2fslibs-dev
 Standards-Version: 3.9.3
-Homepage: http://people.redhat.com/~rjones/febootstrap/
-Vcs-Git: git://git.debian.org/git/pkg-libvirt/febootstrap.git
-Vcs-Browser: http://git.debian.org/?p=pkg-libvirt/febootstrap.git
+Homepage: http://people.redhat.com/~rjones/supermin/
+Vcs-Git: git://git.debian.org/git/pkg-libvirt/supermin.git
+Vcs-Browser: http://git.debian.org/?p=pkg-libvirt/supermin.git
 
 Package: supermin
 Architecture: linux-any
