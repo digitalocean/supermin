@@ -19,7 +19,7 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = lib src helper
+SUBDIRS = lib src helper tests
 
 EXTRA_DIST = \
 	.gitignore \

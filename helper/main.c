@@ -47,9 +47,9 @@ static const struct option long_options[] = {
   { "help", 0, 0, HELP_OPTION },
   { "copy-kernel", 0, 0, 0 },
   { "format", required_argument, 0, 'f' },
-  { "group", 0, 0, 'g' },
+  { "group", required_argument, 0, 'g' },
   { "kmods", required_argument, 0, 'k' },
-  { "user", 0, 0, 'u' },
+  { "user", required_argument, 0, 'u' },
   { "verbose", 0, 0, 'v' },
   { "version", 0, 0, 'V' },
   { 0, 0, 0, 0 }
@@ -83,10 +83,10 @@ usage (FILE *f, const char *progname)
           "       Specify output format (default: cpio).\n"
           "  --copy-kernel\n"
           "       Copy the kernel instead of symlinking to it.\n"
-          "  -u user\n"
+          "  -u user | --user user\n"
           "       The user name or uid the appliance will run as. Use of this\n"
           "       option requires root privileges.\n"
-          "  -g group\n"
+          "  -g group | --group group\n"
           "       The group name or gid the appliance will run as. Use of\n"
           "       this option requires root privileges.\n"
           "  -k file | --kmods file\n"
