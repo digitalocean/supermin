@@ -17,7 +17,7 @@ dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 dnl
 dnl Written by Richard W.M. Jones <rjones@redhat.com>
 
-AC_INIT([supermin],[4.1.1])
+AC_INIT([supermin],[4.1.2])
 AM_INIT_AUTOMAKE
 
 dnl Check for basic C environment.
@@ -56,6 +56,10 @@ if test "$OCAMLFIND" = "no"; then
     AC_MSG_ERROR([You must install OCaml findlib (the ocamlfind command)])
 fi
 
+dnl Optional OCaml packages.
+AC_CHECK_OCAML_PKG([inifiles])
+AM_CONDITIONAL([HAVE_OCAML_INIFILES], [test "x$OCAML_PKG_inifiles" != "xno"])
+
 dnl Optional programs.
 AC_CHECK_PROG(PERLDOC,[perldoc],[perldoc],[no])
 if test "x$PERLDOC" = "xno" ; then
@@ -64,6 +68,7 @@ fi
 AM_CONDITIONAL(HAVE_PERLDOC,[test "$perldoc" != "no"])
 
 dnl For yum-rpm handler.
+AC_CHECK_PROG(ZYPPER,[zypper],[zypper],[no])
 AC_CHECK_PROG(YUM,[yum],[yum],[no])
 AC_CHECK_PROG(RPM,[rpm],[rpm],[no])
 AC_CHECK_PROG(YUMDOWNLOADER,[yumdownloader],[yumdownloader],[no])
@@ -136,10 +141,20 @@ if test "x$GAWK" = "xno" ; then
   AC_MSG_FAILURE([gawk (GNU awk) not found])
 fi
 
+dnl Disable network tests.
+AC_ARG_ENABLE([network-tests],
+    [AS_HELP_STRING([--disable-network-tests],
+                    [Disable tests that need a network connection.])],
+    [],
+    [enable_network_tests=yes])
+AM_CONDITIONAL([NETWORK_TESTS],
+               [test "x$enable_network_tests" = "xyes"])
+
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile
         helper/Makefile
         lib/Makefile
         src/config.ml
-        src/Makefile])
+        src/Makefile
+        tests/Makefile])
 AC_OUTPUT

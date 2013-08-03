@@ -1,6 +1,6 @@
 /* Traverse a file hierarchy.
 
-   Copyright (C) 2004-2012 Free Software Foundation, Inc.
+   Copyright (C) 2004-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -290,7 +290,7 @@ fts_set_stat_required (FTSENT *p, bool required)
 
 /* file-descriptor-relative opendir.  */
 /* FIXME: if others need this function, move it into lib/openat.c */
-static inline DIR *
+static DIR *
 internal_function
 opendirat (int fd, char const *dir, int extra_flags, int *pdir_fd)
 {
@@ -360,7 +360,7 @@ restore_initial_cwd (FTS *sp)
    descriptor.  Return -1 and set errno on failure.  It doesn't matter
    whether the file descriptor has read or write access.  */
 
-static inline int
+static int
 internal_function
 diropen (FTS const *sp, char const *dir)
 {
@@ -487,6 +487,17 @@ fts_open (char * const *argv,
         for (root = NULL, nitems = 0; *argv != NULL; ++argv, ++nitems) {
                 /* *Do* allow zero-length file names. */
                 size_t len = strlen(*argv);
+
+                if ( ! (options & FTS_VERBATIM))
+                  {
+                    /* If there are two or more trailing slashes, trim all but one,
+                       but don't change "//" to "/", and do map "///" to "/".  */
+                    char const *v = *argv;
+                    if (2 < len && v[len - 1] == '/')
+                      while (1 < len && v[len - 2] == '/')
+                        --len;
+                  }
+
                 if ((p = fts_alloc(sp, *argv, len)) == NULL)
                         goto mem3;
                 p->fts_level = FTS_ROOTLEVEL;
@@ -1894,7 +1905,7 @@ fts_alloc (FTS *sp, const char *name, register size_t namelen)
                 return (NULL);
 
         /* Copy the name and guarantee NUL termination. */
-        memmove(p->fts_name, name, namelen);
+        memcpy(p->fts_name, name, namelen);
         p->fts_name[namelen] = '\0';
 
         p->fts_namelen = namelen;

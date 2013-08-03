@@ -1,7 +1,7 @@
-# serial 44
+# serial 45
 # See if we need to use our replacement for Solaris' openat et al functions.
 
-dnl Copyright (C) 2004-2012 Free Software Foundation, Inc.
+dnl Copyright (C) 2004-2013 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -31,7 +31,6 @@ AC_DEFUN([gl_FUNC_OPENAT],
 # Prerequisites of lib/openat.c.
 AC_DEFUN([gl_PREREQ_OPENAT],
 [
-  AC_REQUIRE([AC_C_INLINE])
   AC_REQUIRE([gl_PROMOTED_TYPE_MODE_T])
   :
 ])

@@ -43,10 +43,23 @@ let get_installed_pkgs () =
     | [] -> assert false
     | pkgs -> pkgs
 
-let rec debian_resolve_dependencies_and_download names =
+(* Select which dependencies will be installed.  See apt-cache(8) for
+ * complete details.  Using "-i" means only Depends and Pre-depends
+ * are installed, which is stricter (fewer packages) than ordinary
+ * 'apt-get install'.  Otherwise, enable everything, then selectively
+ * disable what you don't want, to make it behave more like
+ * 'apt-get install'.
+ *)
+let which_dependencies = "-i"
+(*let which_dependencies = "--no-suggests --no-conflicts --no-breaks --no-replaces --no-enhances"*)
+
+let rec debian_resolve_dependencies_and_download names mode =
+  let which_dependencies =
+    if mode == PkgNames then which_dependencies ^ " --recurse"
+    else which_dependencies in
   let cmd =
-    sprintf "%s depends --recurse -i %s | grep -v '^[<[:space:]]' | grep -Ev ':\\w+\\b'"
-      Config.apt_cache
+    sprintf "%s depends %s %s | grep -v '^[<[:space:]]' | grep -Ev ':\\w+\\b'"
+      Config.apt_cache which_dependencies
       (String.concat " " (List.map Filename.quote names)) in
   let pkgs = run_command_get_lines cmd in
   let pkgs =
@@ -103,7 +116,7 @@ let rec debian_resolve_dependencies_and_download names =
 	eprintf "supermin: aptitude: error: no file was downloaded corresponding to package %s\n" pkg;
 	exit 1
       with
-	  Exit -> !r
+	  Exit -> tmpdir // !r
   ) download_pkgs in
 
   List.sort compare (List.append present_pkgs download_pkgs)
@@ -137,11 +150,11 @@ let debian_list_files_downloaded pkg =
   (* We actually need to extract the file in order to get the
    * information about modes etc.
    *)
-  let pkgdir = tmpdir // pkg ^ ".d" in
+  let pkgdir = tmpdir // Filename.basename pkg ^ ".d" in
   mkdir pkgdir 0o755;
   let cmd =
     sprintf "umask 0000; dpkg-deb --fsys-tarfile %s | (cd %s && tar xf -)"
-      (tmpdir // pkg) pkgdir in
+      pkg pkgdir in
   run_command cmd;
 
   let cmd = sprintf "cd %s && find ." pkgdir in
@@ -204,7 +217,7 @@ let debian_get_file_from_package pkg file =
   then
     file
   else
-    tmpdir // pkg ^ ".d" // file
+    tmpdir // Filename.basename pkg ^ ".d" // file
 
 let () =
   let ph = {
