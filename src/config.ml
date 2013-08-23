@@ -18,7 +18,7 @@
  *)
 
 let package_name = "supermin"
-let package_version = "4.1.2"
+let package_version = "4.1.3"
 let zypper = "no"
 let yum = "yum"
 let rpm = "rpm"

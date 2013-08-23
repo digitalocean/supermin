@@ -17,7 +17,7 @@ dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 dnl
 dnl Written by Richard W.M. Jones <rjones@redhat.com>
 
-AC_INIT([supermin],[4.1.2])
+AC_INIT([supermin],[4.1.3])
 AM_INIT_AUTOMAKE
 
 dnl Check for basic C environment.
@@ -152,6 +152,7 @@ AM_CONDITIONAL([NETWORK_TESTS],
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile
+        examples/Makefile
         helper/Makefile
         lib/Makefile
         src/config.ml
