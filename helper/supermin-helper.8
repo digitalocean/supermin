@@ -68,72 +68,10 @@
 .    \}
 .\}
 .rr rF
-.\"
-.\" Accent mark definitions (@(#)ms.acc 1.5 88/02/08 SMI; from UCB 4.2).
-.\" Fear.  Run.  Save yourself.  No user-serviceable parts.
-.    \" fudge factors for nroff and troff
-.if n \{\
-.    ds #H 0
-.    ds #V .8m
-.    ds #F .3m
-.    ds #[ \f1
-.    ds #] \fP
-.\}
-.if t \{\
-.    ds #H ((1u-(\\\\n(.fu%2u))*.13m)
-.    ds #V .6m
-.    ds #F 0
-.    ds #[ \&
-.    ds #] \&
-.\}
-.    \" simple accents for nroff and troff
-.if n \{\
-.    ds ' \&
-.    ds ` \&
-.    ds ^ \&
-.    ds , \&
-.    ds ~ ~
-.    ds /
-.\}
-.if t \{\
-.    ds ' \\k:\h'-(\\n(.wu*8/10-\*(#H)'\'\h"|\\n:u"
-.    ds ` \\k:\h'-(\\n(.wu*8/10-\*(#H)'\`\h'|\\n:u'
-.    ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'^\h'|\\n:u'
-.    ds , \\k:\h'-(\\n(.wu*8/10)',\h'|\\n:u'
-.    ds ~ \\k:\h'-(\\n(.wu-\*(#H-.1m)'~\h'|\\n:u'
-.    ds / \\k:\h'-(\\n(.wu*8/10-\*(#H)'\z\(sl\h'|\\n:u'
-.\}
-.    \" troff and (daisy-wheel) nroff accents
-.ds : \\k:\h'-(\\n(.wu*8/10-\*(#H+.1m+\*(#F)'\v'-\*(#V'\z.\h'.2m+\*(#F'.\h'|\\n:u'\v'\*(#V'
-.ds 8 \h'\*(#H'\(*b\h'-\*(#H'
-.ds o \\k:\h'-(\\n(.wu+\w'\(de'u-\*(#H)/2u'\v'-.3n'\*(#[\z\(de\v'.3n'\h'|\\n:u'\*(#]
-.ds d- \h'\*(#H'\(pd\h'-\w'~'u'\v'-.25m'\f2\(hy\fP\v'.25m'\h'-\*(#H'
-.ds D- D\\k:\h'-\w'D'u'\v'-.11m'\z\(hy\v'.11m'\h'|\\n:u'
-.ds th \*(#[\v'.3m'\s+1I\s-1\v'-.3m'\h'-(\w'I'u*2/3)'\s-1o\s+1\*(#]
-.ds Th \*(#[\s+2I\s-2\h'-\w'I'u*3/5'\v'-.3m'o\v'.3m'\*(#]
-.ds ae a\h'-(\w'a'u*4/10)'e
-.ds Ae A\h'-(\w'A'u*4/10)'E
-.    \" corrections for vroff
-.if v .ds ~ \\k:\h'-(\\n(.wu*9/10-\*(#H)'\s-2\u~\d\s+2\h'|\\n:u'
-.if v .ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'\v'-.4m'^\v'.4m'\h'|\\n:u'
-.    \" for low resolution devices (crt and lpr)
-.if \n(.H>23 .if \n(.V>19 \
-\{\
-.    ds : e
-.    ds 8 ss
-.    ds o a
-.    ds d- d\h'-1'\(ga
-.    ds D- D\h'-1'\(hy
-.    ds th \o'bp'
-.    ds Th \o'LP'
-.    ds ae ae
-.    ds Ae AE
-.\}
-.rm #[ #] #H #V #F C
 .\" ========================================================================
 .\"
 .IX Title "SUPERMIN-HELPER 8"
-.TH SUPERMIN-HELPER 8 "2013-07-29" "supermin-4.1.1" "Virtualization Support"
+.TH SUPERMIN-HELPER 8 "2013-09-06" "supermin-4.1.4" "Virtualization Support"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -142,9 +80,31 @@
 supermin\-helper \- Reconstruct initramfs from supermin appliance.
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
+New style (since supermin 4.1.5):
+.PP
+.Vb 1
+\& supermin\-helper [\-f cpio|ext2] \-o outputdir input [input...]
+.Ve
+.PP
+or:
+.PP
+.Vb 3
+\& supermin\-helper [\-f cpio|ext2] \-\-output\-kernel kernel \e
+\&   [\-\-output\-dtb dtb] \-\-output\-initrd initrd \e
+\&   [\-\-output\-appliance appliance] input [input...]
+.Ve
+.PP
+or:
+.PP
+.Vb 1
+\& supermin\-helper \-f checksum input [input ...]
+.Ve
+.PP
+Old style (still supported in this version but deprecated):
+.PP
 .Vb 2
-\& supermin\-helper supermin.img hostfiles.txt host_cpu kernel initrd
-\& supermin\-helper input [...] host_cpu kernel initrd
+\& supermin\-helper [\-f cpio] supermin.img hostfiles.txt host_cpu kernel initrd
+\& supermin\-helper [\-f cpio] input [...] host_cpu kernel initrd
 \&
 \& supermin\-helper \-f ext2 input [...] host_cpu kernel initrd appliance
 \&
@@ -156,26 +116,59 @@ supermin\-helper \- Reconstruct initramfs from supermin appliance.
 supermin appliance.  First you should be familiar with \fIsupermin\fR\|(8).
 .SH "PARAMETERS"
 .IX Header "PARAMETERS"
-Of the required parameters, the first few are \fIinput\fR files, and the
-last two or three are \fIoutput\fR files.
+Specify the \fIinput\fR file(s), and \fI\-o\fR or \fI\-\-output\-*\fR flags
+indicating where you want the appliance to be written.
+.PP
+Use the \fI\-f\fR option to select what type of appliance you want.
 .PP
 \&\f(CW\*(C`supermin.img\*(C'\fR and \f(CW\*(C`hostfiles.txt\*(C'\fR are the input files which
 describe the supermin appliance.  (You can also use a directory name
 here which is searched for files).
 .PP
-\&\f(CW\*(C`host_cpu\*(C'\fR should be the host \s-1CPU,\s0 eg. \f(CW\*(C`x86_64\*(C'\fR or \f(CW\*(C`i686\*(C'\fR.
+To write the appliance to a directory, use \fI\-o outputdir\fR.  The
+directory should already exist.  Files called \f(CW\*(C`outputdir/kernel\*(C'\fR,
+\&\f(CW\*(C`outputdir/dtb\*(C'\fR, \f(CW\*(C`outputdir/initrd\*(C'\fR and/or \f(CW\*(C`outputdir/appliance\*(C'\fR
+will be written.  (Not all files are written, it depends on what kind
+of appliance you asked for and what architecture you are running on)
 .PP
-\&\f(CW\*(C`kernel\*(C'\fR, \f(CW\*(C`initrd\*(C'\fR and \f(CW\*(C`appliance\*(C'\fR are the temporary output files
-that this script produces.  These output files are meant to be used
-just for booting the appliance, and should be deleted straight
-afterwards.  The extra \f(CW\*(C`appliance\*(C'\fR parameter is only required when
-the format is \f(CW\*(C`ext2\*(C'\fR.  None of these parameters are needed for
-the checksum output \f(CW\*(C`\-f checksum\*(C'\fR.
+To write files with specific names instead, use the
+\&\fI\-\-output\-kernel\fR, \fI\-\-output\-dtb\fR, \fI\-\-output\-initrd\fR and/or
+\&\fI\-\-output\-appliance\fR options.
 .SH "OPTIONS"
 .IX Header "OPTIONS"
 .IP "\fB\-\-help\fR" 4
 .IX Item "--help"
 Display brief command line usage, and exit.
+.IP "\fB\-\-copy\-kernel\fR" 4
+.IX Item "--copy-kernel"
+Copy the kernel (and device tree, if created) instead of symlinking to
+the kernel in \f(CW\*(C`/boot\*(C'\fR.
+.Sp
+This is fractionally slower, but is necessary if you want to change
+the permissions or SELinux label on the kernel or device tree.
+.IP "\fB\-\-dtb wildcard\fR" 4
+.IX Item "--dtb wildcard"
+If specified, search for a device tree which is compatible with the
+selected kernel and the name of which matches the given wildcard.  You
+can use a wildcard such as \f(CW\*(C`vexpress\-*a9*.dtb\*(C'\fR which would match
+\&\f(CW\*(C`vexpress\-v2p\-ca9.dtb\*(C'\fR.
+.Sp
+Notes:
+.RS 4
+.IP "\(bu" 4
+You may need to quote the wildcard to prevent it from being expanded
+by your shell.
+.IP "\(bu" 4
+If no \fI\-\-dtb\fR option is given, no device tree will be looked for.
+.IP "\(bu" 4
+You only need a device tree on architectures such as \s-1ARM\s0 and PowerPC
+which use them.  On other architectures, don't use this option.
+.IP "\(bu" 4
+If you use this option and no compatible device tree can be found,
+supermin-helper will exit with an error.
+.RE
+.RS 4
+.RE
 .IP "\fB\-f fmt\fR" 4
 .IX Item "-f fmt"
 .PD 0
@@ -188,8 +181,8 @@ Select the output format for the appliance.  Possible formats are:
 .IX Item "cpio"
 A Linux initramfs.  This is the default.
 .Sp
-In this case you have to supply names for the \f(CW\*(C`kernel\*(C'\fR
-and \f(CW\*(C`initrd\*(C'\fR, where the \f(CW\*(C`initrd\*(C'\fR is the appliance.
+In this case you have to supply output names for the \f(CW\*(C`kernel\*(C'\fR and
+\&\f(CW\*(C`initrd\*(C'\fR.  The \f(CW\*(C`initrd\*(C'\fR is the appliance.
 .Sp
 Note that \fIcpio\fR\|(1) might not be able to extract this file fully.
 The format used by the Linux kernel is not quite a true cpio file.
@@ -197,8 +190,8 @@ The format used by the Linux kernel is not quite a true cpio file.
 .IX Item "ext2"
 An ext2 filesystem.
 .Sp
-In this case you have to supply names for the \f(CW\*(C`kernel\*(C'\fR, a small
-\&\f(CW\*(C`initrd\*(C'\fR which is used just to locate the appliance, and the
+In this case you have to supply output names for the \f(CW\*(C`kernel\*(C'\fR, a
+small \f(CW\*(C`initrd\*(C'\fR which is used just to locate the appliance, and the
 \&\f(CW\*(C`appliance\*(C'\fR (the ext2 filesystem).
 .IP "checksum" 4
 .IX Item "checksum"
@@ -215,12 +208,12 @@ host_cpu and the \s-1UID\s0 of the current user are included in the checksum.
 .RE
 .RS 4
 .RE
-.IP "\fB\-\-copy\-kernel\fR" 4
-.IX Item "--copy-kernel"
-Copy the kernel instead of symlinking to the kernel in \f(CW\*(C`/boot\*(C'\fR.
-.Sp
-This is fractionally slower, but is necessary if you want to change
-the permissions or SELinux label on the kernel.
+.IP "\fB\-\-host\-cpu cpu\fR" 4
+.IX Item "--host-cpu cpu"
+Specify the host \s-1CPU \s0(eg. \f(CW\*(C`i686\*(C'\fR, \f(CW\*(C`x86_64\*(C'\fR).  This is used as a
+substring match when searching for compatible kernels.  If not
+specified, it defaults to the host \s-1CPU\s0 that supermin-helper was
+compiled on.
 .IP "\fB\-k file\fR" 4
 .IX Item "-k file"
 .PD 0
@@ -244,6 +237,60 @@ automatically.
 If this option is not specified, then every kernel module from the
 host will be included.  This is safer, but can produce rather large
 appliances which need a lot more memory to boot.
+.IP "\fB\-o outputdir\fR" 4
+.IX Item "-o outputdir"
+Write the appliance to the named directory.  Two or more of the
+following files will be created (the exact files created depends on
+the type of appliance you asked for and the architecture):
+.RS 4
+.ie n .IP """outputdir/kernel""" 4
+.el .IP "\f(CWoutputdir/kernel\fR" 4
+.IX Item "outputdir/kernel"
+(ie. A file literally called \f(CW\*(C`kernel\*(C'\fR in the directory \fIoutputdir\fR
+that you specified).  This is usually a symlink to the kernel, unless
+you gave the \fI\-\-copy\-kernel\fR option.
+.ie n .IP """outputdir/dtb""" 4
+.el .IP "\f(CWoutputdir/dtb\fR" 4
+.IX Item "outputdir/dtb"
+The device tree.  See also the \fI\-\-dtb\fR option.
+.Sp
+This is only created on architectures that use device trees, eg. \s-1ARM.\s0
+.Sp
+This is usually a symlink to the device tree binary file, unless you
+gave the \fI\-\-copy\-kernel\fR option.
+.ie n .IP """outputdir/initrd""" 4
+.el .IP "\f(CWoutputdir/initrd\fR" 4
+.IX Item "outputdir/initrd"
+The initrd.  For \fI\-f cpio\fR this also contains the full appliance.
+For \fI\-f ext2\fR this is just a small initrd which is sufficient to find
+and mount the appliance disk.
+.ie n .IP """outputdir/appliance""" 4
+.el .IP "\f(CWoutputdir/appliance\fR" 4
+.IX Item "outputdir/appliance"
+The appliance disk (only for \fI\-f ext2\fR).
+.RE
+.RS 4
+.RE
+.IP "\fB\-\-output\-kernel kernel\fR" 4
+.IX Item "--output-kernel kernel"
+Instead of using the literal hard-coded name \f(CW\*(C`kernel\*(C'\fR, write the
+kernel to the named path.
+This overrides the \fI\-o outputdir\fR option (if present).
+.IP "\fB\-\-output\-dtb dtb\fR" 4
+.IX Item "--output-dtb dtb"
+Instead of using the literal hard-coded name \f(CW\*(C`dtb\*(C'\fR, write the
+device tree to the named path.
+This overrides the \fI\-o outputdir\fR option (if present).
+.IP "\fB\-\-output\-initrd initrd\fR" 4
+.IX Item "--output-initrd initrd"
+Instead of using the literal hard-coded name \f(CW\*(C`initrd\*(C'\fR, write the
+initrd to the named path.
+This overrides the \fI\-o outputdir\fR option (if present).
+.IP "\fB\-\-output\-initrd appliance\fR" 4
+.IX Item "--output-initrd appliance"
+Instead of using the literal hard-coded name \f(CW\*(C`appliance\*(C'\fR, write the
+initrd to the named path.
+This overrides the \fI\-o outputdir\fR option (if present).
 .IP "\fB\-u user\fR" 4
 .IX Item "-u user"
 .PD 0
@@ -278,6 +325,13 @@ Enable verbose messages (give multiple times for more verbosity).
 .IX Item "--version"
 .PD
 Display version number and exit.
+.SH "COMPRESSED INPUT FILES"
+.IX Header "COMPRESSED INPUT FILES"
+supermin-helper ≥ 4.1.4 supports gzip-compressed input cpio image
+files.  \f(CW\*(C`hostfiles\*(C'\fR cannot be compressed.
+.PP
+Compressing input files saves space, but can make supermin-helper run
+fractionally slower.
 .SH "SPEED"
 .IX Header "SPEED"
 In libguestfs, on a mid-range Intel-based \s-1PC,\s0 we reconstruct the
@@ -313,6 +367,9 @@ The environment variable should point to a module directory,
 eg. \f(CW\*(C`/lib/modules/3.0.x86_64/\*(C'\fR
 .Sp
 This has no effect if \f(CW\*(C`SUPERMIN_KERNEL\*(C'\fR is not set.
+.IP "\s-1SUPERMIN_DTB\s0" 4
+.IX Item "SUPERMIN_DTB"
+Force the given device tree file to be used.
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
 \&\fIsupermin\fR\|(8).

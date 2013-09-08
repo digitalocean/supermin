@@ -266,14 +266,14 @@
    declares uintmax_t. */
 #undef HAVE_INTTYPES_H_WITH_UINTMAX
 
-/* Define to 1 if you have the `z' library (-lz). */
-#undef HAVE_LIBZ
-
 /* Define to 1 if the system has the type 'long long int'. */
 #undef HAVE_LONG_LONG_INT
 
 /* Define to 1 if you have the 'lstat' function. */
 #undef HAVE_LSTAT
+
+/* Define if you have static lzma */
+#undef HAVE_LZMA_STATIC
 
 /* Define if the 'malloc' function is POSIX compliant. */
 #undef HAVE_MALLOC_POSIX
@@ -996,6 +996,12 @@
 /* Define to 1 if O_NOFOLLOW works. */
 #undef HAVE_WORKING_O_NOFOLLOW
 
+/* Define if you have zlib */
+#undef HAVE_ZLIB
+
+/* Define if you have static zlib */
+#undef HAVE_ZLIB_STATIC
+
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
 
@@ -1258,6 +1264,9 @@
 
 /* A replacement for va_copy, if needed.  */
 #define gl_va_copy(a,b) ((a) = (b))
+
+/* Host architecture. */
+#undef host_cpu
 
 /* Define to long or long long if <stdint.h> and <inttypes.h> don't define. */
 #undef intmax_t

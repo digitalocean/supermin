@@ -35,7 +35,7 @@ supermin_helper_SOURCES = \
 supermin_helper_CFLAGS = \
 	-Wall $(EXT2FS_CFLAGS) $(COM_ERR_CFLAGS) -I../lib
 supermin_helper_LDADD = \
-	ext2init.o $(EXT2FS_LIBS) $(COM_ERR_LIBS) \
+	ext2init.o $(EXT2FS_LIBS) $(COM_ERR_LIBS) $(ZLIB_LIBS) \
 	$(LTLIBINTL) -L../lib -lgnu
 
 # init "script" used by ext2 initrd.
@@ -43,6 +43,7 @@ noinst_PROGRAMS = init
 init_SOURCES = init.c
 init_CFLAGS = -static
 init_LDFLAGS = -static
+init_LDADD = $(ZLIB_STATIC_LIBS) $(LZMA_STATIC_LIBS)
 
 CLEANFILES = ext2init.S
 
@@ -62,6 +63,7 @@ if HAVE_PERLDOC
 
 supermin-helper.8: supermin-helper.pod
 	pod2man \
+	  -u \
 	  --section 8 \
 	  -c "Virtualization Support" \
 	  --release "$(PACKAGE_NAME)-$(PACKAGE_VERSION)" \

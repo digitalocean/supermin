@@ -166,7 +166,8 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man8dir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_init_OBJECTS = init-init.$(OBJEXT)
 init_OBJECTS = $(am_init_OBJECTS)
-init_LDADD = $(LDADD)
+am__DEPENDENCIES_1 =
+init_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 init_LINK = $(CCLD) $(init_CFLAGS) $(CFLAGS) $(init_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am_supermin_helper_OBJECTS = supermin_helper-appliance.$(OBJEXT) \
@@ -177,9 +178,9 @@ am_supermin_helper_OBJECTS = supermin_helper-appliance.$(OBJEXT) \
 	supermin_helper-kernel.$(OBJEXT) \
 	supermin_helper-main.$(OBJEXT) supermin_helper-utils.$(OBJEXT)
 supermin_helper_OBJECTS = $(am_supermin_helper_OBJECTS)
-am__DEPENDENCIES_1 =
 supermin_helper_DEPENDENCIES = ext2init.o $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 supermin_helper_LINK = $(CCLD) $(supermin_helper_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -793,6 +794,7 @@ LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBINTL = @LTLIBINTL@
 LTLIBOBJS = @LTLIBOBJS@
+LZMA_STATIC_LIBS = @LZMA_STATIC_LIBS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 MKE2FS = @MKE2FS@
@@ -1013,6 +1015,7 @@ UINT64_MAX_EQ_ULONG_MAX = @UINT64_MAX_EQ_ULONG_MAX@
 UNDEFINE_STRTOK_R = @UNDEFINE_STRTOK_R@
 UNISTD_H_HAVE_WINSOCK2_H = @UNISTD_H_HAVE_WINSOCK2_H@
 UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS = @UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS@
+URPMI = @URPMI@
 VERSION = @VERSION@
 WCHAR_T_SUFFIX = @WCHAR_T_SUFFIX@
 WINDOWS_64_BIT_OFF_T = @WINDOWS_64_BIT_OFF_T@
@@ -1020,6 +1023,8 @@ WINDOWS_64_BIT_ST_SIZE = @WINDOWS_64_BIT_ST_SIZE@
 WINT_T_SUFFIX = @WINT_T_SUFFIX@
 YUM = @YUM@
 YUMDOWNLOADER = @YUMDOWNLOADER@
+ZLIB_LIBS = @ZLIB_LIBS@
+ZLIB_STATIC_LIBS = @ZLIB_STATIC_LIBS@
 ZYPPER = @ZYPPER@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -1093,12 +1098,13 @@ supermin_helper_CFLAGS = \
 	-Wall $(EXT2FS_CFLAGS) $(COM_ERR_CFLAGS) -I../lib
 
 supermin_helper_LDADD = \
-	ext2init.o $(EXT2FS_LIBS) $(COM_ERR_LIBS) \
+	ext2init.o $(EXT2FS_LIBS) $(COM_ERR_LIBS) $(ZLIB_LIBS) \
 	$(LTLIBINTL) -L../lib -lgnu
 
 init_SOURCES = init.c
 init_CFLAGS = -static
 init_LDFLAGS = -static
+init_LDADD = $(ZLIB_STATIC_LIBS) $(LZMA_STATIC_LIBS)
 CLEANFILES = ext2init.S
 man_MANS = \
 	supermin-helper.8
@@ -1634,6 +1640,7 @@ ext2init.S: init
 
 @HAVE_PERLDOC_TRUE@supermin-helper.8: supermin-helper.pod
 @HAVE_PERLDOC_TRUE@	pod2man \
+@HAVE_PERLDOC_TRUE@	  -u \
 @HAVE_PERLDOC_TRUE@	  --section 8 \
 @HAVE_PERLDOC_TRUE@	  -c "Virtualization Support" \
 @HAVE_PERLDOC_TRUE@	  --release "$(PACKAGE_NAME)-$(PACKAGE_VERSION)" \

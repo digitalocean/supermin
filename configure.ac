@@ -17,7 +17,7 @@ dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 dnl
 dnl Written by Richard W.M. Jones <rjones@redhat.com>
 
-AC_INIT([supermin],[4.1.3])
+AC_INIT([supermin],[4.1.5])
 AM_INIT_AUTOMAKE
 
 dnl Check for basic C environment.
@@ -36,6 +36,9 @@ dnl Check support for 64 bit file offsets.
 AC_SYS_LARGEFILE
 
 gl_INIT
+
+dnl Define a C symbol for the host CPU architecture.
+AC_DEFINE_UNQUOTED([host_cpu],["$host_cpu"],[Host architecture.])
 
 # Define $(SED).
 m4_ifdef([AC_PROG_SED],[
@@ -68,10 +71,15 @@ fi
 AM_CONDITIONAL(HAVE_PERLDOC,[test "$perldoc" != "no"])
 
 dnl For yum-rpm handler.
-AC_CHECK_PROG(ZYPPER,[zypper],[zypper],[no])
 AC_CHECK_PROG(YUM,[yum],[yum],[no])
 AC_CHECK_PROG(RPM,[rpm],[rpm],[no])
 AC_CHECK_PROG(YUMDOWNLOADER,[yumdownloader],[yumdownloader],[no])
+
+dnl For Zypper handler.
+AC_CHECK_PROG(ZYPPER,[zypper],[zypper],[no])
+
+dnl For URPMI handler.
+AC_CHECK_PROG(URPMI,[urpmi],[urpmi],[no], [$PATH$PATH_SEPARATOR/usr/sbin])
 
 dnl For Debian handler.
 AC_CHECK_PROG(APTITUDE,[aptitude],[aptitude],[no])
@@ -96,8 +104,77 @@ AC_SUBST([APT_CACHE_DEPENDS_RECURSE_BROKEN])
 dnl For ArchLinux handler.
 AC_CHECK_PROG(PACMAN,[pacman],[pacman],[no])
 
-dnl Support for gzipped kernel modules.
-AC_CHECK_LIB([z],[gzopen])
+dnl Support for compressed input files, gzipped kernel modules.
+AC_CHECK_HEADER([zlib.h],[
+    AC_CHECK_LIB([z],[gzopen],[
+        zlib=yes
+        ZLIB_LIBS=-lz
+
+        AC_MSG_CHECKING([for gzip static library])
+        old_CFLAGS="$CFLAGS"
+        old_LDFLAGS="$LDFLAGS"
+        old_LIBS="$LIBS"
+        CFLAGS="$CFLAGS -static"
+        LDFLAGS="$LDFLAGS -static"
+        LIBS="$LIBS -lz"
+        AC_LINK_IFELSE([
+            #include <stdio.h>
+            #include <stdlib.h>
+            #include <zlib.h>
+            int main () { gzFile g = gzopen ("test", "rb"); exit (g ? 1 : 0); }
+        ],[
+            zlib_static=yes
+            ZLIB_STATIC_LIBS="$ZLIB_LIBS"
+            AC_MSG_RESULT([yes])
+        ],[
+            AC_MSG_RESULT([no])
+        ])
+        CFLAGS="$old_CFLAGS"
+        LDFLAGS="$old_LDFLAGS"
+        LIBS="$old_LIBS"
+    ])
+])
+if test "x$zlib" = "xyes"; then
+    AC_DEFINE([HAVE_ZLIB],[1],[Define if you have zlib])
+    AC_SUBST([ZLIB_LIBS])
+fi
+if test "x$zlib_static" = "xyes"; then
+    AC_DEFINE([HAVE_ZLIB_STATIC],[1],[Define if you have static zlib])
+    AC_SUBST([ZLIB_STATIC_LIBS])
+fi
+
+dnl Support for xzed kernel modules.
+AC_CHECK_HEADER([lzma.h],[
+    AC_CHECK_LIB([lzma],[lzma_code],[
+        AC_MSG_CHECKING([for xz static library])
+        old_CFLAGS="$CFLAGS"
+        old_LDFLAGS="$LDFLAGS"
+        old_LIBS="$LIBS"
+        CFLAGS="$CFLAGS -static"
+        LDFLAGS="$LDFLAGS -static"
+        LIBS="$LIBS -llzma"
+        AC_LINK_IFELSE([
+            #include <stdio.h>
+            #include <stdlib.h>
+            #include <lzma.h>
+            int main () { lzma_stream s = LZMA_STREAM_INIT;
+                 exit (s.next_in == NULL ? 1 : 0); }
+        ],[
+            lzma_static=yes
+            LZMA_STATIC_LIBS="-llzma"
+            AC_MSG_RESULT([yes])
+        ],[
+            AC_MSG_RESULT([no])
+        ])
+        CFLAGS="$old_CFLAGS"
+        LDFLAGS="$old_LDFLAGS"
+        LIBS="$old_LIBS"
+    ])
+])
+if test "x$lzma_static" = "xyes"; then
+    AC_DEFINE([HAVE_LZMA_STATIC],[1],[Define if you have static lzma])
+    AC_SUBST([LZMA_STATIC_LIBS])
+fi
 
 dnl mke2fs.
 AC_PATH_PROG([MKE2FS],[mke2fs],[no],
