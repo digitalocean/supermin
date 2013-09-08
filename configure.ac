@@ -17,7 +17,7 @@ dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 dnl
 dnl Written by Richard W.M. Jones <rjones@redhat.com>
 
-AC_INIT([supermin],[4.1.4])
+AC_INIT([supermin],[4.1.5])
 AM_INIT_AUTOMAKE
 
 dnl Check for basic C environment.
@@ -36,6 +36,9 @@ dnl Check support for 64 bit file offsets.
 AC_SYS_LARGEFILE
 
 gl_INIT
+
+dnl Define a C symbol for the host CPU architecture.
+AC_DEFINE_UNQUOTED([host_cpu],["$host_cpu"],[Host architecture.])
 
 # Define $(SED).
 m4_ifdef([AC_PROG_SED],[

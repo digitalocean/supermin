@@ -1265,6 +1265,9 @@
 /* A replacement for va_copy, if needed.  */
 #define gl_va_copy(a,b) ((a) = (b))
 
+/* Host architecture. */
+#undef host_cpu
+
 /* Define to long or long long if <stdint.h> and <inttypes.h> don't define. */
 #undef intmax_t
 
