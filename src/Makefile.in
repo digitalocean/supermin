@@ -756,6 +756,7 @@ LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBINTL = @LTLIBINTL@
 LTLIBOBJS = @LTLIBOBJS@
+LZMA_STATIC_LIBS = @LZMA_STATIC_LIBS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 MKE2FS = @MKE2FS@
@@ -976,6 +977,7 @@ UINT64_MAX_EQ_ULONG_MAX = @UINT64_MAX_EQ_ULONG_MAX@
 UNDEFINE_STRTOK_R = @UNDEFINE_STRTOK_R@
 UNISTD_H_HAVE_WINSOCK2_H = @UNISTD_H_HAVE_WINSOCK2_H@
 UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS = @UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS@
+URPMI = @URPMI@
 VERSION = @VERSION@
 WCHAR_T_SUFFIX = @WCHAR_T_SUFFIX@
 WINDOWS_64_BIT_OFF_T = @WINDOWS_64_BIT_OFF_T@
@@ -983,6 +985,8 @@ WINDOWS_64_BIT_ST_SIZE = @WINDOWS_64_BIT_ST_SIZE@
 WINT_T_SUFFIX = @WINT_T_SUFFIX@
 YUM = @YUM@
 YUMDOWNLOADER = @YUMDOWNLOADER@
+ZLIB_LIBS = @ZLIB_LIBS@
+ZLIB_STATIC_LIBS = @ZLIB_STATIC_LIBS@
 ZYPPER = @ZYPPER@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -1050,6 +1054,7 @@ EXTRA_DIST = \
 	supermin_package_handlers.mli \
 	supermin_package_handlers.ml \
 	supermin_pacman.ml \
+	supermin_urpmi_rpm.ml \
 	supermin_utils.mli \
 	supermin_utils.ml \
 	supermin_yum_rpm.ml \
@@ -1060,8 +1065,8 @@ EXTRA_DIST = \
 SOURCES = config.ml supermin_cmdline.mli supermin_cmdline.ml \
 	supermin_utils.mli supermin_utils.ml \
 	supermin_package_handlers.mli supermin_package_handlers.ml \
-	$(am__append_1) supermin_yum_rpm.ml supermin_debian.ml \
-	supermin_pacman.ml supermin.ml
+	$(am__append_1) supermin_yum_rpm.ml supermin_urpmi_rpm.ml \
+	supermin_debian.ml supermin_pacman.ml supermin.ml
 CLEANFILES = *~ *.cmi *.cmo *.cmx *.o supermin
 man_MANS = \
 	supermin.8
@@ -1435,6 +1440,8 @@ supermin_package_handlers.cmo: supermin_utils.cmi supermin_cmdline.cmi supermin_
 supermin_package_handlers.cmx: supermin_utils.cmx supermin_cmdline.cmx supermin_package_handlers.cmi
 supermin_pacman.cmo: supermin_utils.cmi supermin_package_handlers.cmi supermin_cmdline.cmi config.cmo
 supermin_pacman.cmx: supermin_utils.cmx supermin_package_handlers.cmx supermin_cmdline.cmx config.cmx
+supermin_urpmi_rpm.cmo: supermin_utils.cmi supermin_package_handlers.cmi supermin_cmdline.cmi config.cmo
+supermin_urpmi_rpm.cmx: supermin_utils.cmx supermin_package_handlers.cmx supermin_cmdline.cmx config.cmx
 supermin_utils.cmi:
 supermin_utils.cmo: supermin_cmdline.cmi supermin_utils.cmi
 supermin_utils.cmx: supermin_cmdline.cmx supermin_utils.cmi
@@ -1443,6 +1450,7 @@ supermin_yum_rpm.cmx: supermin_utils.cmx supermin_package_handlers.cmx supermin_
 
 @HAVE_PERLDOC_TRUE@supermin.8: supermin.pod
 @HAVE_PERLDOC_TRUE@	pod2man \
+@HAVE_PERLDOC_TRUE@	  -u \
 @HAVE_PERLDOC_TRUE@	  --section 8 \
 @HAVE_PERLDOC_TRUE@	  -c "Virtualization Support" \
 @HAVE_PERLDOC_TRUE@	  --release "$(PACKAGE_NAME)-$(PACKAGE_VERSION)" \
