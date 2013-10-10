@@ -1,3 +1,10 @@
+supermin (4.1.5-2) unstable; urgency=low
+
+  * Added build-dependencies for gz, lzma support
+  * Updated TODO
+
+ -- Hilko Bengen <bengen@debian.org>  Thu, 10 Oct 2013 14:37:44 +0200
+
 supermin (4.1.5-1) unstable; urgency=low
 
   * New upstream version
