@@ -1,4 +1,3 @@
-- Figure out default ELF object architectures for
-  armel, ia64, mips, mipsel, s390, sparc
+- Figure out how to easily add "Built-Using" field (supermin init)
 - (Possibly) figure out how to set up an initrd equivalent for
   kfreebsd-*, hurd-*
