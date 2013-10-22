@@ -10,6 +10,9 @@ override_dh_auto_build:
 	chmod a+x helper/bin2s.pl
 	dh_auto_build
 
+override_dh_gencontrol:
+	dh_gencontrol -- -Vmisc:Built-Using="$(shell dpkg-query -f '$${source:Package} (= $${source:Version}), ' -W zlib1g-dev liblzma-dev)"
+
 %:
 	dh $@ --with=ocaml,autoreconf
 
