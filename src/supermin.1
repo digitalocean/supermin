@@ -70,8 +70,8 @@
 .rr rF
 .\" ========================================================================
 .\"
-.IX Title "SUPERMIN 8"
-.TH SUPERMIN 8 "2013-08-28" "supermin-4.1.3" "Virtualization Support"
+.IX Title "SUPERMIN 1"
+.TH SUPERMIN 1 "2013-11-12" "supermin-4.1.5" "Virtualization Support"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -259,7 +259,7 @@ to compress the output yourself, eg by doing:
 .Ve
 .SS "\s-1RECONSTRUCTING THE APPLIANCE\s0"
 .IX Subsection "RECONSTRUCTING THE APPLIANCE"
-The separate tool \fIsupermin\-helper\fR\|(8) is used to
+The separate tool \fIsupermin\-helper\fR\|(1) is used to
 reconstruct an appliance from the hostfiles and base image files.
 .PP
 This program in fact iterates recursively over the files and
@@ -353,7 +353,7 @@ host kernel.
 .PP
 supermin-helper is able to choose the best host kernel
 available to boot the appliance.  Users can override this by setting
-environment variables (see \fIsupermin\-helper\fR\|(8)).
+environment variables (see \fIsupermin\-helper\fR\|(1)).
 .SS "\s-1BOOTING AND CACHING THE SUPERMIN APPLIANCE\s0"
 .IX Subsection "BOOTING AND CACHING THE SUPERMIN APPLIANCE"
 For fastest boot times you should cache the output of
@@ -369,7 +369,7 @@ appliance, so that package cannot be installed without pulling in the
 dependent packages and thus making sure the host files are available.
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
-\&\fIsupermin\-helper\fR\|(8),
+\&\fIsupermin\-helper\fR\|(1),
 <http://people.redhat.com/~rjones/supermin/>,
 \&\fIguestfs\fR\|(3),
 <http://libguestfs.org/>.
