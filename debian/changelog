@@ -1,3 +1,9 @@
+supermin (4.1.6-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Hilko Bengen <bengen@debian.org>  Sun, 05 Jan 2014 18:06:16 +0100
+
 supermin (4.1.5-3) unstable; urgency=low
 
   * Added Built-Using flag
