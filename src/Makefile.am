@@ -18,8 +18,9 @@
 # Written by Richard W.M. Jones <rjones@redhat.com>
 
 EXTRA_DIST = \
+	.depend \
 	config.ml \
-	supermin.8 \
+	supermin.1 \
 	supermin.pod \
 	supermin.ml \
 	supermin_cmdline.mli \
@@ -28,6 +29,7 @@ EXTRA_DIST = \
 	supermin_package_handlers.mli \
 	supermin_package_handlers.ml \
 	supermin_pacman.ml \
+	supermin_pacman_g2.ml \
 	supermin_urpmi_rpm.ml \
 	supermin_utils.mli \
 	supermin_utils.ml \
@@ -43,9 +45,17 @@ SOURCES = \
 	supermin_utils.ml \
 	supermin_package_handlers.mli \
 	supermin_package_handlers.ml
+# Can't use filter for this because of automake brokenness.
+SOURCES_ML = \
+	config.ml \
+	supermin_cmdline.ml \
+	supermin_utils.ml \
+	supermin_package_handlers.ml
 
 if HAVE_OCAML_INIFILES
 SOURCES += \
+	supermin_zypp_rpm.ml
+SOURCES_ML += \
 	supermin_zypp_rpm.ml
 endif
 
@@ -54,16 +64,23 @@ SOURCES += \
 	supermin_urpmi_rpm.ml \
 	supermin_debian.ml \
 	supermin_pacman.ml \
+	supermin_pacman_g2.ml \
+	supermin.ml
+SOURCES_ML += \
+	supermin_yum_rpm.ml \
+	supermin_urpmi_rpm.ml \
+	supermin_debian.ml \
+	supermin_pacman.ml \
+	supermin_pacman_g2.ml \
 	supermin.ml
 
 CLEANFILES = *~ *.cmi *.cmo *.cmx *.o supermin
 
 man_MANS = \
-	supermin.8
+	supermin.1
 
 bin_SCRIPTS = supermin
 
-SOURCES_ML = $(filter %.ml,$(SOURCES))
 BOBJECTS = $(SOURCES_ML:.ml=.cmo)
 XOBJECTS = $(SOURCES_ML:.ml=.cmx)
 
@@ -103,29 +120,29 @@ depend: .depend
 	  sort > $@-t
 	mv $@-t $@
 
-include .depend
+-include .depend
 
 SUFFIXES = .cmo .cmi .cmx .ml .mli .mll .mly
 
 if HAVE_PERLDOC
 
-supermin.8: supermin.pod
+supermin.1: supermin.pod
 	pod2man \
 	  -u \
-	  --section 8 \
+	  --section 1 \
 	  -c "Virtualization Support" \
 	  --release "$(PACKAGE_NAME)-$(PACKAGE_VERSION)" \
 	  $< > $@
 
 noinst_DATA = \
-	../html/supermin.8.html
+	../html/supermin.1.html
 
-../html/supermin.8.html: supermin.pod
+../html/supermin.1.html: supermin.pod
 	mkdir -p ../html
 	pod2html \
 	  --css 'pod.css' \
 	  --htmldir ../html \
-	  --outfile ../html/supermin.8.html \
+	  --outfile ../html/supermin.1.html \
 	  supermin.pod
 
 endif

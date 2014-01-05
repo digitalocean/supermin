@@ -18,7 +18,7 @@
  *)
 
 let package_name = "supermin"
-let package_version = "4.1.5"
+let package_version = "4.1.6"
 let zypper = "no"
 let yum = "yum"
 let urpmi = "no"
@@ -28,5 +28,6 @@ let aptitude = "no"
 let apt_cache = "no"
 let dpkg = "no"
 let apt_cache_depends_recurse_broken = false
-let pacman = "no"
+let pacman = ""
+let pacman_g2 = "no"
 let host_cpu = "x86_64"
