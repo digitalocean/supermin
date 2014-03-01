@@ -1,5 +1,5 @@
-(* supermin 4
- * Copyright (C) 2009-2013 Red Hat Inc.
+(* supermin 5
+ * Copyright (C) 2009-2014 Red Hat Inc.
  * @configure_input@
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,15 +19,23 @@
 
 let package_name = "@PACKAGE_NAME@"
 let package_version = "@PACKAGE_VERSION@"
-let zypper = "@ZYPPER@"
-let yum = "@YUM@"
-let urpmi = "@URPMI@"
-let rpm = "@RPM@"
-let yumdownloader = "@YUMDOWNLOADER@"
-let aptitude = "@APTITUDE@"
-let apt_cache = "@APT_CACHE@"
-let dpkg = "@DPKG@"
-let apt_cache_depends_recurse_broken = @APT_CACHE_DEPENDS_RECURSE_BROKEN@
-let pacman = "@PACMAN@"
-let pacman_g2 = "@PACMAN_G2@"
 let host_cpu = "@host_cpu@"
+
+let apt_get = "@APT_GET@"
+let cpio = "@CPIO@"
+let dpkg = "@DPKG@"
+let dpkg_deb = "@DPKG_DEB@"
+let dpkg_query = "@DPKG_QUERY@"
+let fakeroot = "@FAKEROOT@"
+let makepkg = "@MAKEPKG@"
+let pacman = "@PACMAN@"
+let pactree = "@PACTREE@"
+let pacman_g2 = "@PACMAN_G2@"
+let rpm = "@RPM@"
+let rpm2cpio = "@RPM2CPIO@"
+let urpmi = "@URPMI@"
+let yumdownloader = "@YUMDOWNLOADER@"
+let zypper = "@ZYPPER@"
+
+let mke2fs = "@MKE2FS@"
+let mke2fs_t_option = "@MKE2FS_T_OPTION@"

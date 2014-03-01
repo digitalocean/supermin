@@ -19,20 +19,22 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = lib src helper examples tests
+SUBDIRS = lib src examples tests
 
 EXTRA_DIST = \
 	.gitignore \
-	.gitmodules \
 	autogen.sh \
+	bootstrap \
+	HACKING \
 	html/pod.css \
 	m4/gnulib-cache.m4 \
+	README \
+	TODO \
 	$(SOURCES)
 
 # Maintainer website update.
 HTMLFILES = \
-	html/supermin.1.html \
-	html/supermin-helper.1.html
+	html/supermin.1.html
 
 WEBSITEDIR = $(HOME)/d/redhat/websites/libguestfs
 

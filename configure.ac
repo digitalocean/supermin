@@ -1,5 +1,5 @@
 dnl supermin configure.ac
-dnl (C) Copyright 2009-2013 Red Hat Inc.
+dnl (C) Copyright 2009-2014 Red Hat Inc.
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 dnl
 dnl Written by Richard W.M. Jones <rjones@redhat.com>
 
-AC_INIT([supermin],[4.1.6])
+AC_INIT([supermin],[5.1.1])
 AM_INIT_AUTOMAKE(foreign)
 
 dnl Check for basic C environment.
@@ -32,13 +32,17 @@ test "x$U" != "x" && AC_MSG_ERROR([Compiler not ANSI compliant])
 
 AM_PROG_CC_C_O
 
+dnl Gnulib
+gl_INIT
+
 dnl Check support for 64 bit file offsets.
 AC_SYS_LARGEFILE
 
-gl_INIT
+dnl Enable GNU stuff.
+AC_USE_SYSTEM_EXTENSIONS
 
-dnl Define a C symbol for the host CPU architecture.
-AC_DEFINE_UNQUOTED([host_cpu],["$host_cpu"],[Host architecture.])
+dnl Define the host CPU architecture (defines host_cpu).
+AC_CANONICAL_HOST
 
 # Define $(SED).
 m4_ifdef([AC_PROG_SED],[
@@ -59,9 +63,11 @@ if test "$OCAMLFIND" = "no"; then
     AC_MSG_ERROR([You must install OCaml findlib (the ocamlfind command)])
 fi
 
-dnl Optional OCaml packages.
-AC_CHECK_OCAML_PKG([inifiles])
-AM_CONDITIONAL([HAVE_OCAML_INIFILES], [test "x$OCAML_PKG_inifiles" != "xno"])
+# NB: AC_CHECK_PROG(S) or AC_PATH_PROG(S)?
+# Use AC_CHECK_PROG(S) for programs which are only used during build.
+# Use AC_PATH_PROG(S) for program names which are compiled into the
+# binary and used at run time.  The reason is so that we know which
+# programs the binary actually uses.
 
 dnl Optional programs.
 AC_CHECK_PROG(PERLDOC,[perldoc],[perldoc],[no])
@@ -71,43 +77,33 @@ fi
 AM_CONDITIONAL(HAVE_PERLDOC,[test "$perldoc" != "no"])
 
 dnl For yum-rpm handler.
-AC_CHECK_PROG(YUM,[yum],[yum],[no])
-AC_CHECK_PROG(RPM,[rpm],[rpm],[no])
-AC_CHECK_PROG(YUMDOWNLOADER,[yumdownloader],[yumdownloader],[no])
+AC_PATH_PROG(RPM,[rpm],[no])
+AC_PATH_PROG(RPM2CPIO,[rpm2cpio],[no])
+AC_PATH_PROG(YUMDOWNLOADER,[yumdownloader],[no])
 
 dnl For Zypper handler.
-AC_CHECK_PROG(ZYPPER,[zypper],[zypper],[no])
+AC_PATH_PROG(ZYPPER,[zypper],[no])
 
 dnl For URPMI handler.
-AC_CHECK_PROG(URPMI,[urpmi],[urpmi],[no], [$PATH$PATH_SEPARATOR/usr/sbin])
+AC_PATH_PROG(URPMI,[urpmi],[no], [$PATH$PATH_SEPARATOR/usr/sbin])
 
 dnl For Debian handler.
-AC_CHECK_PROG(APTITUDE,[aptitude],[aptitude],[no])
-AC_CHECK_PROG(APT_CACHE,[apt-cache],[apt-cache],[no])
-AC_CHECK_PROG(DPKG,[dpkg],[dpkg],[no])
+AC_PATH_PROG(APT_GET,[apt-get],[no])
+AC_PATH_PROG(DPKG,[dpkg],[no])
+AC_PATH_PROG(DPKG_DEB,[dpkg-deb],[no])
+AC_PATH_PROG(DPKG_QUERY,[dpkg-query],[no])
 
-dnl Include workaround for broken apt-cache depends --recurse (Ubuntu 10.04)?
-if test "x$APT_CACHE" != "xno"; then
-    AC_MSG_CHECKING([if apt-cache depends --recurse is broken])
-    if ! $APT_CACHE depends --recurse -i bash | grep -q '^libc6$'; then
-        AC_MSG_RESULT([yes])
-        APT_CACHE_DEPENDS_RECURSE_BROKEN=true
-    else
-        AC_MSG_RESULT([no])
-        APT_CACHE_DEPENDS_RECURSE_BROKEN=false
-    fi
-else
-    APT_CACHE_DEPENDS_RECURSE_BROKEN=false
-fi
-AC_SUBST([APT_CACHE_DEPENDS_RECURSE_BROKEN])
+dnl For FrugalWare handler (currently disabled).
+AC_PATH_PROG(PACMAN_G2,[pacman-g2],[no])
 
-dnl For FrugalWare handler.
-AC_CHECK_PROG(PACMAN_G2,[pacman-g2],[pacman-g2],[no])
+dnl For ArchLinux handler.
+AC_PATH_PROG(PACMAN,[pacman],[no])
+AC_PATH_PROG(PACTREE,[pactree],[no])
+AC_PATH_PROG(MAKEPKG,[makepkg],[no])
 
-if test "x$pacman_g2" = "xno"; then
-    dnl For ArchLinux handler.
-    AC_CHECK_PROG(PACMAN,[pacman],[pacman],[no])
-fi
+dnl Check for fakeroot, only used a few drivers where the host package
+dnl manager contains broken/unnecessary tests for root privs.
+AC_PATH_PROG(FAKEROOT,[fakeroot],[no])
 
 dnl Support for compressed input files, gzipped kernel modules.
 AC_CHECK_HEADER([zlib.h],[
@@ -187,8 +183,7 @@ AC_PATH_PROG([MKE2FS],[mke2fs],[no],
 if test "x$MKE2FS" = "xno" ; then
   AC_MSG_FAILURE([mke2fs program not found])
 fi
-AC_DEFINE_UNQUOTED([MKE2FS],["$MKE2FS"],
-  [Full path to the mke2fs program.])
+AC_SUBST([MKE2FS])
 
 dnl RHEL 5 mke2fs needed -T <fs> instead of -t <fs>.  Unhelpfully
 dnl the --help output doesn't mention this, so we have to test it.
@@ -204,14 +199,13 @@ else
 fi
 rm conftest.img
 AC_MSG_RESULT([$MKE2FS_T_OPTION])
-AC_DEFINE_UNQUOTED([MKE2FS_T_OPTION],["$MKE2FS_T_OPTION"],
-  [mke2fs option used to specify filesystem type (usually "-t")])
+AC_SUBST([MKE2FS_T_OPTION])
 
 dnl ext2fs, com_err.
 PKG_CHECK_MODULES([EXT2FS], [ext2fs])
 PKG_CHECK_MODULES([COM_ERR], [com_err])
 
-dnl Optional ext2fs_close2 function.
+dnl Requires ext2fs_close2 function, added in 2011.
 old_LIBS="$LIBS"
 LIBS="$EXT2FS_LIBS $COM_ERR_LIBS"
 AC_CHECK_FUNCS([ext2fs_close2])
@@ -223,6 +217,11 @@ if test "x$GAWK" = "xno" ; then
   AC_MSG_FAILURE([gawk (GNU awk) not found])
 fi
 
+dnl cpio
+AC_PATH_PROG([CPIO],[cpio],[no])
+test "x$CPIO" = "xno" &&
+    AC_MSG_ERROR([cpio must be installed])
+
 dnl Disable network tests.
 AC_ARG_ENABLE([network-tests],
     [AS_HELP_STRING([--disable-network-tests],
@@ -233,9 +232,10 @@ AM_CONDITIONAL([NETWORK_TESTS],
                [test "x$enable_network_tests" = "xyes"])
 
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_FILES([src/supermin-link.sh],
+		[chmod +x,-w src/supermin-link.sh])
 AC_CONFIG_FILES([Makefile
         examples/Makefile
-        helper/Makefile
         lib/Makefile
         src/config.ml
         src/Makefile

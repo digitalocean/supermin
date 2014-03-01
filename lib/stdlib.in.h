@@ -1,6 +1,6 @@
 /* A GNU-like <stdlib.h>.
 
-   Copyright (C) 1995, 2001-2004, 2006-2013 Free Software Foundation, Inc.
+   Copyright (C) 1995, 2001-2004, 2006-2014 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -773,7 +773,7 @@ _GL_WARN_ON_USE (rpmatch, "rpmatch is unportable - "
 _GL_FUNCDECL_SYS (secure_getenv, char *,
                   (char const *name) _GL_ARG_NONNULL ((1)));
 # endif
-_GL_CXXALIAS_SYS (secure_getenv, int, (char const *name));
+_GL_CXXALIAS_SYS (secure_getenv, char *, (char const *name));
 _GL_CXXALIASWARN (secure_getenv);
 #elif defined GNULIB_POSIXCHECK
 # undef secure_getenv

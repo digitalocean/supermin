@@ -1,5 +1,5 @@
 # supermin Makefile.am
-# (C) Copyright 2013 Red Hat Inc.
+# (C) Copyright 2013-2014 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,5 +23,7 @@ TESTS =
 
 if NETWORK_TESTS
 TESTS += \
-	test-build-bash.sh
+	test-build-bash.sh \
+	test-binaries-exist.sh \
+	test-harder.sh
 endif

@@ -1,5 +1,5 @@
-(* supermin 4
- * Copyright (C) 2009-2013 Red Hat Inc.
+(* supermin 5
+ * Copyright (C) 2009-2014 Red Hat Inc.
  * src/config.ml.  Generated from config.ml.in by configure.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,16 +18,24 @@
  *)
 
 let package_name = "supermin"
-let package_version = "4.1.6"
-let zypper = "no"
-let yum = "yum"
-let urpmi = "no"
-let rpm = "rpm"
-let yumdownloader = "yumdownloader"
-let aptitude = "no"
-let apt_cache = "no"
-let dpkg = "no"
-let apt_cache_depends_recurse_broken = false
-let pacman = ""
-let pacman_g2 = "no"
+let package_version = "5.1.1"
 let host_cpu = "x86_64"
+
+let apt_get = "no"
+let cpio = "/usr/bin/cpio"
+let dpkg = "no"
+let dpkg_deb = "no"
+let dpkg_query = "no"
+let fakeroot = "/usr/bin/fakeroot"
+let makepkg = "no"
+let pacman = "no"
+let pactree = "no"
+let pacman_g2 = "no"
+let rpm = "/usr/bin/rpm"
+let rpm2cpio = "/usr/bin/rpm2cpio"
+let urpmi = "no"
+let yumdownloader = "/usr/bin/yumdownloader"
+let zypper = "no"
+
+let mke2fs = "/usr/sbin/mke2fs"
+let mke2fs_t_option = "-t"

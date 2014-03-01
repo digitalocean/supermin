@@ -220,7 +220,22 @@ m4_popdef([pkg_default])
 m4_popdef([pkg_description])
 ]) dnl PKG_NOARCH_INSTALLDIR
 
-# po.m4 serial 20 (gettext-0.18.2)
+
+# PKG_CHECK_VAR(VARIABLE, MODULE, CONFIG-VARIABLE,
+# [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+# -------------------------------------------
+# Retrieves the value of the pkg-config variable for the given module.
+AC_DEFUN([PKG_CHECK_VAR],
+[AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
+AC_ARG_VAR([$1], [value of $3 for $2, overriding pkg-config])dnl
+
+_PKG_CONFIG([$1], [variable="][$3]["], [$2])
+AS_VAR_COPY([$1], [pkg_cv_][$1])
+
+AS_VAR_IF([$1], [""], [$5], [$4])dnl
+])# PKG_CHECK_VAR
+
+# po.m4 serial 21 (gettext-0.18.3)
 dnl Copyright (C) 1995-2013 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -247,6 +262,7 @@ AC_DEFUN([AM_PO_SUBDIRS],
   AC_REQUIRE([AC_PROG_MAKE_SET])dnl
   AC_REQUIRE([AC_PROG_INSTALL])dnl
   AC_REQUIRE([AC_PROG_MKDIR_P])dnl
+  AC_REQUIRE([AC_PROG_SED])dnl
   AC_REQUIRE([AM_NLS])dnl
 
   dnl Release version of the gettext macros. This is used to ensure that
@@ -1723,7 +1739,7 @@ AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
 m4_include([m4/00gnulib.m4])
-m4_include([m4/alloca.m4])
+m4_include([m4/absolute-header.m4])
 m4_include([m4/chdir-long.m4])
 m4_include([m4/close.m4])
 m4_include([m4/closedir.m4])
@@ -1739,7 +1755,6 @@ m4_include([m4/dup.m4])
 m4_include([m4/dup2.m4])
 m4_include([m4/errno_h.m4])
 m4_include([m4/error.m4])
-m4_include([m4/exponentd.m4])
 m4_include([m4/extensions.m4])
 m4_include([m4/extern-inline.m4])
 m4_include([m4/fchdir.m4])
@@ -1749,19 +1764,15 @@ m4_include([m4/fcntl.m4])
 m4_include([m4/fcntl_h.m4])
 m4_include([m4/fdopendir.m4])
 m4_include([m4/filenamecat.m4])
-m4_include([m4/float_h.m4])
 m4_include([m4/fstat.m4])
 m4_include([m4/fts.m4])
 m4_include([m4/getcwd.m4])
 m4_include([m4/getdtablesize.m4])
-m4_include([m4/getopt.m4])
+m4_include([m4/gettimeofday.m4])
 m4_include([m4/gnulib-common.m4])
 m4_include([m4/gnulib-comp.m4])
 m4_include([m4/i-ring.m4])
 m4_include([m4/include_next.m4])
-m4_include([m4/intmax_t.m4])
-m4_include([m4/inttypes.m4])
-m4_include([m4/inttypes_h.m4])
 m4_include([m4/largefile.m4])
 m4_include([m4/longlong.m4])
 m4_include([m4/lstat.m4])
@@ -1774,7 +1785,6 @@ m4_include([m4/mode_t.m4])
 m4_include([m4/msvc-inval.m4])
 m4_include([m4/msvc-nothrow.m4])
 m4_include([m4/multiarch.m4])
-m4_include([m4/nocrash.m4])
 m4_include([m4/ocaml.m4])
 m4_include([m4/off_t.m4])
 m4_include([m4/onceonly.m4])
@@ -1782,22 +1792,14 @@ m4_include([m4/open.m4])
 m4_include([m4/openat.m4])
 m4_include([m4/opendir.m4])
 m4_include([m4/pathmax.m4])
-m4_include([m4/printf.m4])
-m4_include([m4/raise.m4])
 m4_include([m4/readdir.m4])
 m4_include([m4/realloc.m4])
-m4_include([m4/safe-read.m4])
-m4_include([m4/safe-write.m4])
 m4_include([m4/save-cwd.m4])
-m4_include([m4/signal_h.m4])
-m4_include([m4/size_max.m4])
 m4_include([m4/ssize_t.m4])
 m4_include([m4/stat.m4])
-m4_include([m4/stdarg.m4])
 m4_include([m4/stdbool.m4])
 m4_include([m4/stddef_h.m4])
 m4_include([m4/stdint.m4])
-m4_include([m4/stdint_h.m4])
 m4_include([m4/stdio_h.m4])
 m4_include([m4/stdlib_h.m4])
 m4_include([m4/strdup.m4])
@@ -1805,18 +1807,10 @@ m4_include([m4/strerror.m4])
 m4_include([m4/string_h.m4])
 m4_include([m4/sys_socket_h.m4])
 m4_include([m4/sys_stat_h.m4])
+m4_include([m4/sys_time_h.m4])
 m4_include([m4/sys_types_h.m4])
 m4_include([m4/time_h.m4])
 m4_include([m4/unistd-safer.m4])
 m4_include([m4/unistd_h.m4])
-m4_include([m4/vasnprintf.m4])
-m4_include([m4/vasprintf.m4])
 m4_include([m4/warn-on-use.m4])
-m4_include([m4/wchar_h.m4])
 m4_include([m4/wchar_t.m4])
-m4_include([m4/wint_t.m4])
-m4_include([m4/write.m4])
-m4_include([m4/xalloc.m4])
-m4_include([m4/xsize.m4])
-m4_include([m4/xstrtol.m4])
-m4_include([m4/xvasprintf.m4])

@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2013 Free Software Foundation, Inc.
+# Copyright (C) 2002-2014 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,10 +38,9 @@ AC_DEFUN([gl_EARLY],
   m4_pattern_allow([^gl_LIBOBJS$])dnl a variable
   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
   AC_REQUIRE([gl_PROG_AR_RANLIB])
-  # Code from module alloca-opt:
+  # Code from module absolute-header:
   # Code from module at-internal:
   # Code from module bitrotate:
-  # Code from module c-ctype:
   # Code from module chdir:
   # Code from module chdir-long:
   # Code from module cloexec:
@@ -73,22 +72,16 @@ AC_DEFUN([gl_EARLY],
   # Code from module fdopendir:
   # Code from module filename:
   # Code from module filenamecat-lgpl:
-  # Code from module filevercmp:
-  # Code from module float:
   # Code from module fstat:
   # Code from module fts:
-  # Code from module full-write:
   # Code from module getcwd-lgpl:
   # Code from module getdtablesize:
-  # Code from module getopt-gnu:
-  # Code from module getopt-posix:
   # Code from module gettext-h:
+  # Code from module gettimeofday:
   # Code from module hash:
-  # Code from module hash-pjw:
   # Code from module i-ring:
   # Code from module include_next:
   # Code from module intprops:
-  # Code from module inttypes-incomplete:
   # Code from module largefile:
   AC_REQUIRE([AC_SYS_LARGEFILE])
   # Code from module lstat:
@@ -99,7 +92,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module msvc-inval:
   # Code from module msvc-nothrow:
   # Code from module multiarch:
-  # Code from module nocrash:
   # Code from module open:
   # Code from module openat:
   # Code from module openat-die:
@@ -107,26 +99,16 @@ AC_DEFUN([gl_EARLY],
   # Code from module openat-safer:
   # Code from module opendir:
   # Code from module pathmax:
-  # Code from module raise:
   # Code from module readdir:
   # Code from module realloc-posix:
-  # Code from module safe-write:
   # Code from module same-inode:
   # Code from module save-cwd:
-  # Code from module signal-h:
-  # Code from module size_max:
   # Code from module snippet/_Noreturn:
   # Code from module snippet/arg-nonnull:
   # Code from module snippet/c++defs:
   # Code from module snippet/warn-on-use:
   # Code from module ssize_t:
   # Code from module stat:
-  # Code from module stdarg:
-  dnl Some compilers (e.g., AIX 5.3 cc) need to be in c99 mode
-  dnl for the builtin va_copy to work.  With Autoconf 2.60 or later,
-  dnl gl_PROG_CC_C99 arranges for this.  With older Autoconf gl_PROG_CC_C99
-  dnl shouldn't hurt, though installers are on their own to set c99 mode.
-  gl_PROG_CC_C99
   # Code from module stdbool:
   # Code from module stddef:
   # Code from module stdint:
@@ -137,21 +119,13 @@ AC_DEFUN([gl_EARLY],
   # Code from module strerror-override:
   # Code from module string:
   # Code from module sys_stat:
+  # Code from module sys_time:
   # Code from module sys_types:
   # Code from module time:
   # Code from module unistd:
   # Code from module unistd-safer:
-  # Code from module vasnprintf:
-  # Code from module vasprintf:
   # Code from module verify:
-  # Code from module wchar:
-  # Code from module write:
-  # Code from module xalloc:
-  # Code from module xalloc-die:
   # Code from module xalloc-oversized:
-  # Code from module xsize:
-  # Code from module xstrtol:
-  # Code from module xvasprintf:
 ])
 
 # This macro should be invoked from ./configure.ac, in the section
@@ -170,7 +144,6 @@ AC_DEFUN([gl_INIT],
   m4_pushdef([gl_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='lib'
-  gl_FUNC_ALLOCA
   AC_LIBOBJ([openat-proc])
   gl_UNISTD_MODULE_INDICATOR([chdir])
   gl_FUNC_CHDIR_LONG
@@ -242,13 +215,6 @@ AC_DEFUN([gl_INIT],
   gl_DIRENT_MODULE_INDICATOR([fdopendir])
   gl_MODULE_INDICATOR([fdopendir])
   gl_FILE_NAME_CONCAT_LGPL
-  gl_FLOAT_H
-  if test $REPLACE_FLOAT_LDBL = 1; then
-    AC_LIBOBJ([float])
-  fi
-  if test $REPLACE_ITOLD = 1; then
-    AC_LIBOBJ([itold])
-  fi
   gl_FUNC_FSTAT
   if test $REPLACE_FSTAT = 1; then
     AC_LIBOBJ([fstat])
@@ -265,34 +231,20 @@ AC_DEFUN([gl_INIT],
   fi
   gl_UNISTD_MODULE_INDICATOR([getcwd])
   gl_FUNC_GETDTABLESIZE
-  if test $HAVE_GETDTABLESIZE = 0; then
+  if test $HAVE_GETDTABLESIZE = 0 || test $REPLACE_GETDTABLESIZE = 1; then
     AC_LIBOBJ([getdtablesize])
     gl_PREREQ_GETDTABLESIZE
   fi
   gl_UNISTD_MODULE_INDICATOR([getdtablesize])
-  gl_FUNC_GETOPT_GNU
-  if test $REPLACE_GETOPT = 1; then
-    AC_LIBOBJ([getopt])
-    AC_LIBOBJ([getopt1])
-    gl_PREREQ_GETOPT
-    dnl Arrange for unistd.h to include getopt.h.
-    GNULIB_GL_UNISTD_H_GETOPT=1
-  fi
-  AC_SUBST([GNULIB_GL_UNISTD_H_GETOPT])
-  gl_MODULE_INDICATOR_FOR_TESTS([getopt-gnu])
-  gl_FUNC_GETOPT_POSIX
-  if test $REPLACE_GETOPT = 1; then
-    AC_LIBOBJ([getopt])
-    AC_LIBOBJ([getopt1])
-    gl_PREREQ_GETOPT
-    dnl Arrange for unistd.h to include getopt.h.
-    GNULIB_GL_UNISTD_H_GETOPT=1
-  fi
-  AC_SUBST([GNULIB_GL_UNISTD_H_GETOPT])
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
+  gl_FUNC_GETTIMEOFDAY
+  if test $HAVE_GETTIMEOFDAY = 0 || test $REPLACE_GETTIMEOFDAY = 1; then
+    AC_LIBOBJ([gettimeofday])
+    gl_PREREQ_GETTIMEOFDAY
+  fi
+  gl_SYS_TIME_MODULE_INDICATOR([gettimeofday])
   gl_I_RING
-  gl_INTTYPES_INCOMPLETE
   AC_REQUIRE([gl_LARGEFILE])
   gl_FUNC_LSTAT
   if test $REPLACE_LSTAT = 1; then
@@ -353,12 +305,6 @@ AC_DEFUN([gl_INIT],
   fi
   gl_DIRENT_MODULE_INDICATOR([opendir])
   gl_PATHMAX
-  gl_FUNC_RAISE
-  if test $HAVE_RAISE = 0 || test $REPLACE_RAISE = 1; then
-    AC_LIBOBJ([raise])
-    gl_PREREQ_RAISE
-  fi
-  gl_SIGNAL_MODULE_INDICATOR([raise])
   gl_FUNC_READDIR
   if test $HAVE_READDIR = 0; then
     AC_LIBOBJ([readdir])
@@ -369,10 +315,7 @@ AC_DEFUN([gl_INIT],
     AC_LIBOBJ([realloc])
   fi
   gl_STDLIB_MODULE_INDICATOR([realloc-posix])
-  gl_PREREQ_SAFE_WRITE
   gl_SAVE_CWD
-  gl_SIGNAL_H
-  gl_SIZE_MAX
   gt_TYPE_SSIZE_T
   gl_FUNC_STAT
   if test $REPLACE_STAT = 1; then
@@ -380,7 +323,6 @@ AC_DEFUN([gl_INIT],
     gl_PREREQ_STAT
   fi
   gl_SYS_STAT_MODULE_INDICATOR([stat])
-  gl_STDARG_H
   AM_STDBOOL_H
   gl_STDDEF_H
   gl_STDINT_H
@@ -407,30 +349,13 @@ AC_DEFUN([gl_INIT],
   gl_HEADER_STRING_H
   gl_HEADER_SYS_STAT_H
   AC_PROG_MKDIR_P
+  gl_HEADER_SYS_TIME_H
+  AC_PROG_MKDIR_P
   gl_SYS_TYPES_H
   AC_PROG_MKDIR_P
   gl_HEADER_TIME_H
   gl_UNISTD_H
   gl_UNISTD_SAFER
-  gl_FUNC_VASNPRINTF
-  gl_FUNC_VASPRINTF
-  gl_STDIO_MODULE_INDICATOR([vasprintf])
-  m4_ifdef([AM_XGETTEXT_OPTION],
-    [AM_][XGETTEXT_OPTION([--flag=asprintf:2:c-format])
-     AM_][XGETTEXT_OPTION([--flag=vasprintf:2:c-format])])
-  gl_WCHAR_H
-  gl_FUNC_WRITE
-  if test $REPLACE_WRITE = 1; then
-    AC_LIBOBJ([write])
-    gl_PREREQ_WRITE
-  fi
-  gl_UNISTD_MODULE_INDICATOR([write])
-  gl_XALLOC
-  gl_XSIZE
-  gl_XSTRTOL
-  gl_XVASPRINTF
-  m4_ifdef([AM_XGETTEXT_OPTION],
-    [AM_][XGETTEXT_OPTION([--flag=xasprintf:1:c-format])])
   # End of code from modules
   m4_ifval(gl_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([gl_LIBSOURCES_DIR])[ ||
@@ -575,14 +500,9 @@ AC_DEFUN([gl_FILE_LIST], [
   build-aux/snippet/arg-nonnull.h
   build-aux/snippet/c++defs.h
   build-aux/snippet/warn-on-use.h
-  lib/alloca.in.h
-  lib/asnprintf.c
-  lib/asprintf.c
   lib/basename-lgpl.c
   lib/bitrotate.c
   lib/bitrotate.h
-  lib/c-ctype.c
-  lib/c-ctype.h
   lib/chdir-long.c
   lib/chdir-long.h
   lib/cloexec.c
@@ -621,33 +541,19 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/filename.h
   lib/filenamecat-lgpl.c
   lib/filenamecat.h
-  lib/filevercmp.c
-  lib/filevercmp.h
-  lib/float+.h
-  lib/float.c
-  lib/float.in.h
   lib/fstat.c
   lib/fts-cycle.c
   lib/fts.c
   lib/fts_.h
-  lib/full-write.c
-  lib/full-write.h
   lib/getcwd-lgpl.c
   lib/getdtablesize.c
-  lib/getopt.c
-  lib/getopt.in.h
-  lib/getopt1.c
-  lib/getopt_int.h
   lib/gettext.h
-  lib/hash-pjw.c
-  lib/hash-pjw.h
+  lib/gettimeofday.c
   lib/hash.c
   lib/hash.h
   lib/i-ring.c
   lib/i-ring.h
   lib/intprops.h
-  lib/inttypes.in.h
-  lib/itold.c
   lib/lstat.c
   lib/malloc.c
   lib/memchr.c
@@ -670,23 +576,12 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/opendir.c
   lib/pathmax.h
   lib/pipe-safer.c
-  lib/printf-args.c
-  lib/printf-args.h
-  lib/printf-parse.c
-  lib/printf-parse.h
-  lib/raise.c
   lib/readdir.c
   lib/realloc.c
-  lib/safe-read.c
-  lib/safe-write.c
-  lib/safe-write.h
   lib/same-inode.h
   lib/save-cwd.c
   lib/save-cwd.h
-  lib/signal.in.h
-  lib/size_max.h
   lib/stat.c
-  lib/stdarg.in.h
   lib/stdbool.in.h
   lib/stddef.in.h
   lib/stdint.in.h
@@ -699,33 +594,17 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/string.in.h
   lib/stripslash.c
   lib/sys_stat.in.h
+  lib/sys_time.in.h
   lib/sys_types.in.h
   lib/time.in.h
   lib/unistd--.h
   lib/unistd-safer.h
   lib/unistd.c
   lib/unistd.in.h
-  lib/vasnprintf.c
-  lib/vasnprintf.h
-  lib/vasprintf.c
   lib/verify.h
-  lib/wchar.in.h
-  lib/write.c
-  lib/xalloc-die.c
   lib/xalloc-oversized.h
-  lib/xalloc.h
-  lib/xasprintf.c
-  lib/xmalloc.c
-  lib/xsize.c
-  lib/xsize.h
-  lib/xstrtol-error.c
-  lib/xstrtol.c
-  lib/xstrtol.h
-  lib/xstrtoul.c
-  lib/xvasprintf.c
-  lib/xvasprintf.h
   m4/00gnulib.m4
-  m4/alloca.m4
+  m4/absolute-header.m4
   m4/chdir-long.m4
   m4/close.m4
   m4/closedir.m4
@@ -741,7 +620,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/dup2.m4
   m4/errno_h.m4
   m4/error.m4
-  m4/exponentd.m4
   m4/extensions.m4
   m4/extern-inline.m4
   m4/fchdir.m4
@@ -751,23 +629,18 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/fcntl_h.m4
   m4/fdopendir.m4
   m4/filenamecat.m4
-  m4/float_h.m4
   m4/fstat.m4
   m4/fts.m4
   m4/getcwd.m4
   m4/getdtablesize.m4
-  m4/getopt.m4
+  m4/gettimeofday.m4
   m4/gnulib-common.m4
   m4/i-ring.m4
   m4/include_next.m4
-  m4/intmax_t.m4
-  m4/inttypes.m4
-  m4/inttypes_h.m4
   m4/largefile.m4
   m4/longlong.m4
   m4/lstat.m4
   m4/malloc.m4
-  m4/math_h.m4
   m4/memchr.m4
   m4/mempcpy.m4
   m4/memrchr.m4
@@ -776,29 +649,20 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/msvc-inval.m4
   m4/msvc-nothrow.m4
   m4/multiarch.m4
-  m4/nocrash.m4
   m4/off_t.m4
   m4/onceonly.m4
   m4/open.m4
   m4/openat.m4
   m4/opendir.m4
   m4/pathmax.m4
-  m4/printf.m4
-  m4/raise.m4
   m4/readdir.m4
   m4/realloc.m4
-  m4/safe-read.m4
-  m4/safe-write.m4
   m4/save-cwd.m4
-  m4/signal_h.m4
-  m4/size_max.m4
   m4/ssize_t.m4
   m4/stat.m4
-  m4/stdarg.m4
   m4/stdbool.m4
   m4/stddef_h.m4
   m4/stdint.m4
-  m4/stdint_h.m4
   m4/stdio_h.m4
   m4/stdlib_h.m4
   m4/strdup.m4
@@ -806,19 +670,11 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/string_h.m4
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
+  m4/sys_time_h.m4
   m4/sys_types_h.m4
   m4/time_h.m4
   m4/unistd-safer.m4
   m4/unistd_h.m4
-  m4/vasnprintf.m4
-  m4/vasprintf.m4
   m4/warn-on-use.m4
-  m4/wchar_h.m4
   m4/wchar_t.m4
-  m4/wint_t.m4
-  m4/write.m4
-  m4/xalloc.m4
-  m4/xsize.m4
-  m4/xstrtol.m4
-  m4/xvasprintf.m4
 ])
