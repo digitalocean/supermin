@@ -11,7 +11,8 @@ Build-Depends: debhelper (>= 9),
  perl-doc,
  comerr-dev, e2fslibs-dev,
  zlib1g-dev, liblzma-dev,
-Standards-Version: 3.9.4
+ cpio,
+Standards-Version: 3.9.5
 Homepage: http://people.redhat.com/~rjones/supermin/
 Vcs-Git: git://git.debian.org/git/pkg-libvirt/supermin.git
 Vcs-Browser: http://git.debian.org/?p=pkg-libvirt/supermin.git

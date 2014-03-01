@@ -1,3 +1,3 @@
 # The library is part of a statically linked init program that is used
 # when starting the supermin appliance.
-supermin: embedded-library usr/bin/supermin-helper: zlib
+supermin: embedded-library usr/bin/supermin: zlib
