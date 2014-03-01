@@ -1,3 +1,10 @@
+supermin (5.1.1-1) experimental; urgency=low
+
+  * New upstream version
+  * Bumped Standards-Version, minor adjustments
+
+ -- Hilko Bengen <bengen@debian.org>  Sat, 01 Mar 2014 16:51:49 +0100
+
 supermin (4.1.6-1) unstable; urgency=low
 
   * New upstream version
