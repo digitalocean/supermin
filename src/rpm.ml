@@ -22,11 +22,21 @@ open Printf
 open Utils
 open Package_handler
 
-let rpm_detect () =
-  Config.rpm <> "no" &&
+let fedora_detect () =
+  Config.rpm <> "no" && Config.rpm2cpio <> "no" &&
     Config.yumdownloader <> "no" &&
-    (file_exists "/etc/redhat-release" ||
-       file_exists "/etc/fedora-release")
+    (file_exists "/etc/redhat-release" || file_exists "/etc/fedora-release")
+
+let opensuse_detect () =
+  Config.rpm <> "no" && Config.rpm2cpio <> "no" &&
+    Config.zypper <> "no" &&
+    file_exists "/etc/SuSE-release"
+
+let mageia_detect () =
+  Config.rpm <> "no" && Config.rpm2cpio <> "no" &&
+    Config.urpmi <> "no" &&
+    Config.fakeroot <> "no" &&
+    file_exists "/etc/mageia-release"
 
 let settings = ref no_settings
 
@@ -53,7 +63,8 @@ let rpm_package_of_string str =
    * ourselves.  *)
   let parse_rpm str =
     let cmd =
-      sprintf "rpm -q --qf '%%{name} %%{epoch} %%{version} %%{release} %%{arch}\\n' %s"
+      sprintf "%s -q --qf '%%{name} %%{epoch} %%{version} %%{release} %%{arch}\\n' %s"
+        Config.rpm
         (quote str) in
     let lines = run_command_get_lines cmd in
     let lines = List.map (string_split " ") lines in
@@ -93,7 +104,7 @@ let rpm_package_of_string str =
 
   (* Check if an RPM is installed. *)
   and check_rpm_installed name =
-    let cmd = sprintf "rpm -q %s >/dev/null" (quote name) in
+    let cmd = sprintf "%s -q %s >/dev/null" Config.rpm (quote name) in
     0 = Sys.command cmd
   in
 
@@ -122,14 +133,18 @@ let rpm_package_name pkg =
   let rpm = rpm_of_pkg pkg in
   rpm.name
 
+let rpm_get_package_database_mtime () =
+  (lstat "/var/lib/rpm/Packages").st_mtime
+
 let rpm_get_all_requires pkgs =
   let get pkgs =
     let cmd = sprintf "\
-        rpm -qR %s |
+        %s -qR %s |
         awk '{print $1}' |
         xargs rpm -q --qf '%%{name}\\n' --whatprovides |
         grep -v 'no package provides' |
         sort -u"
+      Config.rpm
       (quoted_list (List.map rpm_package_to_string
                       (PackageSet.elements pkgs))) in
     let lines = run_command_get_lines cmd in
@@ -146,13 +161,12 @@ let rpm_get_all_requires pkgs =
   in
   loop pkgs
 
-let rpm_get_requires pkg = rpm_get_all_requires (PackageSet.singleton pkg)
-
 let rpm_get_all_files pkgs =
   let cmd = sprintf "\
-      rpm -q --qf '[%%{FILENAMES} %%{FILEFLAGS:fflags}\\n]' %s |
+      %s -q --qf '[%%{FILENAMES} %%{FILEFLAGS:fflags}\\n]' %s |
       grep '^/' |
       sort -u"
+    Config.rpm
     (quoted_list (List.map rpm_package_to_string (PackageSet.elements pkgs))) in
   let lines = run_command_get_lines cmd in
   let lines = List.map (string_split " ") lines in
@@ -164,9 +178,7 @@ let rpm_get_all_files pkgs =
     | _ -> assert false
   ) lines
 
-let rpm_get_files pkg = rpm_get_all_files (PackageSet.singleton pkg)
-
-let rpm_download_all_packages pkgs dir =
+let rec fedora_download_all_packages pkgs dir =
   let tdir = !settings.tmpdir // string_random8 () in
 
   (* It's quite complex to get yumdownloader to download specific
@@ -195,6 +207,65 @@ let rpm_download_all_packages pkgs dir =
       (quoted_list rpms) in
   run_command cmd;
 
+  rpm_unpack tdir dir
+
+and opensuse_download_all_packages pkgs dir =
+  let tdir = !settings.tmpdir // string_random8 () in
+
+  let rpms = List.map rpm_of_pkg (PackageSet.elements pkgs) in
+  let rpms = List.map (
+    fun { name = name; arch = arch } ->
+      sprintf "%s.%s" name arch
+  ) rpms in
+
+  (* This isn't quite right because zypper will resolve the dependencies
+   * of the listed packages against the public repos and download all the
+   * dependencies too.  We only really want it to download the named
+   * packages. XXX
+   *)
+  let cmd =
+    sprintf "
+      %s%s \\
+        --root %s \\
+        --reposd-dir /etc/zypp/repos.d \\
+        --cache-dir %s \\
+        --pkg-cache-dir %s \\
+        --gpg-auto-import-keys --no-gpg-checks --non-interactive \\
+        install \\
+        --auto-agree-with-licenses --download-only \\
+        %s"
+      Config.zypper
+      (if !settings.debug >= 1 then " --verbose --verbose" else " --quiet")
+      (quote tdir)
+      (quote tdir)
+      (quote tdir)
+      (quoted_list rpms) in
+  run_command cmd;
+
+  rpm_unpack tdir dir
+
+and mageia_download_all_packages pkgs dir =
+  let tdir = !settings.tmpdir // string_random8 () in
+
+  let rpms = List.map rpm_package_name (PackageSet.elements pkgs) in
+
+  let cmd =
+    sprintf "
+      %s %s%s \\
+        --download-all %s \\
+        --replacepkgs \\
+        --no-install \\
+        %s"
+      Config.fakeroot
+      Config.urpmi
+      (if !settings.debug >= 1 then " --verbose" else " --quiet")
+      (quote tdir)
+      (quoted_list rpms) in
+  run_command cmd;
+
+  rpm_unpack tdir dir
+
+and rpm_unpack tdir dir =
   (* Unpack each downloaded package.
    * 
    * yumdownloader can't necessarily download the specific file that we
@@ -203,31 +274,35 @@ let rpm_download_all_packages pkgs dir =
   let cmd =
     sprintf "
 umask 0000
-for f in %s/*.rpm; do
-  rpm2cpio \"$f\" | (cd %s && cpio --quiet -id)
+for f in `find %s -name '*.rpm'`; do
+  %s \"$f\" | (cd %s && %s --quiet -id)
 done"
-      (quote tdir) (quote dir) in
+      (quote tdir) Config.rpm2cpio (quote dir) Config.cpio in
   run_command cmd
 
-let rpm_download_package pkg dir =
-  rpm_download_all_packages (PackageSet.singleton pkg) dir
-
-let rpm_get_package_database_mtime () =
-  (lstat "/var/lib/rpm/Packages").st_mtime
-
+(* We register package handlers for each RPM distro variant. *)
 let () =
-  let ph = {
-    ph_detect = rpm_detect;
+  let fedora = {
+    ph_detect = fedora_detect;
     ph_init = rpm_init;
     ph_package_of_string = rpm_package_of_string;
     ph_package_to_string = rpm_package_to_string;
     ph_package_name = rpm_package_name;
-    ph_get_requires = rpm_get_requires;
-    ph_get_all_requires = rpm_get_all_requires;
-    ph_get_files = rpm_get_files;
-    ph_get_all_files = rpm_get_all_files;
-    ph_download_package = rpm_download_package;
-    ph_download_all_packages = rpm_download_all_packages;
     ph_get_package_database_mtime = rpm_get_package_database_mtime;
+    ph_get_requires = PHGetAllRequires rpm_get_all_requires;
+    ph_get_files = PHGetAllFiles rpm_get_all_files;
+    ph_download_package = PHDownloadAllPackages fedora_download_all_packages;
   } in
-  register_package_handler "rpm" ph
+  register_package_handler "fedora" "rpm" fedora;
+  let opensuse = {
+    fedora with
+    ph_detect = opensuse_detect;
+    ph_download_package = PHDownloadAllPackages opensuse_download_all_packages;
+  } in
+  register_package_handler "opensuse" "rpm" opensuse;
+  let mageia = {
+    fedora with
+    ph_detect = mageia_detect;
+    ph_download_package = PHDownloadAllPackages mageia_download_all_packages;
+  } in
+  register_package_handler "mageia" "rpm" mageia

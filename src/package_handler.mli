@@ -100,57 +100,58 @@ type package_handler = {
   ph_package_to_string : package -> string;
   (** Convert package back to a printable string.  {b Only} use this
       for debugging and printing errors.  Use {!ph_package_name} for a
-      reproducible name that can be written to packagelist. *)
+      reproducible name that can be written to packages file. *)
 
   ph_package_name : package -> string;
   (** Return the name of the package, for writing to packagelist. *)
 
-  ph_get_requires : package -> PackageSet.t;
-  (** Given a single installed package, return the names of the
-      installed packages that are dependencies of this package.
+  ph_get_package_database_mtime : unit -> float;
+  (** Return the last modification time of the package database.
 
-      {b Note} the returned set must also contain the original package. *)
+      If not supported, then a package handler can return [0.0] here.
+      However that will mean that supermin will rebuild the appliance
+      every time it is run, even when the --if-newer option is
+      used. *)
 
-  ph_get_all_requires : PackageSet.t -> PackageSet.t;
-  (** Given a list of installed packages, return the combined list of
-      names of installed packages which are dependencies.  Package
-      handlers may override the default implementation (below) if they
-      have a more efficient way to implement it.
+  ph_get_requires : ph_get_requires;
+  (** Given a single installed package or set of packages, return the
+      names of the installed packages that are dependencies of this
+      package.
 
-      {b Note} the returned set must also contain the original packages. *)
+      {b Note} the returned set must also contain the original package.
 
-  ph_get_files : package -> file list;
-  (** Given a single package, list out the files in that package
-      (including package management metadata). *)
+      The package handler can either implement a function to resolve a
+      single package name ([PHGetRequires]), or (more efficiently)
+      resolve a set of packages ([PHGetAllRequires]). *)
 
-  ph_get_all_files : PackageSet.t -> file list;
-  (** Same as {!ph_get_files}, but return a combined list from all
-      packages in the set.  Package handlers may override the default
-      implementation (below) if they have a more efficient way to
-      implement it. *)
+  ph_get_files : ph_get_files;
+  (** Given a single installed package or set of packages, list out
+      the files in that package (including package management
+      metadata).
 
-  ph_download_package : package -> string -> unit;
+      The package handler can either implement a function to list a
+      single package ([PHGetFiles]), or (more efficiently) list all
+      files in a set of packages ([PHGetAllFiles]). *)
+
+  ph_download_package : ph_download_package;
   (** [ph_download_package package dir] downloads the named package
-      from the repository, and unpack it in the given [dir].
+      from the repository, and unpacks it in the given [dir].
+
+      The package handler can either implement a function to download
+      a single package ([PHDownloadPackage]), or (more efficiently)
+      list all files in a set of packages ([PHDownloadAllPackages]).
 
       When [--use-installed] option is used, this will not be called. *)
-
-  ph_download_all_packages : PackageSet.t -> string -> unit;
-  (** [ph_download_all_packages packages dir] downloads all the
-      packages and unpacks them into a single directory tree. *)
-
-  ph_get_package_database_mtime : unit -> float;
-  (** Return the last modification time of the package database.  If
-      not supported, then a package handler can return [0.0] here.
-      However that will mean that supermin will rebuild the appliance
-      every time it is run, even when the --if-newer option is used. *)
 }
-
-(** Defaults for some ph_* functions if the package handler does not
-    want to supply them. *)
-val default_get_all_requires : PackageSet.t -> PackageSet.t
-val default_get_all_files : PackageSet.t -> file list
-val default_download_all_packages : PackageSet.t -> string -> unit
+and ph_get_requires =
+| PHGetRequires of (package -> PackageSet.t)
+| PHGetAllRequires of (PackageSet.t -> PackageSet.t)
+and ph_get_files =
+| PHGetFiles of (package -> file list)
+| PHGetAllFiles of (PackageSet.t -> file list)
+and ph_download_package =
+| PHDownloadPackage of (package -> string -> unit)
+| PHDownloadAllPackages of (PackageSet.t -> string -> unit)
 
 (** Package handlers could use these memoization functions to convert
     from the {!package} type to an internal struct and back again, or
@@ -158,10 +159,17 @@ val default_download_all_packages : PackageSet.t -> string -> unit
 val get_memo_functions : unit -> (package -> 'a) * ('a -> package)
 
 (** At program start-up, all package handlers register themselves here. *)
-val register_package_handler : string -> package_handler -> unit
+val register_package_handler : string -> string -> package_handler -> unit
+
+val list_package_handlers : unit -> unit
 
 val check_system : settings -> unit
 
 val get_package_handler : unit -> package_handler
 
 val get_package_handler_name : unit -> string
+
+val get_all_requires : PackageSet.t -> PackageSet.t
+val get_files : package -> file list
+val get_all_files : PackageSet.t -> file list
+val download_all_packages : PackageSet.t -> string -> unit

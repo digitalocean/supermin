@@ -18,11 +18,14 @@
 
 set -e
 
+# XXX Hack for Arch.
+if [ -f /etc/arch-release ]; then
+    export SUPERMIN_KERNEL=/boot/vmlinuz-linux
+fi
+
 d1=test-build-bash.d1
 d2=test-build-bash.d2
 rm -rf $d1 $d2
-
-set -x
 
 # We assume 'bash' is a package everywhere.
 ../src/supermin -v --prepare bash -o $d1

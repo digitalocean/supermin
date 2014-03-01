@@ -27,6 +27,8 @@ kernel.cmx: utils.cmx fnmatch.cmx ext2fs.cmx
 package_handler.cmi:
 package_handler.cmo: utils.cmi package_handler.cmi
 package_handler.cmx: utils.cmx package_handler.cmi
+pacman.cmo: utils.cmi package_handler.cmi config.cmo
+pacman.cmx: utils.cmx package_handler.cmx config.cmx
 prepare.cmo: utils.cmi package_handler.cmi
 prepare.cmx: utils.cmx package_handler.cmx
 realpath.cmi:

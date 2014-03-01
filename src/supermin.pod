@@ -196,7 +196,12 @@ directory.  The operation is only carried out if either the host
 package database or the input supermin files are newer than the output
 directory.
 
-See also I<--lock> above.
+See also I<--lock> below.
+
+=item B<--list-drivers>
+
+List the package manager drivers compiled into supermin, and whether
+the corresponding package manager is detected on the current system.
 
 =item B<--lock> LOCKFILE
 

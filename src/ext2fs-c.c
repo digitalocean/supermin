@@ -26,7 +26,6 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fts.h>
 #include <limits.h>
 #include <errno.h>
 #include <assert.h>
@@ -48,6 +47,9 @@
 #include <caml/mlvalues.h>
 #include <caml/unixsupport.h>
 
+/* fts.h in glibc is broken, forcing us to use the GNUlib alternative. */
+#include "fts_.h"
+
 static void initialize (void) __attribute__((constructor));
 
 static void
@@ -56,12 +58,13 @@ initialize (void)
   initialize_ext2_error_table ();
 }
 
-static void ext2_error_to_exception (const char *fn, errcode_t err) __attribute__((noreturn));
+static void ext2_error_to_exception (const char *fn, errcode_t err, const char *filename) __attribute__((noreturn));
 
 static void
-ext2_error_to_exception (const char *fn, errcode_t err)
+ext2_error_to_exception (const char *fn, errcode_t err, const char *filename)
 {
-  fprintf (stderr, "supermin: %s: %s\n", fn, error_message (err));
+  fprintf (stderr, "supermin: %s: %s: %s\n",
+	   fn, filename ? : "(no filename))", error_message (err));
   caml_failwith (fn);
 }
 
@@ -126,7 +129,7 @@ supermin_ext2fs_open (value filev)
   err = ext2fs_open (String_val (filev), fs_flags, 0, 0,
                      unix_io_manager, &fs);
   if (err != 0)
-    ext2_error_to_exception ("ext2fs_open", err);
+    ext2_error_to_exception ("ext2fs_open", err, String_val (filev));
 
   fsv = Val_ext2fs (fs);
   CAMLreturn (fsv);
@@ -158,7 +161,7 @@ supermin_ext2fs_read_bitmaps (value fsv)
 
   err = ext2fs_read_bitmaps (fs);
   if (err != 0)
-    ext2_error_to_exception ("ext2fs_read_bitmaps", err);
+    ext2_error_to_exception ("ext2fs_read_bitmaps", err, NULL);
 
   CAMLreturn (Val_unit);
 }
@@ -284,7 +287,7 @@ ext2_mkdir (ext2_filsys fs,
   /* Otherwise, create it. */
   err = ext2fs_new_inode (fs, dir_ino, mode, 0, &ino);
   if (err != 0)
-    ext2_error_to_exception ("ext2fs_new_inode", err);
+    ext2_error_to_exception ("ext2fs_new_inode", err, basename);
 
  try_again:
   err = ext2fs_mkdir (fs, dir_ino, ino, basename);
@@ -293,17 +296,17 @@ ext2_mkdir (ext2_filsys fs,
     if (err == EXT2_ET_DIR_NO_SPACE) {
       err = ext2fs_expand_dir (fs, dir_ino);
       if (err)
-        ext2_error_to_exception ("ext2fs_expand_dir", err);
+        ext2_error_to_exception ("ext2fs_expand_dir", err, dirname);
       goto try_again;
     } else
-      ext2_error_to_exception ("ext2fs_mkdir", err);
+      ext2_error_to_exception ("ext2fs_mkdir", err, basename);
   }
 
   /* Copy the final permissions, UID etc. to the inode. */
   struct ext2_inode inode;
   err = ext2fs_read_inode (fs, ino, &inode);
   if (err != 0)
-    ext2_error_to_exception ("ext2fs_read_inode", err);
+    ext2_error_to_exception ("ext2fs_read_inode", err, basename);
   inode.i_mode = mode;
   inode.i_uid = uid;
   inode.i_gid = gid;
@@ -312,7 +315,7 @@ ext2_mkdir (ext2_filsys fs,
   inode.i_mtime = mtime;
   err = ext2fs_write_inode (fs, ino, &inode);
   if (err != 0)
-    ext2_error_to_exception ("ext2fs_write_inode", err);
+    ext2_error_to_exception ("ext2fs_write_inode", err, basename);
 }
 
 static void
@@ -328,7 +331,7 @@ ext2_empty_inode (ext2_filsys fs,
 
   err = ext2fs_new_inode (fs, dir_ino, mode, 0, &ino);
   if (err != 0)
-    ext2_error_to_exception ("ext2fs_new_inode", err);
+    ext2_error_to_exception ("ext2fs_new_inode", err, dirname);
 
   memset (&inode, 0, sizeof inode);
   inode.i_mode = mode;
@@ -344,7 +347,7 @@ ext2_empty_inode (ext2_filsys fs,
 
   err = ext2fs_write_new_inode (fs, ino, &inode);
   if (err != 0)
-    ext2_error_to_exception ("ext2fs_write_inode", err);
+    ext2_error_to_exception ("ext2fs_write_inode", err, dirname);
 
   ext2_link (fs, dir_ino, basename, ino, dir_ft);
 
@@ -364,7 +367,7 @@ ext2_write_file (ext2_filsys fs,
   ext2_file_t file;
   err = ext2fs_file_open2 (fs, ino, NULL, EXT2_FILE_WRITE, &file);
   if (err != 0)
-    ext2_error_to_exception ("ext2fs_file_open2", err);
+    ext2_error_to_exception ("ext2fs_file_open2", err, filename);
 
   /* ext2fs_file_write cannot deal with partial writes.  You have
    * to write the entire file in a single call.
@@ -372,26 +375,26 @@ ext2_write_file (ext2_filsys fs,
   unsigned int written;
   err = ext2fs_file_write (file, buf, size, &written);
   if (err != 0)
-    ext2_error_to_exception ("ext2fs_file_write", err);
+    ext2_error_to_exception ("ext2fs_file_write", err, filename);
   if ((size_t) written != size)
     caml_failwith ("ext2fs_file_write: file size != bytes written");
 
   err = ext2fs_file_flush (file);
   if (err != 0)
-    ext2_error_to_exception ("ext2fs_file_flush", err);
+    ext2_error_to_exception ("ext2fs_file_flush", err, filename);
   err = ext2fs_file_close (file);
   if (err != 0)
-    ext2_error_to_exception ("ext2fs_file_close", err);
+    ext2_error_to_exception ("ext2fs_file_close", err, filename);
 
   /* Update the true size in the inode. */
   struct ext2_inode inode;
   err = ext2fs_read_inode (fs, ino, &inode);
   if (err != 0)
-    ext2_error_to_exception ("ext2fs_read_inode", err);
+    ext2_error_to_exception ("ext2fs_read_inode", err, filename);
   inode.i_size = size;
   err = ext2fs_write_inode (fs, ino, &inode);
   if (err != 0)
-    ext2_error_to_exception ("ext2fs_write_inode", err);
+    ext2_error_to_exception ("ext2fs_write_inode", err, filename);
 }
 
 /* This is just a wrapper around ext2fs_link which calls
@@ -410,12 +413,12 @@ ext2_link (ext2_filsys fs,
   if (err == EXT2_ET_DIR_NO_SPACE) {
     err = ext2fs_expand_dir (fs, dir_ino);
     if (err != 0)
-      ext2_error_to_exception ("ext2fs_expand_dir", err);
+      ext2_error_to_exception ("ext2fs_expand_dir", err, basename);
     goto again;
   }
 
   if (err != 0)
-    ext2_error_to_exception ("ext2fs_link", err);
+    ext2_error_to_exception ("ext2fs_link", err, basename);
 }
 
 static int
@@ -447,21 +450,21 @@ ext2_clean_path (ext2_filsys fs, ext2_ino_t dir_ino,
     struct ext2_inode inode;
     err = ext2fs_read_inode (fs, ino, &inode);
     if (err != 0)
-      ext2_error_to_exception ("ext2fs_read_inode", err);
+      ext2_error_to_exception ("ext2fs_read_inode", err, basename);
     inode.i_links_count--;
     err = ext2fs_write_inode (fs, ino, &inode);
     if (err != 0)
-      ext2_error_to_exception ("ext2fs_write_inode", err);
+      ext2_error_to_exception ("ext2fs_write_inode", err, basename);
 
     err = ext2fs_unlink (fs, dir_ino, basename, 0, 0);
     if (err != 0)
-      ext2_error_to_exception ("ext2fs_unlink_inode", err);
+      ext2_error_to_exception ("ext2fs_unlink_inode", err, basename);
 
     if (inode.i_links_count == 0) {
       inode.i_dtime = time (NULL);
       err = ext2fs_write_inode (fs, ino, &inode);
       if (err != 0)
-        ext2_error_to_exception ("ext2fs_write_inode", err);
+        ext2_error_to_exception ("ext2fs_write_inode", err, basename);
 
       if (ext2fs_inode_has_valid_blocks (&inode)) {
 	int flags = 0;
@@ -567,23 +570,54 @@ ext2_copy_file (ext2_filsys fs, const char *src, const char *dest)
     basename = p+1;
 
     /* If the parent directory is a symlink to another directory, then
-     * we want to look up the target directory. (RHBZ#698089).
+     * we want to look up the target directory as an absolute path
+     * (RHBZ#698089).  We really want GNU coreutils 'readlink -f' so
+     * we might as well just run it.
      */
     struct stat stat1, stat2;
     if (lstat (dirname, &stat1) == 0 && S_ISLNK (stat1.st_mode) &&
-        stat (dirname, &stat2) == 0 && S_ISDIR (stat2.st_mode)) {
-      char *new_dirname = malloc (PATH_MAX+1);
-      ssize_t r = readlink (dirname, new_dirname, PATH_MAX+1);
-      if (r == -1)
-        unix_error (errno, (char *) "readlink", caml_copy_string (dest));
-      new_dirname[r] = '\0';
+	stat (dirname, &stat2) == 0 && S_ISDIR (stat2.st_mode)) {
+      char cmd[strlen (dirname) + 100];
+      FILE *fp;
+      char *new_dirname;
+      size_t len;
+
+      /* XXX quoting, although this is from a trusted source */
+      snprintf (cmd, sizeof cmd, "readlink -f '%s'", dirname);
+      fp = popen (cmd, "r");
+      if (fp == NULL)
+	goto cont;
+      new_dirname = malloc (PATH_MAX+1);
+      if (fgets (new_dirname, PATH_MAX, fp) == NULL) {
+	pclose (fp);
+	goto cont;
+      }
+      pclose (fp);
+
+      len = strlen (new_dirname);
+      if (len >= 1 &&
+	  new_dirname[len-1] == '\n')
+	new_dirname[len-1] = '\0';
+
       dirname = new_dirname;
     }
+  cont:
 
     /* Look up the parent directory. */
     err = ext2fs_namei (fs, EXT2_ROOT_INO, EXT2_ROOT_INO, dirname, &dir_ino);
-    if (err != 0)
-      ext2_error_to_exception ("ext2fs_namei: parent directory not found", err);
+    if (err != 0) {
+      /* This is the most popular supermin "WTF" error, so make
+       * sure we capture as much information as possible.
+       */
+      fprintf (stderr, "supermin: *** parent directory not found ***\n");
+      fprintf (stderr, "supermin: When reporting this error:\n");
+      fprintf (stderr, "supermin: please include ALL the debugging information below\n");
+      fprintf (stderr, "supermin: AND tell us what system you are running this on.\n");
+      fprintf (stderr, "     src=%s\n    dest=%s\n dirname=%s\nbasename=%s\n",
+	       src, dest, dirname, basename);
+      ext2_error_to_exception ("ext2fs_namei: parent directory not found",
+			       err, dirname);
+    }
   }
 
   ext2_clean_path (fs, dir_ino, dirname, basename, S_ISDIR (statbuf.st_mode));

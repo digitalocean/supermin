@@ -50,10 +50,15 @@ let prepare debug (copy_kernel, dtb_wildcard, format, host_cpu,
     flush stdout
   );
 
-  (* Write packages file - after removing missing packages, but before
-   * resolving dependencies.
+  (* Convert input packages to a set.  This removes duplicates. *)
+  let packages = package_set_of_list packages in
+
+  (* Write input packages to the 'packages' file.  We don't need to
+   * write the dependencies because we do dependency resolution at
+   * build time too.
    *)
   let () =
+    let packages = PackageSet.elements packages in
     let pkg_names = List.map ph.ph_package_name packages in
     let pkg_names = List.sort compare pkg_names in
 
@@ -66,9 +71,7 @@ let prepare debug (copy_kernel, dtb_wildcard, format, host_cpu,
     close_out chan in
 
   (* Resolve the dependencies. *)
-  let packages =
-    let packages = package_set_of_list packages in
-    ph.ph_get_all_requires packages in
+  let packages = get_all_requires packages in
 
   if debug >= 1 then (
     printf "supermin: after resolving dependencies there are %d packages:\n"
@@ -84,7 +87,7 @@ let prepare debug (copy_kernel, dtb_wildcard, format, host_cpu,
   let packages =
     PackageSet.fold (
       fun pkg pkgs ->
-        let files = ph.ph_get_files pkg in
+        let files = get_files pkg in
         (pkg, files) :: pkgs
     ) packages [] in
 
@@ -117,7 +120,7 @@ let prepare debug (copy_kernel, dtb_wildcard, format, host_cpu,
             if has_config_files then Some pkg else None
         ) packages in
         let dl_packages = package_set_of_list dl_packages in
-        ph.ph_download_all_packages dl_packages dir in
+        download_all_packages dl_packages dir in
 
       dir
     )

@@ -52,14 +52,20 @@ type package_handler = {
   ph_package_of_string : string -> package option;
   ph_package_to_string : package -> string;
   ph_package_name : package -> string;
-  ph_get_requires : package -> PackageSet.t;
-  ph_get_all_requires : PackageSet.t -> PackageSet.t;
-  ph_get_files : package -> file list;
-  ph_get_all_files : PackageSet.t -> file list;
-  ph_download_package : package -> string -> unit;
-  ph_download_all_packages : PackageSet.t -> string -> unit;
   ph_get_package_database_mtime : unit -> float;
+  ph_get_requires : ph_get_requires;
+  ph_get_files : ph_get_files;
+  ph_download_package : ph_download_package;
 }
+and ph_get_requires =
+| PHGetRequires of (package -> PackageSet.t)
+| PHGetAllRequires of (PackageSet.t -> PackageSet.t)
+and ph_get_files =
+| PHGetFiles of (package -> file list)
+| PHGetAllFiles of (PackageSet.t -> file list)
+and ph_download_package =
+| PHDownloadPackage of (package -> string -> unit)
+| PHDownloadAllPackages of (PackageSet.t -> string -> unit)
 
 (* Suggested memoization functions. *)
 let get_memo_functions () =
@@ -79,13 +85,23 @@ let get_memo_functions () =
   internal_of_pkg, pkg_of_internal
 
 let handlers = ref []
-let register_package_handler name ph = handlers := (name, ph) :: !handlers
+let register_package_handler system packager ph =
+  handlers := (system, packager, ph) :: !handlers
+
+let list_package_handlers () =
+  List.iter (
+    fun (system, packager, ph) ->
+      let detected = ph.ph_detect () in
+      printf "%s/%s\t%s\n"
+        system packager (if detected then "detected" else "not-detected")
+  ) !handlers
 
 let handler = ref None
 
 let check_system settings =
   try
-    let (_, ph) as h = List.find (fun (_, ph) -> ph.ph_detect ()) !handlers in
+    let (_, _, ph) as h =
+      List.find (fun (_, _, ph) -> ph.ph_detect ()) !handlers in
     handler := Some h;
     ph.ph_init settings
   with Not_found ->
@@ -96,35 +112,47 @@ If this is a new Linux distro, or not Linux, or a Linux distro that uses
 an unusual packaging format then you may need to port supermin.  If
 you are expecting that supermin should work on this system or distro
 then it may be that the package detection code is not working.
+
+To list which package handlers are compiled into this version of
+supermin, do:
+
+  supermin --list-drivers
 ";
     exit 1
 
 let rec get_package_handler () =
   match !handler with
-  | Some (_, ph) -> ph
+  | Some (_, _, ph) -> ph
   | None -> assert false
 
 let rec get_package_handler_name () =
   match !handler with
-  | Some (name, _) -> name
+  | Some (system, packager, _) -> sprintf "%s/%s" system packager
   | None -> assert false
 
-let default_get_all_requires pkgs =
+let get_all_requires pkgs =
   let ph = get_package_handler () in
-  PackageSet.fold
-    (fun pkg -> PackageSet.union (ph.ph_get_requires pkg))
-    pkgs PackageSet.empty
+  match ph.ph_get_requires with
+  | PHGetRequires f ->
+    PackageSet.fold (fun pkg -> PackageSet.union (f pkg)) pkgs PackageSet.empty
+  | PHGetAllRequires f -> f pkgs
 
-let default_get_all_files pkgs =
+let get_files pkg =
   let ph = get_package_handler () in
-  PackageSet.fold (
-    fun pkg xs ->
-      let files = ph.ph_get_files pkg in
-      files @ xs
-  ) pkgs []
+  match ph.ph_get_files with
+  | PHGetFiles f -> f pkg
+  | PHGetAllFiles f -> f (PackageSet.singleton pkg)
 
-let default_download_all_packages pkgs dir =
+let get_all_files pkgs =
   let ph = get_package_handler () in
-  PackageSet.iter (
-    fun pkg -> ph.ph_download_package pkg dir
-  ) pkgs
+  match ph.ph_get_files with
+  | PHGetFiles f ->
+    PackageSet.fold (fun pkg xs -> let files = f pkg in files @ xs) pkgs []
+  | PHGetAllFiles f -> f pkgs
+
+let download_all_packages pkgs dir =
+  let ph = get_package_handler () in
+  match ph.ph_download_package with
+  | PHDownloadPackage f ->
+    PackageSet.iter (fun pkg -> f pkg dir) pkgs
+  | PHDownloadAllPackages f -> f pkgs dir

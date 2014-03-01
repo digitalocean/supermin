@@ -39,6 +39,8 @@ Requirements
   perldoc
     - This is just used to generate the manpage.
 
+  static libc
+
   bash
 
   gcc
@@ -63,8 +65,6 @@ For Debian/Ubuntu:
 Optional
 --------
 
-  ocaml inifiles library (needed for zypper only)
-
 These are only needed if you plan to boot the supermin appliances you
 are building:
 
@@ -78,8 +78,22 @@ are building:
 Building and installing
 -----------------------
 
+If you're cloning this from git the first time, do:
+
+  ./bootstrap
+  ./autogen.sh
+
+For normal builds, and building from the tarball:
+
   ./configure
   make
+
+You can run supermin without installing:
+
+  ./src/supermin --help
+
+To install the software:
+
   sudo make install
 
 Tests

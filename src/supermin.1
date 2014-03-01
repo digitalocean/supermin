@@ -71,7 +71,7 @@
 .\" ========================================================================
 .\"
 .IX Title "SUPERMIN 1"
-.TH SUPERMIN 1 "2014-02-25" "supermin-5.1.0" "Virtualization Support"
+.TH SUPERMIN 1 "2014-03-01" "supermin-5.1.0" "Virtualization Support"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -260,7 +260,11 @@ directory.  The operation is only carried out if either the host
 package database or the input supermin files are newer than the output
 directory.
 .Sp
-See also \fI\-\-lock\fR above.
+See also \fI\-\-lock\fR below.
+.IP "\fB\-\-list\-drivers\fR" 4
+.IX Item "--list-drivers"
+List the package manager drivers compiled into supermin, and whether
+the corresponding package manager is detected on the current system.
 .IP "\fB\-\-lock\fR \s-1LOCKFILE\s0" 4
 .IX Item "--lock LOCKFILE"
 (\fI\-\-build\fR mode only)

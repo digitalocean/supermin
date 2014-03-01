@@ -93,21 +93,15 @@ let rec build debug
   let packages = filter_map ph.ph_package_of_string appliance.packages in
   let packages =
     let packages = package_set_of_list packages in
-    ph.ph_get_all_requires packages in
+    get_all_requires packages in
 
   if debug >= 1 then
     printf "supermin: build: %d packages, including dependencies\n%!"
       (PackageSet.cardinal packages);
 
   (* List the files in each package. *)
-  let files =
-    PackageSet.fold (
-      fun pkg files ->
-        let fs = ph.ph_get_files pkg in
-        let fs = List.map (fun { ft_path = path } -> path) fs in
-        fs :: files
-    ) packages [] in
-  let files = List.flatten files in
+  let files = get_all_files packages in
+  let files = List.map (fun { ft_path = path } -> path) files in
 
   if debug >= 1 then
     printf "supermin: build: %d files\n%!" (List.length files);

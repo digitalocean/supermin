@@ -17,11 +17,12 @@ dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 dnl
 dnl Written by Richard W.M. Jones <rjones@redhat.com>
 
-AC_INIT([supermin],[5.1.0])
+AC_INIT([supermin],[5.1.1])
 AM_INIT_AUTOMAKE(foreign)
 
 dnl Check for basic C environment.
 AC_PROG_CC_STDC
+gl_EARLY
 
 AC_PROG_INSTALL
 AC_PROG_CPP
@@ -30,6 +31,9 @@ AC_C_PROTOTYPES
 test "x$U" != "x" && AC_MSG_ERROR([Compiler not ANSI compliant])
 
 AM_PROG_CC_C_O
+
+dnl Gnulib
+gl_INIT
 
 dnl Check support for 64 bit file offsets.
 AC_SYS_LARGEFILE
@@ -59,6 +63,12 @@ if test "$OCAMLFIND" = "no"; then
     AC_MSG_ERROR([You must install OCaml findlib (the ocamlfind command)])
 fi
 
+# NB: AC_CHECK_PROG(S) or AC_PATH_PROG(S)?
+# Use AC_CHECK_PROG(S) for programs which are only used during build.
+# Use AC_PATH_PROG(S) for program names which are compiled into the
+# binary and used at run time.  The reason is so that we know which
+# programs the binary actually uses.
+
 dnl Optional programs.
 AC_CHECK_PROG(PERLDOC,[perldoc],[perldoc],[no])
 if test "x$PERLDOC" = "xno" ; then
@@ -67,25 +77,33 @@ fi
 AM_CONDITIONAL(HAVE_PERLDOC,[test "$perldoc" != "no"])
 
 dnl For yum-rpm handler.
-AC_CHECK_PROG(RPM,[rpm],[rpm],[no])
-AC_CHECK_PROG(YUMDOWNLOADER,[yumdownloader],[yumdownloader],[no])
+AC_PATH_PROG(RPM,[rpm],[no])
+AC_PATH_PROG(RPM2CPIO,[rpm2cpio],[no])
+AC_PATH_PROG(YUMDOWNLOADER,[yumdownloader],[no])
 
 dnl For Zypper handler.
-AC_CHECK_PROG(ZYPPER,[zypper],[zypper],[no])
+AC_PATH_PROG(ZYPPER,[zypper],[no])
 
 dnl For URPMI handler.
-AC_CHECK_PROG(URPMI,[urpmi],[urpmi],[no], [$PATH$PATH_SEPARATOR/usr/sbin])
+AC_PATH_PROG(URPMI,[urpmi],[no], [$PATH$PATH_SEPARATOR/usr/sbin])
 
 dnl For Debian handler.
-AC_CHECK_PROG(DPKG,[dpkg],[dpkg],[no])
+AC_PATH_PROG(APT_GET,[apt-get],[no])
+AC_PATH_PROG(DPKG,[dpkg],[no])
+AC_PATH_PROG(DPKG_DEB,[dpkg-deb],[no])
+AC_PATH_PROG(DPKG_QUERY,[dpkg-query],[no])
 
-dnl For FrugalWare handler.
-AC_CHECK_PROG(PACMAN_G2,[pacman-g2],[pacman-g2],[no])
+dnl For FrugalWare handler (currently disabled).
+AC_PATH_PROG(PACMAN_G2,[pacman-g2],[no])
 
-if test "x$pacman_g2" = "xno"; then
-    dnl For ArchLinux handler.
-    AC_CHECK_PROG(PACMAN,[pacman],[pacman],[no])
-fi
+dnl For ArchLinux handler.
+AC_PATH_PROG(PACMAN,[pacman],[no])
+AC_PATH_PROG(PACTREE,[pactree],[no])
+AC_PATH_PROG(MAKEPKG,[makepkg],[no])
+
+dnl Check for fakeroot, only used a few drivers where the host package
+dnl manager contains broken/unnecessary tests for root privs.
+AC_PATH_PROG(FAKEROOT,[fakeroot],[no])
 
 dnl Support for compressed input files, gzipped kernel modules.
 AC_CHECK_HEADER([zlib.h],[
@@ -199,6 +217,11 @@ if test "x$GAWK" = "xno" ; then
   AC_MSG_FAILURE([gawk (GNU awk) not found])
 fi
 
+dnl cpio
+AC_PATH_PROG([CPIO],[cpio],[no])
+test "x$CPIO" = "xno" &&
+    AC_MSG_ERROR([cpio must be installed])
+
 dnl Disable network tests.
 AC_ARG_ENABLE([network-tests],
     [AS_HELP_STRING([--disable-network-tests],
@@ -213,6 +236,7 @@ AC_CONFIG_FILES([src/supermin-link.sh],
 		[chmod +x,-w src/supermin-link.sh])
 AC_CONFIG_FILES([Makefile
         examples/Makefile
+        lib/Makefile
         src/config.ml
         src/Makefile
         tests/Makefile])
