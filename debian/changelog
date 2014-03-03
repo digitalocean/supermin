@@ -1,3 +1,10 @@
+supermin (5.1.2-1) experimental; urgency=low
+
+  * New upstream version
+  * Fixed FTBFS on architectures without native OCaml compiler
+
+ -- Hilko Bengen <bengen@debian.org>  Mon, 03 Mar 2014 09:12:41 +0100
+
 supermin (5.1.1-1) experimental; urgency=low
 
   * New upstream version
