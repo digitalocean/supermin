@@ -71,7 +71,7 @@
 .\" ========================================================================
 .\"
 .IX Title "SUPERMIN 1"
-.TH SUPERMIN 1 "2014-03-01" "supermin-5.1.0" "Virtualization Support"
+.TH SUPERMIN 1 "2014-03-01" "supermin-5.1.1" "Virtualization Support"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -83,7 +83,7 @@ supermin \- Tool for creating and building supermin appliances
 .Vb 1
 \& supermin \-\-prepare \-o OUTPUTDIR PACKAGE [PACKAGE ...]
 \&
-\& supermin \-\-build \-o OUTPUTDIR \-\-format chroot|ext2 INPUT [INPUT ...]
+\& supermin \-\-build \-o OUTPUTDIR \-f chroot|ext2 INPUT [INPUT ...]
 .Ve
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
@@ -117,8 +117,7 @@ packages has to be installed on the host machine.
 .PP
 For example:
 .PP
-.Vb 2
-\& mkdir supermin.d
+.Vb 1
 \& supermin \-\-prepare bash coreutils \-o supermin.d
 .Ve
 .PP
@@ -138,7 +137,7 @@ is easy because supermin appliances are so small).
 builds the full appliance from the supermin appliance:
 .PP
 .Vb 1
-\& supermin \-\-build \-o appliance.d \-\-format ext2 supermin.d
+\& supermin \-\-build \-\-format ext2 supermin.d \-o appliance.d
 .Ve
 .PP
 This will create files called \f(CW\*(C`appliance.d/kernel\*(C'\fR,
@@ -148,6 +147,26 @@ It is intended that the \fI\-\-build\fR step is done on the end user's
 machine at the last second before the appliance is needed.  The
 packages in the supermin appliance (those specified when the supermin
 appliance was prepared) must be installed on the end user's machine.
+.PP
+Build and cache
+.IX Subsection "Build and cache"
+.PP
+Typically you want to rebuild the appliance on the end user machine
+only on demand.  Supermin has some extra options to make this easy:
+.PP
+.Vb 3
+\& supermin \-\-build \e
+\&   \-\-if\-newer \-\-lock /run/user/\`id \-u\`/supermin.lock \e
+\&   \-\-format ext2 supermin.d \-o appliance.d
+.Ve
+.PP
+If multiple programs run this command in parallel, the instances will
+wait on the lock file.  The full appliance only gets rebuilt if it
+doesn't exist or if it is older than the input files and host package
+database.
+.PP
+Note that the lock file \fBmust not\fR be stored inside the \fI\-o\fR
+directory.
 .PP
 \fI\s-1PACKAGES\s0\fR
 .IX Subsection "PACKAGES"
@@ -276,18 +295,6 @@ each other.
 The lock file is used to provide mutual exclusion so only one instance
 of supermin will run at a time.
 .Sp
-Typical usage is:
-.Sp
-.Vb 4
-\& supermin \-\-build \-f ext2 \e
-\&   \-\-if\-newer \-\-lock /run/user/\`id \-u\`/supermin.lock \e
-\&   \-o /var/tmp/random_dir/appliance.d \e
-\&   /usr/share/your_app/supermin.d
-.Ve
-.Sp
-(where it is assumed that multiple applications might run the above
-command at the same time in order to build or update the appliance.)
-.Sp
 Note that the lock file \fBmust not\fR be stored inside the output
 directory.
 .IP "\fB\-o\fR \s-1OUTPUTDIR\s0" 4
@@ -375,7 +382,8 @@ appliance share many common files such as \f(CW\*(C`/bin/bash\*(C'\fR and
 \&\f(CW\*(C`/lib/libc.so\*(C'\fR there is no reason to ship these files in the
 appliance.  They can simply be read from the host on demand when the
 appliance is launched.  Therefore to save space we just store the
-packages we want from the host, and copy those in at build time.
+names of the packages we want from the host, and copy those in (plus
+dependencies) at build time.
 .PP
 There are some files which cannot just be copied from the host in this
 way.  These include configuration files which the host admin might
@@ -419,9 +427,10 @@ would copy all of the \f(CW\*(C`*.repo\*(C'\fR files into the appliance.
 .Sp
 Each pathname in the file should start with a \f(CW\*(C`/\*(C'\fR character.
 .Sp
-Supermin itself does not create hostfiles (although before
-version 5, this was the main mechanism used to create the full
-appliance).
+Supermin itself does not create hostfiles (although before version 5, this was the main mechanism used to create the full appliance).
+However you may drop one or more of these files into the supermin
+appliance directory if you want to copy random unpackaged files into
+the full appliance.
 .IP "\fBexcludefiles\fR" 4
 .IX Item "excludefiles"
 A list of filenames, directory names, or wildcards prefixed by \f(CW\*(C`\-\*(C'\fR
@@ -431,7 +440,9 @@ This is rather brutal since it just removes things, potentially
 breaking packages.  However it can be used as a convenient way to
 minimize the size of the final appliance.
 .Sp
-Supermin itself does not create excludefiles.
+Supermin itself does not create excludefiles.  However you may drop
+one of more of these files into the supermin appliance directory to
+stop packaged files from being copied into the full appliance.
 .PP
 Note that the names above are just suggestions.  You can use any names
 you want, as supermin detects the contents of each file when it
@@ -471,9 +482,9 @@ skipped when the full appliance is built.
 .Vb 5
 \& \-/boot/*
 \& \-/lib/modules/*
-\& \-/usr/share/man/*
 \& \-/usr/share/doc/*
 \& \-/usr/share/info/*
+\& \-/usr/share/man/*
 .Ve
 .PP
 Be careful what you remove because files may be necessary for correct
@@ -489,16 +500,11 @@ copied in, and it is booted using the host kernel.
 Supermin is able to choose the best host kernel available to boot the
 appliance.  Users can override this by setting environment variables
 (see \*(L"\s-1ENVIRONMENT VARIABLES\*(R"\s0 below).
-.SS "\s-1BOOTING AND CACHING THE SUPERMIN APPLIANCE\s0"
-.IX Subsection "BOOTING AND CACHING THE SUPERMIN APPLIANCE"
-For fastest boot times you should cache the output of supermin
-\&\fI\-\-build\fR.  See the libguestfs source file \f(CW\*(C`src/appliance.c\*(C'\fR for an
-example of how this is done.
 .SS "\s-1ENFORCING AVAILABILITY OF HOSTFILES\s0"
 .IX Subsection "ENFORCING AVAILABILITY OF HOSTFILES"
-Supermin builds the appliance by copying in host files as listed in
-\&\f(CW\*(C`hostfiles\*(C'\fR.  For this to work those host files must be available.
-We usually enforce this by adding requirements (eg. \s-1RPM \s0\f(CW\*(C`Requires:\*(C'\fR
+Supermin builds the appliance by copying in the packages listed in
+\&\f(CW\*(C`packages\*(C'\fR.  For this to work those packages must be available.  We
+usually enforce this by adding requirements (eg. \s-1RPM \s0\f(CW\*(C`Requires:\*(C'\fR
 lines) on the package that uses the supermin appliance, so that
 package cannot be installed without pulling in the dependent packages
 and thus making sure the host files are available.
