@@ -1,5 +1,5 @@
-From: Hilko Bengen <bengen@debian.org>
-Date: Mon, 3 Mar 2014 08:07:36 +0000
+From: Hilko Bengen <bengen@hilluzination.de>
+Date: Mon, 3 Mar 2014 09:22:21 +0100
 Subject: Fix build with bytecode compiler
 
 ---

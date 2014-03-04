@@ -1,1 +1,2 @@
 0001-Fix-build-with-bytecode-compiler.patch
+0002-dpkg-Handle-multiarch-setups-correctly.patch
