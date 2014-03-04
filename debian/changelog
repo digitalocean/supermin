@@ -1,3 +1,10 @@
+supermin (5.1.2-2) experimental; urgency=low
+
+  * Added Breaks statement for "older" libguestfs versions
+  * Updated patch queue: Added multiarch fix
+
+ -- Hilko Bengen <bengen@debian.org>  Tue, 04 Mar 2014 21:46:49 +0100
+
 supermin (5.1.2-1) experimental; urgency=low
 
   * New upstream version
