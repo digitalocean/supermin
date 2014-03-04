@@ -20,6 +20,7 @@ Vcs-Browser: http://git.debian.org/?p=pkg-libvirt/supermin.git
 Package: supermin
 Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends}, aptitude, cpio
+Breaks: libguestfs-tools (<< 1.25.38),
 Built-Using: ${misc:Built-Using}
 Description: tool for building supermin appliances.
  Supermin (formerly called febootstrap) is a tool for building
