@@ -1,3 +1,11 @@
+supermin (5.1.3-1) experimental; urgency=low
+
+  * New upstream version
+  * Cleared patch queue
+  * Updated dependencies, build-dependencies
+
+ -- Hilko Bengen <bengen@debian.org>  Thu, 06 Mar 2014 18:53:45 +0100
+
 supermin (5.1.2-2) experimental; urgency=low
 
   * Added Breaks statement for "older" libguestfs versions
