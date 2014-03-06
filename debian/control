@@ -6,9 +6,9 @@ Uploaders: Hilko Bengen <bengen@debian.org>
 Build-Depends: debhelper (>= 9),
  dh-autoreconf,
  gawk, pkg-config,
- aptitude,
+ apt,
  ocaml-nox, ocaml-findlib, dh-ocaml,
- perl-doc,
+ perl,
  comerr-dev, e2fslibs-dev,
  zlib1g-dev, liblzma-dev,
  cpio,
@@ -19,7 +19,8 @@ Vcs-Browser: http://git.debian.org/?p=pkg-libvirt/supermin.git
 
 Package: supermin
 Architecture: linux-any
-Depends: ${shlibs:Depends}, ${misc:Depends}, aptitude, cpio
+Depends: ${shlibs:Depends}, ${misc:Depends},
+ apt, cpio,
 Breaks: libguestfs-tools (<< 1.25.38),
 Built-Using: ${misc:Built-Using}
 Description: tool for building supermin appliances.
