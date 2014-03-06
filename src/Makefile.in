@@ -99,6 +99,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = supermin$(EXEEXT)
+@HAVE_OCAMLOPT_FALSE@am__append_1 = -custom
 noinst_PROGRAMS = init$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -1020,12 +1021,12 @@ supermin_CFLAGS = \
 
 BOBJECTS = $(SOURCES_ML:.ml=.cmo)
 XOBJECTS = $(SOURCES_ML:.ml=.cmx)
+OCAMLPACKAGES = -package unix,str
+OCAMLFLAGS = -warn-error CDEFLMPSUVXYZ $(am__append_1)
 @HAVE_OCAMLOPT_FALSE@OBJECTS = $(BOBJECTS)
 @HAVE_OCAMLOPT_TRUE@OBJECTS = $(XOBJECTS)
 @HAVE_OCAMLOPT_FALSE@BEST = c
 @HAVE_OCAMLOPT_TRUE@BEST = opt
-OCAMLPACKAGES = -package unix,str
-OCAMLFLAGS = -warn-error CDEFLMPSUVXYZ
 supermin_DEPENDENCIES = $(OBJECTS) ext2init-bin.o
 supermin_LDADD = ext2init-bin.o ../lib/libgnu.a
 supermin_LINK = \
