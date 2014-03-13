@@ -1058,7 +1058,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-EXTRA_DIST = $(TESTS)
+EXTRA_DIST = \
+	automake2junit.ml \
+	$(TESTS)
+
 TESTS = test-basic.sh $(am__append_1)
 all: all-am
 
