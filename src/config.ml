@@ -18,7 +18,7 @@
  *)
 
 let package_name = "supermin"
-let package_version = "5.1.4"
+let package_version = "5.1.5"
 let host_cpu = "x86_64"
 
 let apt_get = "no"
@@ -26,6 +26,7 @@ let cpio = "/usr/bin/cpio"
 let dpkg = "no"
 let dpkg_deb = "no"
 let dpkg_query = "no"
+let dpkg_divert = "no"
 let fakeroot = "/usr/bin/fakeroot"
 let makepkg = "no"
 let pacman = "no"
