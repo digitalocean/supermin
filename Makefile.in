@@ -99,8 +99,8 @@ host_triplet = @host@
 subdir = .
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
-	$(srcdir)/config.h.in COPYING INSTALL README TODO compile \
-	config.guess config.sub depcomp install-sh missing
+	$(srcdir)/config.h.in COPYING README TODO compile config.guess \
+	config.sub depcomp install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/absolute-header.m4 \
@@ -280,6 +280,7 @@ DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DPKG = @DPKG@
 DPKG_DEB = @DPKG_DEB@
+DPKG_DIVERT = @DPKG_DIVERT@
 DPKG_QUERY = @DPKG_QUERY@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@

@@ -407,6 +407,7 @@ DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DPKG = @DPKG@
 DPKG_DEB = @DPKG_DEB@
+DPKG_DIVERT = @DPKG_DIVERT@
 DPKG_QUERY = @DPKG_QUERY@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -1058,7 +1059,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-EXTRA_DIST = $(TESTS)
+EXTRA_DIST = \
+	automake2junit.ml \
+	$(TESTS)
+
 TESTS = test-basic.sh $(am__append_1)
 all: all-am
 

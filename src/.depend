@@ -1,13 +1,13 @@
 build.cmo: utils.cmi types.cmo realpath.cmi package_handler.cmi kernel.cmo glob.cmi fnmatch.cmi ext2_initrd.cmo ext2.cmo chroot.cmo
 build.cmx: utils.cmx types.cmx realpath.cmx package_handler.cmx kernel.cmx glob.cmx fnmatch.cmx ext2_initrd.cmx ext2.cmx chroot.cmx
-chroot.cmo: utils.cmi
-chroot.cmx: utils.cmx
+chroot.cmo: utils.cmi package_handler.cmi
+chroot.cmx: utils.cmx package_handler.cmx
 config.cmo:
 config.cmx:
 dpkg.cmo: utils.cmi package_handler.cmi config.cmo
 dpkg.cmx: utils.cmx package_handler.cmx config.cmx
-ext2.cmo: utils.cmi ext2fs.cmi config.cmo
-ext2.cmx: utils.cmx ext2fs.cmx config.cmx
+ext2.cmo: utils.cmi package_handler.cmi ext2fs.cmi config.cmo
+ext2.cmx: utils.cmx package_handler.cmx ext2fs.cmx config.cmx
 ext2fs.cmi:
 ext2fs.cmo: ext2fs.cmi
 ext2fs.cmx: ext2fs.cmi

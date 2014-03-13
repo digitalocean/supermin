@@ -17,7 +17,7 @@ dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 dnl
 dnl Written by Richard W.M. Jones <rjones@redhat.com>
 
-AC_INIT([supermin],[5.1.3])
+AC_INIT([supermin],[5.1.5])
 AM_INIT_AUTOMAKE(foreign)
 
 dnl Check for basic C environment.
@@ -92,6 +92,7 @@ AC_PATH_PROG(APT_GET,[apt-get],[no])
 AC_PATH_PROG(DPKG,[dpkg],[no])
 AC_PATH_PROG(DPKG_DEB,[dpkg-deb],[no])
 AC_PATH_PROG(DPKG_QUERY,[dpkg-query],[no])
+AC_PATH_PROG(DPKG_DIVERT,[[dpkg-divert]],[no])
 
 dnl For FrugalWare handler (currently disabled).
 AC_PATH_PROG(PACMAN_G2,[pacman-g2],[no])
