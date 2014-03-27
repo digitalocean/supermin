@@ -1,3 +1,10 @@
+supermin (5.1.6-1) experimental; urgency=medium
+
+  * New upstream version
+  * Added more dependencies for running tests
+
+ -- Hilko Bengen <bengen@debian.org>  Thu, 27 Mar 2014 15:25:46 +0100
+
 supermin (5.1.5-1) experimental; urgency=medium
 
   * New upstream version
