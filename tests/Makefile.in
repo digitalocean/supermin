@@ -97,9 +97,9 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @NETWORK_TESTS_TRUE@am__append_1 = \
-@NETWORK_TESTS_TRUE@	test-build-bash.sh \
-@NETWORK_TESTS_TRUE@	test-binaries-exist.sh \
-@NETWORK_TESTS_TRUE@	test-harder.sh
+@NETWORK_TESTS_TRUE@	test-build-bash-network.sh \
+@NETWORK_TESTS_TRUE@	test-binaries-exist-network.sh \
+@NETWORK_TESTS_TRUE@	test-harder-network.sh
 
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -1063,7 +1063,8 @@ EXTRA_DIST = \
 	automake2junit.ml \
 	$(TESTS)
 
-TESTS = test-basic.sh $(am__append_1)
+TESTS = test-basic.sh test-build-bash.sh test-binaries-exist.sh \
+	test-harder.sh $(am__append_1)
 all: all-am
 
 .SUFFIXES:
@@ -1270,6 +1271,27 @@ test-binaries-exist.sh.log: test-binaries-exist.sh
 test-harder.sh.log: test-harder.sh
 	@p='test-harder.sh'; \
 	b='test-harder.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test-build-bash-network.sh.log: test-build-bash-network.sh
+	@p='test-build-bash-network.sh'; \
+	b='test-build-bash-network.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test-binaries-exist-network.sh.log: test-binaries-exist-network.sh
+	@p='test-binaries-exist-network.sh'; \
+	b='test-binaries-exist-network.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test-harder-network.sh.log: test-harder-network.sh
+	@p='test-harder-network.sh'; \
+	b='test-harder-network.sh'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

@@ -71,7 +71,7 @@
 .\" ========================================================================
 .\"
 .IX Title "SUPERMIN 1"
-.TH SUPERMIN 1 "2014-03-01" "supermin-5.1.3" "Virtualization Support"
+.TH SUPERMIN 1 "2014-03-21" "supermin-5.1.5" "Virtualization Support"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -497,9 +497,27 @@ supermin appliance.
 When the full appliance is built, the kernel modules from the host are
 copied in, and it is booted using the host kernel.
 .PP
+\fI\s-1USING A CUSTOM KERNEL AND KERNEL MODULES\s0\fR
+.IX Subsection "USING A CUSTOM KERNEL AND KERNEL MODULES"
+.PP
 Supermin is able to choose the best host kernel available to boot the
-appliance.  Users can override this by setting environment variables
-(see \*(L"\s-1ENVIRONMENT VARIABLES\*(R"\s0 below).
+appliance.  However you can override this by setting environment
+variables (see \*(L"\s-1ENVIRONMENT VARIABLES\*(R"\s0 below).
+.PP
+If you build a custom kernel (eg. by compiling Linux from source),
+then you should do something like this:
+.PP
+.Vb 4
+\& mkdir /tmp/kmods
+\& make bzImage
+\& make modules
+\& make modules_install INSTALL_MOD_PATH=/tmp/kmods
+\& 
+\& export SUPERMIN_KERNEL=/path/to/linux.git/arch/x86/boot/bzImage
+\& export SUPERMIN_MODULES=/tmp/kmods/lib/modules/3.xx.yy
+\& 
+\& supermin \-\-build \-f ext2 [etc]
+.Ve
 .SS "\s-1ENFORCING AVAILABILITY OF HOSTFILES\s0"
 .IX Subsection "ENFORCING AVAILABILITY OF HOSTFILES"
 Supermin builds the appliance by copying in the packages listed in
