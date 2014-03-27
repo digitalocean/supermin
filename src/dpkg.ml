@@ -30,18 +30,19 @@ let dpkg_detect () =
     Config.apt_get <> "no" &&
     file_exists "/etc/debian_version"
 
-let dpkg_primary_arch () =
+let dpkg_primary_arch = ref ""
+let settings = ref no_settings
+
+let dpkg_init s =
+  settings := s;
+
   let cmd = sprintf "%s --print-architecture" Config.dpkg in
   let lines = run_command_get_lines cmd in
   match lines with
   | [] ->
     eprintf "supermin: dpkg: expecting %s to return some output\n" cmd;
     exit 1
-  | arch :: _ -> arch
-
-let settings = ref no_settings
-
-let dpkg_init s = settings := s
+  | arch :: _ -> dpkg_primary_arch := arch
 
 type dpkg_t = {
   name : string;
@@ -52,70 +53,31 @@ type dpkg_t = {
 (* Memo from package type to internal dpkg_t. *)
 let dpkg_of_pkg, pkg_of_dpkg = get_memo_functions ()
 
-(* Memo of dpkg_package_of_string. *)
-let dpkgh = Hashtbl.create 13
-
+let dpkg_packages = Hashtbl.create 13
 let dpkg_package_of_string str =
-  (* Parse an dpkg name into the fields like name and version.  Since
-   * the package is installed (see check below), it's easier to use
-   * dpkg-query itself to do this parsing rather than haphazardly
-   * parsing it ourselves.
-   *)
-  let parse_dpkg str =
+  if Hashtbl.length dpkg_packages == 0 then (
     let cmd =
-      sprintf "%s --show --showformat='${Package} ${Version} ${Architecture}\\n' %s"
-        Config.dpkg_query
-        (quote str) in
+      sprintf "%s --show --showformat='${Package} ${Version} ${Architecture} ${Status}\\n'"
+        Config.dpkg_query in
     let lines = run_command_get_lines cmd in
-
-    let pkgs = List.map (
+    List.iter (
       fun line ->
-        let line = string_split " " line in
-        match line with
-        | [ name; version; arch ] ->
-          assert (version <> "");
-          { name = name; version = version; arch = arch }
-        | xs -> assert false)
-      lines in
-
-    (* On multiarch setups, only consider the primary architecture *)
-    try
-      List.find (fun pkg ->
-        pkg.arch = dpkg_primary_arch () || pkg.arch = "all") pkgs
-    with
-      Not_found -> assert false
-
-  (* Check if a package is installed. *)
-  and check_dpkg_installed name =
-    let cmd =
-      sprintf "%s --show %s >/dev/null 2>&1" Config.dpkg_query (quote name) in
-    if 0 <> Sys.command cmd then false
-    else (
-      (* dpkg-query --show can return information about packages which
-       * are not installed.  These have no version information.
-       *)
-      let cmd =
-	sprintf "%s --show --showformat='${Version}' %s"
-          Config.dpkg_query (quote name) in
-      let lines = run_command_get_lines cmd in
-      match lines with
-      | [] | [""] -> false
-      | _ -> true
-    )
-  in
-
+        match string_split " " line with
+        | [ name; version; arch; _; _; "installed" ] ->
+          Hashtbl.add dpkg_packages name { name; version; arch }
+        | _ -> ();
+    ) lines
+  );
+  let candidates = Hashtbl.find_all dpkg_packages str in
+  (* On multiarch setups, only consider the primary architecture *)
   try
-    Hashtbl.find dpkgh str
+    let pkg = List.find (
+      fun cand ->
+        cand.arch = !dpkg_primary_arch || cand.arch = "all"
+    ) candidates in
+    Some (pkg_of_dpkg pkg)
   with
-    Not_found ->
-      let r =
-        if check_dpkg_installed str then (
-          let dpkg = parse_dpkg str in
-          Some (pkg_of_dpkg dpkg)
-        )
-        else None in
-      Hashtbl.add dpkgh str r;
-      r
+    Not_found -> None
 
 let dpkg_package_to_string pkg =
   let dpkg = dpkg_of_pkg pkg in
@@ -133,16 +95,31 @@ let dpkg_get_package_database_mtime () =
   (lstat "/var/lib/dpkg/status").st_mtime
 
 let dpkg_get_all_requires pkgs =
+  let dpkg_requires = Hashtbl.create 13 in
+  (* Prepare dpkg_requires hashtbl with depends, pre-depends from all
+     packages. Strip version information and discard alternative
+     dependencies *)
+  let cmd = sprintf "\
+      %s --show --showformat='${Package} ${Depends} ${Pre-Depends}\n' | \
+      sed -e 's/ *([^)]*) */ /g' \
+          -e 's/ *, */ /g' \
+          -e 's/ *| *[^ ]* */ /g'"
+    Config.dpkg_query in
+  let lines = run_command_get_lines cmd in
+  List.iter (
+    fun line ->
+      match string_split " " line with
+      | [] -> ()
+      | pkgname :: [] -> ()
+      | pkgname :: deps -> Hashtbl.add dpkg_requires pkgname deps
+  ) lines;
+
   let get pkgs =
-    let cmd = sprintf "\
-        %s --show --showformat='${Depends} ${Pre-Depends} ' %s |
-        sed -e 's/([^)]*)//g' -e 's/,//g' -e 's/ \\+/\\n/g' |
-        sort -u"
-      Config.dpkg_query
-      (quoted_list (List.map dpkg_package_name (PackageSet.elements pkgs))) in
-    let lines = run_command_get_lines cmd in
-    let lines = filter_map dpkg_package_of_string lines in
-    PackageSet.union pkgs (package_set_of_list lines)
+    let pkgnames = List.map dpkg_package_name (PackageSet.elements pkgs) in
+    let deps = List.map (Hashtbl.find_all dpkg_requires) pkgnames in
+    let deps = List.flatten (List.flatten deps) in
+    let deps = filter_map dpkg_package_of_string deps in
+    PackageSet.union pkgs (package_set_of_list deps)
   in
   (* The command above only gets one level of dependencies.  We need
    * to keep iterating until we reach a fixpoint.
@@ -154,18 +131,20 @@ let dpkg_get_all_requires pkgs =
   in
   loop pkgs
 
+let dpkg_diversions = Hashtbl.create 13
 let dpkg_get_all_files pkgs =
-  let cmd = sprintf "%s --list" Config.dpkg_divert in
-  let lines = run_command_get_lines cmd in
-  let diversions = Hashtbl.create (List.length lines) in
-  List.iter (
-    fun line ->
-    let items = string_split " " line in
-    match items with
-    | ["diversion"; "of"; path; "to"; real_path; "by"; pkg] ->
-      Hashtbl.add diversions path real_path
-    | _ -> ()
-  ) lines;
+  if Hashtbl.length dpkg_diversions = 0 then (
+    let cmd = sprintf "%s --list" Config.dpkg_divert in
+    let lines = run_command_get_lines cmd in
+    List.iter (
+      fun line ->
+        let items = string_split " " line in
+        match items with
+        | ["diversion"; "of"; path; "to"; real_path; "by"; pkg] ->
+          Hashtbl.add dpkg_diversions path real_path
+        | _ -> ()
+    ) lines
+  );
   let cmd =
     sprintf "%s --listfiles %s | grep '^/' | grep -v '^/.$' | sort -u"
       Config.dpkg_query
@@ -178,7 +157,7 @@ let dpkg_get_all_files pkgs =
 	try string_prefix "/etc/" path && (lstat path).st_kind = S_REG
 	with Unix_error _ -> false in
       let source_path =
-        try Hashtbl.find diversions path
+        try Hashtbl.find dpkg_diversions path
         with Not_found -> path in
       { ft_path = path; ft_source_path = source_path; ft_config = config }
   ) lines

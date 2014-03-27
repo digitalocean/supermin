@@ -35,9 +35,10 @@ else
     exit 77
 fi
 
-d1=test-harder.d1
-d2=test-harder.d2
-rm -rf $d1 $d2
+tmpdir=`mktemp -d`
+
+d1=$tmpdir/d1
+d2=$tmpdir/d2
 
 case $distro in
     arch)
@@ -54,7 +55,9 @@ case $distro in
 	;;
 esac
 
-../src/supermin -v --prepare $pkgs -o $d1
+test "$USE_NETWORK" = 1 || USE_INSTALLED=--use-installed
+
+../src/supermin -v --prepare $USE_INSTALLED $pkgs -o $d1
 
 # Build a chroot.
 ../src/supermin -v --build -f chroot $d1 -o $d2
@@ -126,4 +129,4 @@ esac
 
 # Need to chmod $d2 since rm -r can't remove unwritable directories.
 chmod -R +w $d2 ||:
-rm -r $d1 $d2
+rm -rf $tmpdir
