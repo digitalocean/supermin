@@ -1,3 +1,9 @@
+supermin (5.1.6-2) unstable; urgency=medium
+
+  * Upload to unstable
+
+ -- Hilko Bengen <bengen@debian.org>  Sat, 29 Mar 2014 11:34:22 +0100
+
 supermin (5.1.6-1) experimental; urgency=medium
 
   * New upstream version
