@@ -28,7 +28,7 @@ let dpkg_detect () =
     Config.dpkg_query <> "no" &&
     Config.dpkg_divert <> "no" &&
     Config.apt_get <> "no" &&
-    file_exists "/etc/debian_version"
+    try (stat "/etc/debian_version").st_kind = S_REG with Unix_error _ -> false
 
 let dpkg_primary_arch = ref ""
 let settings = ref no_settings
@@ -64,7 +64,8 @@ let dpkg_package_of_string str =
       fun line ->
         match string_split " " line with
         | [ name; version; arch; _; _; "installed" ] ->
-          Hashtbl.add dpkg_packages name { name; version; arch }
+          let dpkg = { name = name; version = version; arch = arch } in
+          Hashtbl.add dpkg_packages name dpkg
         | _ -> ();
     ) lines
   );
