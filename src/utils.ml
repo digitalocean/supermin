@@ -28,10 +28,6 @@ let (//) = Filename.concat
 let quote = Filename.quote
 let quoted_list names = String.concat " " (List.map quote names)
 
-let file_exists name =
-  try access name [F_OK]; true
-  with Unix_error _ -> false
-
 let dir_exists name =
   try (stat name).st_kind = S_DIR
   with Unix_error _ -> false
@@ -193,7 +189,7 @@ let compare_architecture a1 a2 =
     | a when string_prefix "armv7" a -> 32
     | a when string_prefix "armv8" a -> 64
     | "ppc" | "ppc32" -> 32
-    | "ppc64" -> 64
+    | a when string_prefix "ppc64" a -> 64
     | "sparc" | "sparc32" -> 32
     | "sparc64" -> 64
     | "ia64" -> 64
