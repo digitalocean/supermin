@@ -1,13 +1,13 @@
 From: Hilko Bengen <bengen@debian.org>
-Date: Sat, 26 Apr 2014 14:23:00 +0200
-Subject: Be smarter about finding suitable kernel images
+Date: Mon, 28 Apr 2014 21:37:19 +0200
+Subject: Be smarter about finding suitable kernel images and device trees
 
 ---
- src/kernel.ml | 43 ++++++++++++++++++++++++++++---------------
- 1 file changed, 28 insertions(+), 15 deletions(-)
+ src/kernel.ml | 58 ++++++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 38 insertions(+), 20 deletions(-)
 
 diff --git a/src/kernel.ml b/src/kernel.ml
-index ed5aea3..436b1b0 100644
+index ed5aea3..5560ed5 100644
 --- a/src/kernel.ml
 +++ b/src/kernel.ml
 @@ -23,6 +23,19 @@ open Utils
@@ -18,11 +18,11 @@ index ed5aea3..436b1b0 100644
 +  let models =
 +    match host_cpu with
 +    | "mips" | "mips64" -> [host_cpu; "*-malta"]
-+    | "ppc" | "powerpc" -> ["ppc"; "powerpc"]
++    | "ppc" | "powerpc" | "powerpc64" -> ["ppc"; "powerpc"; "powerpc64"]
 +    | "sparc" | "sparc64" -> ["sparc"; "sparc64"]
 +    | "amd64" | "x86_64" -> ["amd64"; "x86_64"]
 +    | _ when host_cpu.[0] = 'i' && host_cpu.[2] = '8' && host_cpu.[3] = '6' -> ["?86"]
-+    | _ when String.sub host_cpu 0 5 = "armv7" ->  ["armmp"]
++    | _ when String.length host_cpu >= 5 && String.sub host_cpu 0 5 = "armv7" ->  ["armmp"]
 +    | _ -> [host_cpu]
 +  in
 +  List.map (fun model -> sprintf "vmlinu?-*-%s" model) models
@@ -59,7 +59,7 @@ index ed5aea3..436b1b0 100644
 +          kernel_filter ["vmlinu?-*"] is_arm all_files in
  
 -      if files = [] then no_kernels ();
-+      if files = [] then no_kernels (host_cpu);
++      if files = [] then no_kernels host_cpu;
  
        let files = List.sort (fun a b -> compare_version b a) files in
        let kernel_name = List.hd files in
@@ -84,7 +84,7 @@ index ed5aea3..436b1b0 100644
    List.filter (fun filename -> has_modpath filename) files
  
 -and no_kernels () =
-+and no_kernels (host_cpu) =
++and no_kernels host_cpu =
    eprintf "\
 -supermin: failed to find a suitable kernel.
 +supermin: failed to find a suitable kernel (host_cpu=%s).
@@ -99,7 +99,31 @@ index ed5aea3..436b1b0 100644
    exit 1
  
  and find_dtb debug copy_kernel kernel_name wildcard dtb =
-@@ -200,7 +212,8 @@ and has_modpath kernel_name =
+@@ -131,13 +143,18 @@ and find_dtb debug copy_kernel kernel_name wildcard dtb =
+       dtb_file
+     with Not_found ->
+       (* Replace vmlinuz- with dtb- *)
+-      if not (string_prefix "vmlinuz-" kernel_name) then
++      if not (string_prefix "vmlinuz-" kernel_name) &&
++        not (string_prefix "vmlinuz-" kernel_name) then
+         no_dtb_dir kernel_name;
+       let dtb_dir =
+-        "/boot/dtb-" ^
+-          String.sub kernel_name 8 (String.length kernel_name - 8) in
+-      if not (dir_exists dtb_dir) then
+-        no_dtb_dir kernel_name;
++        try
++          List.find dir_exists (
++            List.map (fun prefix ->
++              prefix ^ String.sub kernel_name 8 (String.length kernel_name - 8)
++            ) ["/boot/dtb-"; "/usr/lib/linux-image-"])
++        with Not_found ->
++          no_dtb_dir kernel_name; ""
++      in
+ 
+       let all_files = Sys.readdir dtb_dir in
+       let all_files = Array.to_list all_files in
+@@ -200,7 +217,8 @@ and has_modpath kernel_name =
    | Not_found -> false
  
  and get_kernel_version kernel_name =
