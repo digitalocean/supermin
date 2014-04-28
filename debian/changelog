@@ -1,3 +1,10 @@
+supermin (5.1.7-3) unstable; urgency=medium
+
+  * Fixed internal error on short host_cpu names, added Debian-specific
+    dtb path.
+
+ -- Hilko Bengen <bengen@debian.org>  Mon, 28 Apr 2014 21:39:55 +0200
+
 supermin (5.1.7-2) unstable; urgency=medium
 
   * Added patch to fix FTBFS on non-x86 platforms (Closes: #745724)
