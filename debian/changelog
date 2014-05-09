@@ -1,3 +1,10 @@
+supermin (5.1.8-1) unstable; urgency=medium
+
+  * New upstream version
+  * Dropped patches integrated upstream
+
+ -- Hilko Bengen <bengen@debian.org>  Fri, 09 May 2014 23:22:41 +0200
+
 supermin (5.1.7-4) unstable; urgency=medium
 
   * Added hppa assembler patch by Helge Deller (Closes: #742797)
