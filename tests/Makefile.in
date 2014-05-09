@@ -1063,8 +1063,8 @@ EXTRA_DIST = \
 	automake2junit.ml \
 	$(TESTS)
 
-TESTS = test-basic.sh test-build-bash.sh test-binaries-exist.sh \
-	test-harder.sh $(am__append_1)
+TESTS = test-basic.sh test-execstack.sh test-build-bash.sh \
+	test-binaries-exist.sh test-harder.sh $(am__append_1)
 all: all-am
 
 .SUFFIXES:
@@ -1250,6 +1250,13 @@ recheck: all
 test-basic.sh.log: test-basic.sh
 	@p='test-basic.sh'; \
 	b='test-basic.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test-execstack.sh.log: test-execstack.sh
+	@p='test-execstack.sh'; \
+	b='test-execstack.sh'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

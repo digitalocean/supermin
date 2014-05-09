@@ -1018,7 +1018,7 @@ supermin_SOURCES = $(SOURCES_C)
 supermin_CFLAGS = \
 	-I$(shell $(OCAMLC) -where) \
 	$(EXT2FS_CFLAGS) $(COM_ERR_CFLAGS) \
-	-I$(srcdir)/lib -I../lib
+	-I$(top_srcdir)/lib -I../lib
 
 BOBJECTS = $(SOURCES_ML:.ml=.cmo)
 XOBJECTS = $(SOURCES_ML:.ml=.cmx)
@@ -1509,26 +1509,26 @@ uninstall-man: uninstall-man1
 ext2init-bin.o: ext2init-bin.S
 	$(CC) -o $@ -c $<
 
-ext2init-bin.S: init
+ext2init-bin.S: init $(srcdir)/bin2s.pl
 	strip --strip-all $<
 	@file $< | grep -isq static || \
 	  (echo "*** error: init is not staticly linked"; exit 1)
-	./bin2s.pl $< $@
+	$(srcdir)/bin2s.pl $< $@
 
 depend: .depend
 
-.depend: $(SOURCES)
+.depend: $(wildcard $(abs_srcdir)/*.mli) $(wildcard $(abs_srcdir)/*.ml) config.ml
 	rm -f $@ $@-t
-	$(OCAMLFIND) ocamldep $^ | \
+	$(OCAMLFIND) ocamldep -I $(abs_srcdir) -I $(builddir) $^ | \
 	  $(SED) 's/ *$$//' | \
 	  $(SED) -e :a -e '/ *\\$$/N; s/ *\\\n */ /; ta' | \
-	  $(SED) 's/ :/:/' | \
+	  $(SED) -e 's,$(abs_srcdir)/,$(builddir)/,g' | \
 	  sort > $@-t
 	mv $@-t $@
 
 -include .depend
 
-@HAVE_PERLDOC_TRUE@supermin.1: supermin.pod
+@HAVE_PERLDOC_TRUE@supermin.1: $(srcdir)/supermin.pod
 @HAVE_PERLDOC_TRUE@	pod2man \
 @HAVE_PERLDOC_TRUE@	  -u \
 @HAVE_PERLDOC_TRUE@	  --section 1 \
@@ -1536,13 +1536,13 @@ depend: .depend
 @HAVE_PERLDOC_TRUE@	  --release "$(PACKAGE_NAME)-$(PACKAGE_VERSION)" \
 @HAVE_PERLDOC_TRUE@	  $< > $@
 
-@HAVE_PERLDOC_TRUE@../html/supermin.1.html: supermin.pod
+@HAVE_PERLDOC_TRUE@../html/supermin.1.html: $(srcdir)/supermin.pod
 @HAVE_PERLDOC_TRUE@	mkdir -p ../html
 @HAVE_PERLDOC_TRUE@	pod2html \
 @HAVE_PERLDOC_TRUE@	  --css 'pod.css' \
 @HAVE_PERLDOC_TRUE@	  --htmldir ../html \
 @HAVE_PERLDOC_TRUE@	  --outfile ../html/supermin.1.html \
-@HAVE_PERLDOC_TRUE@	  supermin.pod
+@HAVE_PERLDOC_TRUE@	  $<
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
