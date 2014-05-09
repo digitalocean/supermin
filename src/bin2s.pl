@@ -18,6 +18,10 @@ open my $ofh, '>', $outfile or die "open $outfile: $!";
 print $ofh <<"EOF";
 /* This file has been automatically generated from $infile by $0 */
 
+/* Mark stack as non-executable for GNU tools. */
+\t.section .note.GNU-stack,"",%progbits
+\t.previous
+
 \t.globl\t_binary_${infile}_start
 \t.globl\t_binary_${infile}_end
 \t.globl\t_binary_${infile}_size
@@ -39,7 +43,11 @@ print $ofh <<"EOF";
 
 _binary_${infile}_end:
 
+#if defined(__hppa__)
+\t_binary_${infile}_size: .equ $sz
+#else
 \t.equ _binary_${infile}_size, $sz
+#endif
 EOF
 
 close $ofh;

@@ -1,45 +1,47 @@
-build.cmo: utils.cmi types.cmo realpath.cmi package_handler.cmi kernel.cmo glob.cmi fnmatch.cmi ext2_initrd.cmo ext2.cmo chroot.cmo
-build.cmx: utils.cmx types.cmx realpath.cmx package_handler.cmx kernel.cmx glob.cmx fnmatch.cmx ext2_initrd.cmx ext2.cmx chroot.cmx
-chroot.cmo: utils.cmi package_handler.cmi
-chroot.cmx: utils.cmx package_handler.cmx
-config.cmo:
-config.cmx:
-dpkg.cmo: utils.cmi package_handler.cmi config.cmo
-dpkg.cmx: utils.cmx package_handler.cmx config.cmx
-ext2.cmo: utils.cmi package_handler.cmi ext2fs.cmi config.cmo
-ext2.cmx: utils.cmx package_handler.cmx ext2fs.cmx config.cmx
-ext2fs.cmi:
-ext2fs.cmo: ext2fs.cmi
-ext2fs.cmx: ext2fs.cmi
-ext2init.cmi:
-ext2init.cmo: ext2init.cmi
-ext2init.cmx: ext2init.cmi
-ext2_initrd.cmo: utils.cmi fnmatch.cmi ext2init.cmi ext2fs.cmi
-ext2_initrd.cmx: utils.cmx fnmatch.cmx ext2init.cmx ext2fs.cmx
-fnmatch.cmi:
-fnmatch.cmo: fnmatch.cmi
-fnmatch.cmx: fnmatch.cmi
-glob.cmi:
-glob.cmo: glob.cmi
-glob.cmx: glob.cmi
-kernel.cmo: utils.cmi fnmatch.cmi ext2fs.cmi
-kernel.cmx: utils.cmx fnmatch.cmx ext2fs.cmx
-package_handler.cmi:
-package_handler.cmo: utils.cmi package_handler.cmi
-package_handler.cmx: utils.cmx package_handler.cmi
-pacman.cmo: utils.cmi package_handler.cmi config.cmo
-pacman.cmx: utils.cmx package_handler.cmx config.cmx
-prepare.cmo: utils.cmi package_handler.cmi
-prepare.cmx: utils.cmx package_handler.cmx
-realpath.cmi:
-realpath.cmo: realpath.cmi
-realpath.cmx: realpath.cmi
-rpm.cmo: utils.cmi package_handler.cmi config.cmo
-rpm.cmx: utils.cmx package_handler.cmx config.cmx
-supermin.cmo: utils.cmi types.cmo prepare.cmo package_handler.cmi config.cmo build.cmo
-supermin.cmx: utils.cmx types.cmx prepare.cmx package_handler.cmx config.cmx build.cmx
-types.cmo:
-types.cmx:
-utils.cmi:
-utils.cmo: utils.cmi
-utils.cmx: utils.cmi
+./build.cmo : utils.cmi types.cmo realpath.cmi package_handler.cmi kernel.cmo glob.cmi fnmatch.cmi ext2_initrd.cmo ext2.cmo chroot.cmo
+./build.cmx : utils.cmx types.cmx realpath.cmx package_handler.cmx kernel.cmx glob.cmx fnmatch.cmx ext2_initrd.cmx ext2.cmx chroot.cmx
+./chroot.cmo : utils.cmi package_handler.cmi
+./chroot.cmx : utils.cmx package_handler.cmx
+./config.cmo :
+config.cmo :
+./config.cmx :
+config.cmx :
+./dpkg.cmo : utils.cmi package_handler.cmi config.cmo
+./dpkg.cmx : utils.cmx package_handler.cmx config.cmx
+./ext2.cmo : utils.cmi package_handler.cmi ext2fs.cmi config.cmo
+./ext2.cmx : utils.cmx package_handler.cmx ext2fs.cmx config.cmx
+./ext2fs.cmi :
+./ext2fs.cmo : ./ext2fs.cmi
+./ext2fs.cmx : ./ext2fs.cmi
+./ext2init.cmi :
+./ext2init.cmo : ./ext2init.cmi
+./ext2init.cmx : ./ext2init.cmi
+./ext2_initrd.cmo : utils.cmi fnmatch.cmi ext2init.cmi ext2fs.cmi
+./ext2_initrd.cmx : utils.cmx fnmatch.cmx ext2init.cmx ext2fs.cmx
+./fnmatch.cmi :
+./fnmatch.cmo : ./fnmatch.cmi
+./fnmatch.cmx : ./fnmatch.cmi
+./glob.cmi :
+./glob.cmo : ./glob.cmi
+./glob.cmx : ./glob.cmi
+./kernel.cmo : utils.cmi fnmatch.cmi ext2fs.cmi
+./kernel.cmx : utils.cmx fnmatch.cmx ext2fs.cmx
+./package_handler.cmi :
+./package_handler.cmo : utils.cmi ./package_handler.cmi
+./package_handler.cmx : utils.cmx ./package_handler.cmi
+./pacman.cmo : utils.cmi package_handler.cmi config.cmo
+./pacman.cmx : utils.cmx package_handler.cmx config.cmx
+./prepare.cmo : utils.cmi package_handler.cmi
+./prepare.cmx : utils.cmx package_handler.cmx
+./realpath.cmi :
+./realpath.cmo : ./realpath.cmi
+./realpath.cmx : ./realpath.cmi
+./rpm.cmo : utils.cmi package_handler.cmi config.cmo
+./rpm.cmx : utils.cmx package_handler.cmx config.cmx
+./supermin.cmo : utils.cmi types.cmo prepare.cmo package_handler.cmi config.cmo build.cmo
+./supermin.cmx : utils.cmx types.cmx prepare.cmx package_handler.cmx config.cmx build.cmx
+./types.cmo :
+./types.cmx :
+./utils.cmi :
+./utils.cmo : ./utils.cmi
+./utils.cmx : ./utils.cmi
