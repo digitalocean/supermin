@@ -1,3 +1,9 @@
+supermin (5.1.7-4) unstable; urgency=medium
+
+  * Added hppa assembler patch by Helge Deller (Closes: #742797)
+
+ -- Hilko Bengen <bengen@debian.org>  Fri, 09 May 2014 20:06:25 +0200
+
 supermin (5.1.7-3) unstable; urgency=medium
 
   * Fixed internal error on short host_cpu names, added Debian-specific
