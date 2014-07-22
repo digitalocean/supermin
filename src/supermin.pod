@@ -303,7 +303,7 @@ Detailed information within each stage.
 
 =item I<-v -v -v>
 
-Massive amounts of debugging (far too much more normal use, but good
+Massive amounts of debugging (far too much for normal use, but good
 if you are trying to diagnose a bug in supermin).
 
 =back
@@ -463,14 +463,14 @@ then you should do something like this:
  
  supermin --build -f ext2 [etc]
 
-=head2 ENFORCING AVAILABILITY OF HOSTFILES
+=head2 ENFORCING AVAILABILITY OF PACKAGES
 
 Supermin builds the appliance by copying in the packages listed in
 C<packages>.  For this to work those packages must be available.  We
 usually enforce this by adding requirements (eg. RPM C<Requires:>
 lines) on the package that uses the supermin appliance, so that
 package cannot be installed without pulling in the dependent packages
-and thus making sure the host files are available.
+and thus making sure the packages are installed for supermin to use.
 
 =head1 ENVIRONMENT VARIABLES
 
@@ -494,6 +494,12 @@ eg. C</lib/modules/3.0.x86_64/>
 =item SUPERMIN_DTB
 
 Force the given device tree file to be used.
+
+=item SUPERMIN_KERNEL_VERSION
+
+On non-x86 architectures, you may need to set this environment
+variable if supermin cannot determine the kernel version of
+C<SUPERMIN_KERNEL> just by looking at the file.
 
 =back
 

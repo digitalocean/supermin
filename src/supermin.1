@@ -71,7 +71,7 @@
 .\" ========================================================================
 .\"
 .IX Title "SUPERMIN 1"
-.TH SUPERMIN 1 "2014-03-21" "supermin-5.1.5" "Virtualization Support"
+.TH SUPERMIN 1 "2014-07-12" "supermin-5.1.9" "Virtualization Support"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -361,7 +361,7 @@ Debugging of overall stages.
 Detailed information within each stage.
 .IP "\fI\-v \-v \-v\fR" 4
 .IX Item "-v -v -v"
-Massive amounts of debugging (far too much more normal use, but good
+Massive amounts of debugging (far too much for normal use, but good
 if you are trying to diagnose a bug in supermin).
 .RE
 .RS 4
@@ -518,14 +518,14 @@ then you should do something like this:
 \& 
 \& supermin \-\-build \-f ext2 [etc]
 .Ve
-.SS "\s-1ENFORCING AVAILABILITY OF HOSTFILES\s0"
-.IX Subsection "ENFORCING AVAILABILITY OF HOSTFILES"
+.SS "\s-1ENFORCING AVAILABILITY OF PACKAGES\s0"
+.IX Subsection "ENFORCING AVAILABILITY OF PACKAGES"
 Supermin builds the appliance by copying in the packages listed in
 \&\f(CW\*(C`packages\*(C'\fR.  For this to work those packages must be available.  We
 usually enforce this by adding requirements (eg. \s-1RPM \s0\f(CW\*(C`Requires:\*(C'\fR
 lines) on the package that uses the supermin appliance, so that
 package cannot be installed without pulling in the dependent packages
-and thus making sure the host files are available.
+and thus making sure the packages are installed for supermin to use.
 .SH "ENVIRONMENT VARIABLES"
 .IX Header "ENVIRONMENT VARIABLES"
 .IP "\s-1SUPERMIN_KERNEL\s0" 4
@@ -544,6 +544,11 @@ eg. \f(CW\*(C`/lib/modules/3.0.x86_64/\*(C'\fR
 .IP "\s-1SUPERMIN_DTB\s0" 4
 .IX Item "SUPERMIN_DTB"
 Force the given device tree file to be used.
+.IP "\s-1SUPERMIN_KERNEL_VERSION\s0" 4
+.IX Item "SUPERMIN_KERNEL_VERSION"
+On non\-x86 architectures, you may need to set this environment
+variable if supermin cannot determine the kernel version of
+\&\f(CW\*(C`SUPERMIN_KERNEL\*(C'\fR just by looking at the file.
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
 <http://people.redhat.com/~rjones/supermin/>,
