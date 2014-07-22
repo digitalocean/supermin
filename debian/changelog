@@ -1,3 +1,10 @@
+supermin (5.1.9-1) unstable; urgency=medium
+
+  * New upstream version
+  * Dropped patch that was integrated upstream
+
+ -- Hilko Bengen <bengen@debian.org>  Tue, 22 Jul 2014 14:12:46 +0200
+
 supermin (5.1.8-2) unstable; urgency=medium
 
   * skip test-execstack.sh
