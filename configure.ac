@@ -17,7 +17,7 @@ dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 dnl
 dnl Written by Richard W.M. Jones <rjones@redhat.com>
 
-AC_INIT([supermin],[5.1.9])
+AC_INIT([supermin],[5.1.10])
 AM_INIT_AUTOMAKE(foreign)
 
 dnl Check for basic C environment.
@@ -51,6 +51,21 @@ m4_ifdef([AC_PROG_SED],[
     dnl ... else hope for the best
     AC_SUBST([SED], "sed")
 ])
+
+AC_ARG_ENABLE([werror],
+    [AS_HELP_STRING([--enable-werror],
+                    [turn GCC warnings into errors (for developers)])],
+    [case $enableval in
+     yes|no) ;;
+     *)      AC_MSG_ERROR([bad value $enableval for werror option]) ;;
+     esac
+     gcc_werror=$enableval],
+    [gcc_werror=no]
+)
+if test "$gcc_werror" = "yes"; then
+    WERROR_CFLAGS="-Werror"
+    AC_SUBST([WERROR_CFLAGS])
+fi
 
 # OCaml and ocamlfind are required to compile.
 AC_PROG_OCAML

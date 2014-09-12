@@ -875,6 +875,7 @@ UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS = @UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOC
 URPMI = @URPMI@
 VERSION = @VERSION@
 WCHAR_T_SUFFIX = @WCHAR_T_SUFFIX@
+WERROR_CFLAGS = @WERROR_CFLAGS@
 WINDOWS_64_BIT_OFF_T = @WINDOWS_64_BIT_OFF_T@
 WINDOWS_64_BIT_ST_SIZE = @WINDOWS_64_BIT_ST_SIZE@
 WINT_T_SUFFIX = @WINT_T_SUFFIX@
@@ -1018,6 +1019,7 @@ supermin_SOURCES = $(SOURCES_C)
 supermin_CFLAGS = \
 	-I$(shell $(OCAMLC) -where) \
 	$(EXT2FS_CFLAGS) $(COM_ERR_CFLAGS) \
+	-Wall $(WERROR_CFLAGS) \
 	-I$(top_srcdir)/lib -I../lib
 
 BOBJECTS = $(SOURCES_ML:.ml=.cmo)
@@ -1512,7 +1514,7 @@ ext2init-bin.o: ext2init-bin.S
 ext2init-bin.S: init $(srcdir)/bin2s.pl
 	strip --strip-all $<
 	@file $< | grep -isq static || \
-	  (echo "*** error: init is not staticly linked"; exit 1)
+	  (echo "*** error: init is not statically linked"; exit 1)
 	$(srcdir)/bin2s.pl $< $@
 
 depend: .depend

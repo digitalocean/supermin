@@ -52,6 +52,12 @@
 /* fts.h in glibc is broken, forcing us to use the GNUlib alternative. */
 #include "fts_.h"
 
+struct ext2_data
+{
+  ext2_filsys fs;
+  int debug;
+};
+
 static void initialize (void) __attribute__((constructor));
 
 static void
@@ -78,18 +84,20 @@ ext2_handle_closed (void)
   caml_failwith ("ext2fs: function called on a closed handle");
 }
 
-#define Ext2fs_val(v) (*((ext2_filsys *)Data_custom_val(v)))
+#define Ext2fs_val(v) (*((struct ext2_data *)Data_custom_val(v)))
+#define Val_none Val_int(0)
+#define Some_val(v) Field(v,0)
 
 static void
 ext2_finalize (value fsv)
 {
-  ext2_filsys fs = Ext2fs_val (fsv);
+  struct ext2_data data = Ext2fs_val (fsv);
 
-  if (fs) {
+  if (data.fs) {
 #ifdef HAVE_EXT2FS_CLOSE2
-    ext2fs_close2 (fs, EXT2_FLAG_FLUSH_NO_SYNC);
+    ext2fs_close2 (data.fs, EXT2_FLAG_FLUSH_NO_SYNC);
 #else
-    ext2fs_close (fs);
+    ext2fs_close (data.fs);
 #endif
   }
 }
@@ -104,36 +112,38 @@ static struct custom_operations ext2_custom_operations = {
 };
 
 static value
-Val_ext2fs (ext2_filsys fs)
+Val_ext2fs (struct ext2_data *data)
 {
   CAMLparam0 ();
   CAMLlocal1 (fsv);
 
   fsv = caml_alloc_custom (&ext2_custom_operations,
-                           sizeof (ext2_filsys), 0, 1);
-  Ext2fs_val (fsv) = fs;
+                           sizeof (struct ext2_data), 0, 1);
+  Ext2fs_val (fsv) = *data;
   CAMLreturn (fsv);
 }
 
 value
-supermin_ext2fs_open (value filev)
+supermin_ext2fs_open (value filev, value debugv)
 {
   CAMLparam1 (filev);
   CAMLlocal1 (fsv);
   int fs_flags = EXT2_FLAG_RW;
   errcode_t err;
-  ext2_filsys fs;
+  struct ext2_data data;
 
 #ifdef EXT2_FLAG_64BITS
   fs_flags |= EXT2_FLAG_64BITS;
 #endif
 
   err = ext2fs_open (String_val (filev), fs_flags, 0, 0,
-                     unix_io_manager, &fs);
+                     unix_io_manager, &data.fs);
   if (err != 0)
     ext2_error_to_exception ("ext2fs_open", err, String_val (filev));
 
-  fsv = Val_ext2fs (fs);
+  data.debug = debugv == Val_none ? 0 : Int_val (Some_val (debugv));
+
+  fsv = Val_ext2fs (&data);
   CAMLreturn (fsv);
 }
 
@@ -145,7 +155,7 @@ supermin_ext2fs_close (value fsv)
   ext2_finalize (fsv);
 
   /* So we don't double-free in the finalizer. */
-  Ext2fs_val (fsv) = NULL;
+  Ext2fs_val (fsv).fs = NULL;
 
   CAMLreturn (Val_unit);
 }
@@ -154,14 +164,14 @@ value
 supermin_ext2fs_read_bitmaps (value fsv)
 {
   CAMLparam1 (fsv);
-  ext2_filsys fs;
+  struct ext2_data data;
   errcode_t err;
 
-  fs = Ext2fs_val (fsv);
-  if (fs == NULL)
+  data = Ext2fs_val (fsv);
+  if (data.fs == NULL)
     ext2_handle_closed ();
 
-  err = ext2fs_read_bitmaps (fs);
+  err = ext2fs_read_bitmaps (data.fs);
   if (err != 0)
     ext2_error_to_exception ("ext2fs_read_bitmaps", err, NULL);
 
@@ -173,7 +183,7 @@ static void ext2_empty_inode (ext2_filsys fs, ext2_ino_t dir_ino, const char *di
 static void ext2_write_file (ext2_filsys fs, ext2_ino_t ino, const char *buf, size_t size, const char *filename);
 static void ext2_link (ext2_filsys fs, ext2_ino_t dir_ino, const char *basename, ext2_ino_t ino, int dir_ft);
 static void ext2_clean_path (ext2_filsys fs, ext2_ino_t dir_ino, const char *dirname, const char *basename, int isdir);
-static void ext2_copy_file (ext2_filsys fs, const char *src, const char *dest);
+static void ext2_copy_file (struct ext2_data *data, const char *src, const char *dest);
 
 /* Copy the host filesystem file/directory 'src' to the destination
  * 'dest'.  Directories are NOT copied recursively - the directory is
@@ -185,13 +195,13 @@ supermin_ext2fs_copy_file_from_host (value fsv, value srcv, value destv)
   CAMLparam3 (fsv, srcv, destv);
   const char *src = String_val (srcv);
   const char *dest = String_val (destv);
-  ext2_filsys fs;
+  struct ext2_data data;
 
-  fs = Ext2fs_val (fsv);
-  if (fs == NULL)
+  data = Ext2fs_val (fsv);
+  if (data.fs == NULL)
     ext2_handle_closed ();
 
-  ext2_copy_file (fs, src, dest);
+  ext2_copy_file (&data, src, dest);
 
   CAMLreturn (Val_unit);
 }
@@ -207,7 +217,7 @@ supermin_ext2fs_copy_dir_recursively_from_host (value fsv,
   const char *srcdir = String_val (srcdirv);
   const char *destdir = String_val (destdirv);
   size_t srclen = strlen (srcdir);
-  ext2_filsys fs;
+  struct ext2_data data;
   char *paths[2];
   FTS *fts;
   FTSENT *entry;
@@ -216,8 +226,8 @@ supermin_ext2fs_copy_dir_recursively_from_host (value fsv,
   size_t i, n;
   int r;
 
-  fs = Ext2fs_val (fsv);
-  if (fs == NULL)
+  data = Ext2fs_val (fsv);
+  if (data.fs == NULL)
     ext2_handle_closed ();
 
   paths[0] = (char *) srcdir;
@@ -269,7 +279,7 @@ supermin_ext2fs_copy_dir_recursively_from_host (value fsv,
       }
     }
 
-    ext2_copy_file (fs, entry->fts_path, destpath);
+    ext2_copy_file (&data, entry->fts_path, destpath);
     free (destpath);
   }
 
@@ -511,6 +521,7 @@ read_whole_file (const char *filename, size_t size)
   if (fd == -1) {
     /* Skip unreadable files. */
     fprintf (stderr, "supermin: open: %s: %m\n", filename);
+    free (buf);
     return NULL;
   }
 
@@ -537,11 +548,14 @@ read_whole_file (const char *filename, size_t size)
 
 /* Copy a file (or directory etc) from the host. */
 static void
-ext2_copy_file (ext2_filsys fs, const char *src, const char *dest)
+ext2_copy_file (struct ext2_data *data, const char *src, const char *dest)
 {
   errcode_t err;
   struct stat statbuf;
   struct statvfs statvfsbuf;
+
+  if (data->debug >= 3)
+    printf ("supermin: ext2: copy_file %s -> %s\n", src, dest);
 
   if (lstat (src, &statbuf) == -1)
     unix_error (errno, (char *) "lstat", caml_copy_string (src));
@@ -550,19 +564,14 @@ ext2_copy_file (ext2_filsys fs, const char *src, const char *dest)
    * Note we cheat by looking at fs->device_name (which is the output
    * file).  We could store this filename separately.
    */
-  if (fs->device_name && statvfs (fs->device_name, &statvfsbuf) == 0) {
+  if (data->fs->device_name && statvfs (data->fs->device_name, &statvfsbuf) == 0) {
     uint64_t space = statvfsbuf.f_bavail * statvfsbuf.f_bsize;
     uint64_t estimate = 128*1024 + 2 * statbuf.st_size;
 
     if (space < estimate)
       unix_error (ENOSPC, (char *) "statvfs",
-                  caml_copy_string (fs->device_name));
+                  caml_copy_string (data->fs->device_name));
   }
-
-#if 0
-  /* if debug >= 3 */
-  fprintf (stderr, "ext2_copy_file %s %s 0%o\n", src, dest, statbuf.st_mode);
-#endif
 
   /* Sanity check the path.  These rules are always true for the paths
    * passed to us here from the appliance layer.  The assertions just
@@ -585,11 +594,12 @@ ext2_copy_file (ext2_filsys fs, const char *src, const char *dest)
    * is because the code was copied and pasted from supermin 4 where
    * there was no such distinction.
    */
-  const char *dirname, *basename;
+  char *dirname;
+  const char *basename;
   const char *p = strrchr (dest, '/');
   ext2_ino_t dir_ino;
   if (dest == p) {     /* "/foo" */
-    dirname = "/";
+    dirname = strdup ("/");
     basename = dest+1;
     dir_ino = EXT2_ROOT_INO;
   } else {                      /* "/foo/bar" */
@@ -615,6 +625,10 @@ ext2_copy_file (ext2_filsys fs, const char *src, const char *dest)
       if (fp == NULL)
 	goto cont;
       new_dirname = malloc (PATH_MAX+1);
+      if (new_dirname == NULL) {
+	pclose (fp);
+	goto cont;
+      }
       if (fgets (new_dirname, PATH_MAX, fp) == NULL) {
 	pclose (fp);
 	goto cont;
@@ -626,12 +640,13 @@ ext2_copy_file (ext2_filsys fs, const char *src, const char *dest)
 	  new_dirname[len-1] == '\n')
 	new_dirname[len-1] = '\0';
 
+      free (dirname);
       dirname = new_dirname;
     }
   cont:
 
     /* Look up the parent directory. */
-    err = ext2fs_namei (fs, EXT2_ROOT_INO, EXT2_ROOT_INO, dirname, &dir_ino);
+    err = ext2fs_namei (data->fs, EXT2_ROOT_INO, EXT2_ROOT_INO, dirname, &dir_ino);
     if (err != 0) {
       /* This is the most popular supermin "WTF" error, so make
        * sure we capture as much information as possible.
@@ -647,7 +662,7 @@ ext2_copy_file (ext2_filsys fs, const char *src, const char *dest)
     }
   }
 
-  ext2_clean_path (fs, dir_ino, dirname, basename, S_ISDIR (statbuf.st_mode));
+  ext2_clean_path (data->fs, dir_ino, dirname, basename, S_ISDIR (statbuf.st_mode));
 
   int dir_ft;
 
@@ -663,13 +678,13 @@ ext2_copy_file (ext2_filsys fs, const char *src, const char *dest)
         goto skip_unreadable_file;
     }
 
-    ext2_empty_inode (fs, dir_ino, dirname, basename,
+    ext2_empty_inode (data->fs, dir_ino, dirname, basename,
                       statbuf.st_mode, statbuf.st_uid, statbuf.st_gid,
                       statbuf.st_ctime, statbuf.st_atime, statbuf.st_mtime,
                       0, 0, EXT2_FT_REG_FILE, &ino);
 
     if (statbuf.st_size > 0) {
-      ext2_write_file (fs, ino, buf, statbuf.st_size, dest);
+      ext2_write_file (data->fs, ino, buf, statbuf.st_size, dest);
       free (buf);
     }
   skip_unreadable_file: ;
@@ -677,7 +692,7 @@ ext2_copy_file (ext2_filsys fs, const char *src, const char *dest)
   /* Create a symlink. */
   else if (S_ISLNK (statbuf.st_mode)) {
     ext2_ino_t ino;
-    ext2_empty_inode (fs, dir_ino, dirname, basename,
+    ext2_empty_inode (data->fs, dir_ino, dirname, basename,
                       statbuf.st_mode, statbuf.st_uid, statbuf.st_gid,
                       statbuf.st_ctime, statbuf.st_atime, statbuf.st_mtime,
                       0, 0, EXT2_FT_SYMLINK, &ino);
@@ -686,11 +701,11 @@ ext2_copy_file (ext2_filsys fs, const char *src, const char *dest)
     ssize_t r = readlink (src, buf, sizeof buf);
     if (r == -1)
       unix_error (errno, (char *) "readlink", caml_copy_string (src));
-    ext2_write_file (fs, ino, buf, r, dest);
+    ext2_write_file (data->fs, ino, buf, r, dest);
   }
   /* Create directory. */
   else if (S_ISDIR (statbuf.st_mode))
-    ext2_mkdir (fs, dir_ino, dirname, basename,
+    ext2_mkdir (data->fs, dir_ino, dirname, basename,
                 statbuf.st_mode, statbuf.st_uid, statbuf.st_gid,
                 statbuf.st_ctime, statbuf.st_atime, statbuf.st_mtime);
   /* Create a special file. */
@@ -707,10 +722,12 @@ ext2_copy_file (ext2_filsys fs, const char *src, const char *dest)
   } else if (S_ISSOCK (statbuf.st_mode)) {
     dir_ft = EXT2_FT_SOCK;
   make_special:
-    ext2_empty_inode (fs, dir_ino, dirname, basename,
+    ext2_empty_inode (data->fs, dir_ino, dirname, basename,
                       statbuf.st_mode, statbuf.st_uid, statbuf.st_gid,
                       statbuf.st_ctime, statbuf.st_atime, statbuf.st_mtime,
                       major (statbuf.st_rdev), minor (statbuf.st_rdev),
                       dir_ft, NULL);
   }
+
+  free (dirname);
 }
