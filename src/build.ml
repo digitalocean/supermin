@@ -126,9 +126,9 @@ let rec build debug
     List.filter (
       fun file ->
         try ignore (lstat file.ft_source_path); true
-        with Unix_error (err, fn, _) ->
+        with Unix_error _ ->
           try ignore (lstat file.ft_path); true
-          with Unix_error (err, fn, _) -> false
+          with Unix_error _ -> false
     ) files in
 
   if debug >= 1 then
@@ -376,6 +376,7 @@ and munge files =
 
     | { ft_path = "/" } :: rest ->
       (* This is just to avoid a corner-case in subsequent rules. *)
+      insert_dir "/";
       loop rest
 
     | dir :: rest when stat_is_dir dir.ft_path && dir_seen dir.ft_path ->
