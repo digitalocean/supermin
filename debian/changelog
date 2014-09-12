@@ -1,3 +1,9 @@
+supermin (5.1.10-1) unstable; urgency=medium
+
+  * New upstream version
+
+ -- Hilko Bengen <bengen@debian.org>  Fri, 12 Sep 2014 22:35:45 +0200
+
 supermin (5.1.9-3) unstable; urgency=medium
 
   * Corrected ppc64el kernel name
