@@ -86,11 +86,17 @@ let rec build debug
   (* Read the supermin appliance, ie. the input files and/or
    * directories that make up the appliance.
    *)
+  if debug >= 1 then
+    printf "supermin: reading the supermin appliance\n%!";
   let appliance = read_appliance debug basedir empty_appliance inputs in
 
   (* Resolve dependencies in the list of packages. *)
   let ph = get_package_handler () in
+  if debug >= 1 then
+    printf "supermin: mapping package names to installed packages\n%!";
   let packages = filter_map ph.ph_package_of_string appliance.packages in
+  if debug >= 1 then
+    printf "supermin: resolving full list of package dependencies\n%!";
   let packages =
     let packages = package_set_of_list packages in
     get_all_requires packages in
@@ -316,13 +322,13 @@ and get_file_content file buf len =
 
 and get_compressed_file_content zcat file =
   let cmd = sprintf "%s %s" zcat (quote file) in
-  let chan = open_process_in cmd in
+  let chan_out, chan_in, chan_err = open_process_full cmd [||] in
   let buf = String.create 512 in
-  let len = input chan buf 0 (String.length buf) in
+  let len = input chan_out buf 0 (String.length buf) in
   (* We're expecting the subprocess to fail because we close the pipe
    * early, so:
    *)
-  ignore (close_process_in chan);
+  ignore (Unix.close_process_full (chan_out, chan_in, chan_err));
 
   get_file_content file buf len
 
@@ -394,6 +400,13 @@ and munge files =
       let target =
         if String.length target < 1 || target.[0] <> '/' then
           realpath (parent // target)
+        else
+          target in
+      (* Remove trailing slash from filenames (RHBZ#1155586). *)
+      let target =
+        let len = String.length target in
+        if len >= 2 && target.[len-1] = '/' then
+          String.sub target 0 (len-1)
         else
           target in
       if not (dir_seen target) then (

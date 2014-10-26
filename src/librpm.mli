@@ -1,6 +1,5 @@
 (* supermin 5
- * Copyright (C) 2009-2014 Red Hat Inc.
- * src/config.ml.  Generated from config.ml.in by configure.
+ * Copyright (C) 2014 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +16,33 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *)
 
-let package_name = "supermin"
-let package_version = "5.1.11"
-let host_cpu = "x86_64"
+val rpm_is_available : unit -> bool
 
-let apt_get = "no"
-let cpio = "/usr/bin/cpio"
-let dpkg = "/usr/bin/dpkg"
-let dpkg_deb = "/usr/bin/dpkg-deb"
-let dpkg_query = "/usr/bin/dpkg-query"
-let dpkg_divert = "/usr/bin/dpkg-divert"
-let fakeroot = "/usr/bin/fakeroot"
-let makepkg = "no"
-let pacman = "no"
-let pactree = "no"
-let pacman_g2 = "no"
-let rpm = "/usr/bin/rpm"
-let rpm2cpio = "/usr/bin/rpm2cpio"
-let urpmi = "no"
-let yumdownloader = "/usr/bin/yumdownloader"
-let zypper = "no"
+val rpm_version : unit -> string
 
-let mke2fs = "/usr/sbin/mke2fs"
-let mke2fs_t_option = "-t"
+type t
+
+exception Multiple_matches of int
+
+val rpm_open : ?debug:int -> t
+val rpm_close : t -> unit
+
+type rpm_t = {
+  name : string;
+  epoch : int;
+  version : string;
+  release : string;
+  arch : string;
+}
+
+type rpmfile_t = {
+  filepath : string;
+  filetype : rpmfiletype_t;
+} and rpmfiletype_t =
+  | FileNormal
+  | FileConfig
+
+val rpm_installed : t -> string -> rpm_t array
+val rpm_pkg_requires : t -> string -> string array
+val rpm_pkg_whatprovides : t -> string -> string array
+val rpm_pkg_filelist : t -> string -> rpmfile_t array
