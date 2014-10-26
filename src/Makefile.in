@@ -164,7 +164,8 @@ init_LINK = $(CCLD) $(init_CFLAGS) $(CFLAGS) $(init_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am__objects_1 = supermin-ext2fs-c.$(OBJEXT) \
 	supermin-ext2init-c.$(OBJEXT) supermin-fnmatch-c.$(OBJEXT) \
-	supermin-glob-c.$(OBJEXT) supermin-realpath-c.$(OBJEXT)
+	supermin-glob-c.$(OBJEXT) supermin-librpm-c.$(OBJEXT) \
+	supermin-realpath-c.$(OBJEXT)
 am_supermin_OBJECTS = $(am__objects_1)
 supermin_OBJECTS = $(am_supermin_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -671,6 +672,8 @@ LIBGNU_LIBDEPS = @LIBGNU_LIBDEPS@
 LIBGNU_LTLIBDEPS = @LIBGNU_LTLIBDEPS@
 LIBINTL = @LIBINTL@
 LIBOBJS = @LIBOBJS@
+LIBRPM_CFLAGS = @LIBRPM_CFLAGS@
+LIBRPM_LIBS = @LIBRPM_LIBS@
 LIBS = @LIBS@
 LTLIBINTL = @LTLIBINTL@
 LTLIBOBJS = @LTLIBOBJS@
@@ -964,6 +967,9 @@ SOURCES = \
 	realpath-c.c \
 	realpath.ml \
 	realpath.mli \
+	librpm-c.c \
+	librpm.ml \
+	librpm.mli \
 	config.ml \
 	utils.ml \
 	utils.mli \
@@ -989,6 +995,7 @@ SOURCES_ML = \
 	fnmatch.ml \
 	glob.ml \
 	realpath.ml \
+	librpm.ml \
 	config.ml \
 	utils.ml \
 	types.ml \
@@ -1009,6 +1016,7 @@ SOURCES_C = \
 	ext2init-c.c \
 	fnmatch-c.c \
 	glob-c.c \
+	librpm-c.c \
 	realpath-c.c
 
 CLEANFILES = *~ *.cmi *.cmo *.cmx *.o supermin ext2init-bin.S
@@ -1018,7 +1026,7 @@ man_MANS = \
 supermin_SOURCES = $(SOURCES_C)
 supermin_CFLAGS = \
 	-I$(shell $(OCAMLC) -where) \
-	$(EXT2FS_CFLAGS) $(COM_ERR_CFLAGS) \
+	$(EXT2FS_CFLAGS) $(COM_ERR_CFLAGS) $(LIBRPM_CFLAGS) \
 	-Wall $(WERROR_CFLAGS) \
 	-I$(top_srcdir)/lib -I../lib
 
@@ -1148,6 +1156,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin-ext2init-c.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin-fnmatch-c.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin-glob-c.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin-librpm-c.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin-realpath-c.Po@am__quote@
 
 .c.o:
@@ -1233,6 +1242,20 @@ supermin-glob-c.obj: glob-c.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='glob-c.c' object='supermin-glob-c.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_CFLAGS) $(CFLAGS) -c -o supermin-glob-c.obj `if test -f 'glob-c.c'; then $(CYGPATH_W) 'glob-c.c'; else $(CYGPATH_W) '$(srcdir)/glob-c.c'; fi`
+
+supermin-librpm-c.o: librpm-c.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_CFLAGS) $(CFLAGS) -MT supermin-librpm-c.o -MD -MP -MF $(DEPDIR)/supermin-librpm-c.Tpo -c -o supermin-librpm-c.o `test -f 'librpm-c.c' || echo '$(srcdir)/'`librpm-c.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/supermin-librpm-c.Tpo $(DEPDIR)/supermin-librpm-c.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='librpm-c.c' object='supermin-librpm-c.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_CFLAGS) $(CFLAGS) -c -o supermin-librpm-c.o `test -f 'librpm-c.c' || echo '$(srcdir)/'`librpm-c.c
+
+supermin-librpm-c.obj: librpm-c.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_CFLAGS) $(CFLAGS) -MT supermin-librpm-c.obj -MD -MP -MF $(DEPDIR)/supermin-librpm-c.Tpo -c -o supermin-librpm-c.obj `if test -f 'librpm-c.c'; then $(CYGPATH_W) 'librpm-c.c'; else $(CYGPATH_W) '$(srcdir)/librpm-c.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/supermin-librpm-c.Tpo $(DEPDIR)/supermin-librpm-c.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='librpm-c.c' object='supermin-librpm-c.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_CFLAGS) $(CFLAGS) -c -o supermin-librpm-c.obj `if test -f 'librpm-c.c'; then $(CYGPATH_W) 'librpm-c.c'; else $(CYGPATH_W) '$(srcdir)/librpm-c.c'; fi`
 
 supermin-realpath-c.o: realpath-c.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_CFLAGS) $(CFLAGS) -MT supermin-realpath-c.o -MD -MP -MF $(DEPDIR)/supermin-realpath-c.Tpo -c -o supermin-realpath-c.o `test -f 'realpath-c.c' || echo '$(srcdir)/'`realpath-c.c

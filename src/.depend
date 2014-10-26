@@ -26,6 +26,9 @@ config.cmx :
 ./glob.cmx : ./glob.cmi
 ./kernel.cmo : utils.cmi fnmatch.cmi ext2fs.cmi
 ./kernel.cmx : utils.cmx fnmatch.cmx ext2fs.cmx
+./librpm.cmi :
+./librpm.cmo : ./librpm.cmi
+./librpm.cmx : ./librpm.cmi
 ./package_handler.cmi :
 ./package_handler.cmo : utils.cmi ./package_handler.cmi
 ./package_handler.cmx : utils.cmx ./package_handler.cmi
@@ -36,8 +39,8 @@ config.cmx :
 ./realpath.cmi :
 ./realpath.cmo : ./realpath.cmi
 ./realpath.cmx : ./realpath.cmi
-./rpm.cmo : utils.cmi package_handler.cmi config.cmo
-./rpm.cmx : utils.cmx package_handler.cmx config.cmx
+./rpm.cmo : utils.cmi package_handler.cmi librpm.cmi config.cmo
+./rpm.cmx : utils.cmx package_handler.cmx librpm.cmx config.cmx
 ./supermin.cmo : utils.cmi types.cmo prepare.cmo package_handler.cmi config.cmo build.cmo
 ./supermin.cmx : utils.cmx types.cmx prepare.cmx package_handler.cmx config.cmx build.cmx
 ./types.cmo :
