@@ -1,3 +1,10 @@
+supermin (5.1.11-1) unstable; urgency=medium
+
+  * New upstream version
+  * Bumped Standards-Version
+
+ -- Hilko Bengen <bengen@debian.org>  Sun, 26 Oct 2014 10:41:59 +0100
+
 supermin (5.1.10-1) unstable; urgency=medium
 
   * New upstream version
