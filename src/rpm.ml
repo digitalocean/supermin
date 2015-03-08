@@ -30,7 +30,7 @@ let stringset_of_list pkgs =
 
 let fedora_detect () =
   Config.rpm <> "no" && Config.rpm2cpio <> "no" && rpm_is_available () &&
-    Config.yumdownloader <> "no" &&
+    (Config.yumdownloader <> "no" || Config.dnf <> "no") &&
     try
       (stat "/etc/redhat-release").st_kind = S_REG ||
       (stat "/etc/fedora-release").st_kind = S_REG
@@ -144,7 +144,7 @@ let rpm_package_of_string str =
      * architecture.
      *)
     let cmp { version = v1; arch = a1 } { version = v2; arch = a2 } =
-      let i = compare_version v2 v1 in
+      let i = rpm_vercmp v2 v1 in
       if i <> 0 then i
       else compare_architecture a2 a1
     in
@@ -278,20 +278,44 @@ let rpm_get_all_files pkgs =
 let rec fedora_download_all_packages pkgs dir =
   let tdir = !settings.tmpdir // string_random8 () in
 
+  if Config.yumdownloader <> "no" then
+    fedora_download_all_packages_with_yum pkgs dir tdir
+  else (* Config.dnf <> "no" *)
+    fedora_download_all_packages_with_dnf pkgs dir tdir;
+
+  rpm_unpack tdir dir
+
+and fedora_download_all_packages_with_dnf pkgs dir tdir =
+  (* dnf doesn't create the download directory, and if you use
+   * --destdir without an existing directory then it downloads each
+   * package on top of each other to --destdir as a file.  WTF?
+   *)
+  mkdir tdir 0o700;
+
+  let rpms = pkgs_as_NA_rpms pkgs in
+
+  let cmd =
+    sprintf "%s download%s%s --destdir %s %s"
+      Config.dnf
+      (if !settings.debug >= 1 then " -v" else " -q")
+      (match !settings.packager_config with
+      | None -> ""
+      | Some filename -> sprintf " -c %s" (quote filename))
+      (quote tdir)
+      (quoted_list rpms) in
+  run_command cmd
+
+and fedora_download_all_packages_with_yum pkgs dir tdir =
   (* It's quite complex to get yumdownloader to download specific
    * RPMs.  If we use the full NVR, then it will refuse if an installed
    * RPM is older than whatever is currently in the repo.  If we use
    * just name, it will download all architectures (even with
    * --archlist).
-   * 
+   *
    * Use name.arch so it can download any version but only the specific
    * architecture.
    *)
-  let rpms = List.map rpm_of_pkg (PackageSet.elements pkgs) in
-  let rpms = List.map (
-    fun { name = name; arch = arch } ->
-      sprintf "%s.%s" name arch
-  ) rpms in
+  let rpms = pkgs_as_NA_rpms pkgs in
 
   let cmd =
     sprintf "%s%s%s --destdir %s %s"
@@ -302,18 +326,12 @@ let rec fedora_download_all_packages pkgs dir =
       | Some filename -> sprintf " -c %s" (quote filename))
       (quote tdir)
       (quoted_list rpms) in
-  run_command cmd;
-
-  rpm_unpack tdir dir
+  run_command cmd
 
 and opensuse_download_all_packages pkgs dir =
   let tdir = !settings.tmpdir // string_random8 () in
 
-  let rpms = List.map rpm_of_pkg (PackageSet.elements pkgs) in
-  let rpms = List.map (
-    fun { name = name; arch = arch } ->
-      sprintf "%s.%s" name arch
-  ) rpms in
+  let rpms = pkgs_as_NA_rpms pkgs in
 
   let is_zypper_1_9_14 =
     !zypper_major > 1
@@ -381,6 +399,13 @@ and mageia_download_all_packages pkgs dir =
   run_command cmd;
 
   rpm_unpack tdir dir
+
+and pkgs_as_NA_rpms pkgs =
+  let rpms = List.map rpm_of_pkg (PackageSet.elements pkgs) in
+  List.map (
+    fun { name = name; arch = arch } ->
+      sprintf "%s.%s" name arch
+  ) rpms
 
 and rpm_unpack tdir dir =
   (* Unpack each downloaded package.
