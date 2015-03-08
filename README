@@ -55,12 +55,32 @@ Requirements
 For Fedora/RHEL:
 
   rpm
-  yumdownloader (from yum-utils)
+  librpm
+  yumdownloader (from yum-utils) or 'dnf download' plugin
 
 For Debian/Ubuntu:
 
   dpkg
   apt-get
+
+For openSUSE:
+
+  rpm
+  librpm
+  zypper
+
+For Mageia:
+
+  rpm
+  librpm
+  urpmi
+  fakeroot
+
+For Arch Linux:
+
+  pacman
+  fakeroot
+  makepkg
 
 Optional
 --------

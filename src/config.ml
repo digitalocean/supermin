@@ -18,11 +18,12 @@
  *)
 
 let package_name = "supermin"
-let package_version = "5.1.11"
+let package_version = "5.1.12"
 let host_cpu = "x86_64"
 
 let apt_get = "no"
 let cpio = "/usr/bin/cpio"
+let dnf = "/usr/bin/dnf"
 let dpkg = "/usr/bin/dpkg"
 let dpkg_deb = "/usr/bin/dpkg-deb"
 let dpkg_query = "/usr/bin/dpkg-query"
