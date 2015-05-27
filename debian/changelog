@@ -1,3 +1,10 @@
+supermin (5.1.13-3) unstable; urgency=medium
+
+  * Put linux-image-586 to the front in the hope that sbuild's apt-based
+    resolver gets it right.
+
+ -- Hilko Bengen <bengen@debian.org>  Wed, 27 May 2015 23:19:28 +0200
+
 supermin (5.1.13-2) unstable; urgency=medium
 
   * Added linux-image-586 to Build-Dependencies as linux-image-486 has
