@@ -47,6 +47,13 @@ let mageia_detect () =
     Config.fakeroot <> "no" &&
     try (stat "/etc/mageia-release").st_kind = S_REG with Unix_error _ -> false
 
+let ibm_powerkvm_detect () =
+  Config.rpm <> "no" && Config.rpm2cpio <> "no" && rpm_is_available () &&
+    Config.yumdownloader <> "no" &&
+    try
+      (stat "/etc/ibm_powerkvm-release").st_kind = S_REG
+    with Unix_error _ -> false
+
 let settings = ref no_settings
 let rpm_major, rpm_minor = ref 0, ref 0
 let zypper_major, zypper_minor, zypper_patch = ref 0, ref 0, ref 0
@@ -278,10 +285,10 @@ let rpm_get_all_files pkgs =
 let rec fedora_download_all_packages pkgs dir =
   let tdir = !settings.tmpdir // string_random8 () in
 
-  if Config.yumdownloader <> "no" then
-    fedora_download_all_packages_with_yum pkgs dir tdir
-  else (* Config.dnf <> "no" *)
-    fedora_download_all_packages_with_dnf pkgs dir tdir;
+  if Config.dnf <> "no" then
+    fedora_download_all_packages_with_dnf pkgs dir tdir
+  else (* Config.yumdownloader <> "no" *)
+    fedora_download_all_packages_with_yum pkgs dir tdir;
 
   rpm_unpack tdir dir
 
@@ -437,6 +444,11 @@ let () =
     ph_download_package = PHDownloadAllPackages fedora_download_all_packages;
   } in
   register_package_handler "fedora" "rpm" fedora;
+  let ibm_powerkvm = {
+    fedora with
+    ph_detect = ibm_powerkvm_detect;
+  } in
+  register_package_handler "ibm_powerkvm" "rpm" ibm_powerkvm;
   let opensuse = {
     fedora with
     ph_detect = opensuse_detect;

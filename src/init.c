@@ -166,15 +166,23 @@ main ()
     asprintf (&path, "/sys/block/%s/dev", root);
 
     uint64_t delay_ns = 250000;
+    int virtio_message = 0;
     while (delay_ns <= MAX_ROOT_WAIT * UINT64_C(1000000000)) {
       fp = fopen (path, "r");
       if (fp != NULL)
         goto found;
 
-      if (delay_ns > 1000000000)
+      if (delay_ns > 1000000000) {
 	fprintf (stderr,
 		 "supermin: waiting another %" PRIu64 " ns for %s to appear\n",
 		 delay_ns, path);
+        if (!virtio_message) {
+          fprintf (stderr,
+                   "This usually means your kernel doesn't support virtio, or supermin was unable\n"
+                   "to load some kernel modules (see module loading messages above).\n");
+          virtio_message = 1;
+        }
+      }
 
       struct timespec t;
       t.tv_sec = delay_ns / 1000000000;
@@ -484,7 +492,10 @@ print_uptime (void)
 static void
 read_cmdline (void)
 {
-  FILE *fp = fopen ("/proc/cmdline", "r");
+  FILE *fp;
+  size_t len;
+
+  fp = fopen ("/proc/cmdline", "r");
   if (fp == NULL) {
     perror ("/proc/cmdline");
     return;
@@ -493,7 +504,11 @@ read_cmdline (void)
   fgets (cmdline, sizeof cmdline, fp);
   fclose (fp);
 
-  fprintf (stderr, "supermin: cmdline: %s", cmdline);
+  len = strlen (cmdline);
+  if (len >= 1 && cmdline[len-1] == '\n')
+    cmdline[len-1] = '\0';
+
+  fprintf (stderr, "supermin: cmdline: %s\n", cmdline);
 }
 
 /* Display a directory on stderr.  This is used for debugging only. */
