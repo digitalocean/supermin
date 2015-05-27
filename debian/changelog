@@ -1,3 +1,10 @@
+supermin (5.1.13-2) unstable; urgency=medium
+
+  * Added linux-image-586 to Build-Dependencies as linux-image-486 has
+    been removed from unstable
+
+ -- Hilko Bengen <bengen@debian.org>  Wed, 27 May 2015 20:47:05 +0200
+
 supermin (5.1.13-1) unstable; urgency=medium
 
   * New upstream version
