@@ -1,3 +1,9 @@
+supermin (5.1.13-1) unstable; urgency=medium
+
+  * New upstream version
+
+ -- Hilko Bengen <bengen@debian.org>  Wed, 27 May 2015 08:38:24 +0200
+
 supermin (5.1.12-2) unstable; urgency=medium
 
   * Fixed FTBFS on mips64el (Closes: #756467)
