@@ -22,7 +22,13 @@ open Printf
 open Utils
 open Package_handler
 
-let build_chroot debug files outputdir =
+let build_chroot debug files outputdir packagelist_file =
+  let do_copy src dest =
+    if debug >= 2 then printf "supermin: chroot: copy %s\n%!" dest;
+    let cmd = sprintf "cp -p %s %s" (quote src) (quote dest) in
+    ignore (Sys.command cmd)
+  in
+
   List.iter (
     fun file ->
       try
@@ -59,11 +65,26 @@ let build_chroot debug files outputdir =
           symlink link opath
 
         | S_REG | S_CHR | S_BLK | S_FIFO | S_SOCK ->
-          if debug >= 2 then printf "supermin: chroot: copy %s\n%!" opath;
-          let cmd = sprintf "cp -p %s %s" (quote path) (quote opath) in
-          ignore (Sys.command cmd)
+          do_copy path opath
       with Unix_error _ -> ()
   ) files;
+
+  (* Add packagelist file, if requested. *)
+  (match packagelist_file with
+  | None -> ()
+  | Some filename ->
+    if debug >= 1 then
+      printf "supermin: chroot: creating /packagelist\n%!";
+
+    let opath = outputdir // "packagelist" in
+
+    do_copy filename opath;
+    (* Change the permissions of the file to be sure it is readable
+     * by everyone.  Unfortunately we cannot change the ownership,
+     * as non-root users cannot give away files to other users.
+     *)
+    chmod opath 0o644
+  );
 
   (* Second pass: fix up directory permissions in reverse. *)
   let dirs = filter_map (

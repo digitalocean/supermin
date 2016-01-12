@@ -23,26 +23,28 @@ open Utils
 open Ext2fs
 open Package_handler
 
-(* The ext2 image that we build always has a fixed size, and we 'hope'
- * that the files fit in (otherwise we'll get an error).  Note that
- * the file is sparsely allocated.
+(* The ext2 image that we build has a size of 4GB if not specified,
+ * and we 'hope' that the files fit in (otherwise we'll get an error).
+ * Note that the file is sparsely allocated.
  *
  * The downside of allocating a very large initial disk is that the
  * fixed overhead of ext2 is larger (since ext2 calculates it based on
  * the size of the disk).  For a 4GB disk the overhead is
  * approximately 66MB.
- *
- * In future, make this configurable, or determine it from the input
- * files (XXX).
  *)
-let appliance_size = 4L *^ 1024L *^ 1024L *^ 1024L
+let default_appliance_size = 4L *^ 1024L *^ 1024L *^ 1024L
 
-let build_ext2 debug basedir files modpath kernel_version appliance =
+let build_ext2 debug basedir files modpath kernel_version appliance size
+    packagelist_file =
   if debug >= 1 then
     printf "supermin: ext2: creating empty ext2 filesystem '%s'\n%!" appliance;
 
   let fd = openfile appliance [O_WRONLY;O_CREAT;O_TRUNC;O_NOCTTY] 0o644 in
-  LargeFile.ftruncate fd appliance_size;
+  let size =
+    match size with
+    | None -> default_appliance_size
+    | Some s -> s in
+  LargeFile.ftruncate fd size;
   close fd;
 
   let cmd =
@@ -72,6 +74,21 @@ let build_ext2 debug basedir files modpath kernel_version appliance =
       let src = file_source file in
       ext2fs_copy_file_from_host fs src file.ft_path
   ) files;
+
+  (* Add packagelist file, if requested. *)
+  (match packagelist_file with
+  | None -> ()
+  | Some filename ->
+    if debug >= 1 then
+      printf "supermin: ext2: creating /packagelist\n%!";
+
+    ext2fs_copy_file_from_host fs filename "/packagelist";
+    (* Change the permissions and ownership of the file, to be sure
+     * it is root-owned, and readable by everyone.
+     *)
+    ext2fs_chmod fs "/packagelist" 0o644;
+    ext2fs_chown fs "/packagelist" 0 0
+  );
 
   if debug >= 1 then
     printf "supermin: ext2: copying kernel modules\n%!";
