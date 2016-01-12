@@ -94,6 +94,8 @@ let main () =
     let outputdir = ref "" in
     let packager_config = ref "" in
     let use_installed = ref false in
+    let size = ref None in
+    let include_packagelist = ref false in
 
     let set_debug () = incr debug in
 
@@ -118,6 +120,8 @@ let main () =
       exit 1
     in
 
+    let set_size arg = size := Some (parse_size arg) in
+
     let error_supermin_5 () =
       eprintf "supermin: *** error: This is supermin version 5.\n";
       eprintf "supermin: *** It looks like you are looking for supermin version 4.\n";
@@ -137,12 +141,15 @@ let main () =
       "--format",  Arg.String set_format,     ditto;
       "--host-cpu", Arg.Set_string host_cpu,  "ARCH Set host CPU architecture";
       "--if-newer", Arg.Set if_newer,             " Only build if needed";
+      "--include-packagelist", Arg.Set include_packagelist,
+                                              " Add a file with the list of packages";
       "--list-drivers", Arg.Unit display_drivers, " Display list of drivers and exit";
       "--lock",    Arg.Set_string lockfile,   "LOCKFILE Use a lock file";
       "--names",   Arg.Unit error_supermin_5, " Give an error for people needing supermin 4";
       "-o",        Arg.Set_string outputdir,  "OUTPUTDIR Set output directory";
       "--packager-config", Arg.Set_string packager_config, "CONFIGFILE Set packager config file";
       "--prepare", Arg.Unit set_prepare_mode, " Prepare a supermin appliance";
+      "--size",    Arg.String set_size,       " Set the size of the ext2 filesystem";
       "--use-installed", Arg.Set use_installed, " Use installed files instead of accessing network";
       "-v",        Arg.Unit set_debug,        " Enable debugging messages";
       "--verbose", Arg.Unit set_debug,        ditto;
@@ -165,6 +172,8 @@ let main () =
     let packager_config =
       match !packager_config with "" -> None | s -> Some s in
     let use_installed = !use_installed in
+    let size = !size in
+    let include_packagelist = !include_packagelist in
 
     let format =
       match mode, !format with
@@ -181,10 +190,16 @@ let main () =
       eprintf "supermin: output directory (-o option) must be supplied\n";
       exit 1
     );
+    (* Chop final '/' in output directory (RHBZ#1146753). *)
+    let outputdir =
+      let len = String.length outputdir in
+      if outputdir.[len - 1] == '/' then String.sub outputdir 0 (len - 1)
+      else outputdir in
 
     debug, mode, if_newer, inputs, lockfile, outputdir,
     (copy_kernel, dtb_wildcard, format, host_cpu,
-     packager_config, tmpdir, use_installed) in
+     packager_config, tmpdir, use_installed, size,
+     include_packagelist) in
 
   if debug >= 1 then printf "supermin: version: %s\n" Config.package_version;
 
@@ -192,7 +207,7 @@ let main () =
    * This fails with an error if one could not be located.
    *)
   let () =
-    let (_, _, _, _, packager_config, tmpdir, _) = args in
+    let (_, _, _, _, packager_config, tmpdir, _, _, _) = args in
     let settings = {
       debug = debug;
       tmpdir = tmpdir;

@@ -18,16 +18,16 @@
  *)
 
 let package_name = "supermin"
-let package_version = "5.1.13"
+let package_version = "5.1.14"
 let host_cpu = "x86_64"
 
 let apt_get = "no"
 let cpio = "/usr/bin/cpio"
 let dnf = "/usr/bin/dnf"
-let dpkg = "/usr/bin/dpkg"
-let dpkg_deb = "/usr/bin/dpkg-deb"
-let dpkg_query = "/usr/bin/dpkg-query"
-let dpkg_divert = "/usr/bin/dpkg-divert"
+let dpkg = "no"
+let dpkg_deb = "no"
+let dpkg_query = "no"
+let dpkg_divert = "no"
 let fakeroot = "/usr/bin/fakeroot"
 let makepkg = "no"
 let pacman = "no"
