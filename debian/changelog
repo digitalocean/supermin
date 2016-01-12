@@ -1,3 +1,9 @@
+supermin (5.1.14-2) unstable; urgency=medium
+
+  * Apply upstream change to bin2s.pl
+
+ -- Hilko Bengen <bengen@debian.org>  Tue, 12 Jan 2016 21:31:42 +0100
+
 supermin (5.1.14-1) unstable; urgency=medium
 
   * New upstream version
