@@ -1,1 +1,2 @@
 0001-Add-hppa-hppa64-ppc64el-architectures.patch
+0002-bin2s-Remove-_size-since-it-can-be-computed-from-_st.patch
