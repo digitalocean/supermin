@@ -1,3 +1,10 @@
+supermin (5.1.14-1) unstable; urgency=medium
+
+  * New upstream version
+  * Add support for alpha, hppa, powerpc64, sparc64 architectures
+
+ -- Hilko Bengen <bengen@debian.org>  Tue, 12 Jan 2016 08:02:46 +0100
+
 supermin (5.1.13-3) unstable; urgency=medium
 
   * Put linux-image-586 to the front in the hope that sbuild's apt-based
