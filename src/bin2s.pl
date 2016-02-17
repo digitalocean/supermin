@@ -30,6 +30,9 @@ my ($buf, $i, $sz);
 open my $ifh, '<', $infile or die "open $infile: $!";
 open my $ofh, '>', $outfile or die "open $outfile: $!";
 
+my $infile_basename = $infile;
+$infile_basename =~ s{.*/}{};
+
 print $ofh <<"EOF";
 /* This file has been automatically generated from $infile by $0 */
 
@@ -37,12 +40,11 @@ print $ofh <<"EOF";
 \t.section .note.GNU-stack,"",%progbits
 \t.previous
 
-\t.globl\t_binary_${infile}_start
-\t.globl\t_binary_${infile}_end
-\t.globl\t_binary_${infile}_size
+\t.globl\t_binary_${infile_basename}_start
+\t.globl\t_binary_${infile_basename}_end
 
 \t.section\t.rodata
-_binary_${infile}_start:
+_binary_${infile_basename}_start:
 EOF
 
 $sz = 0;
@@ -55,14 +57,7 @@ die "read $infile (at offset $sz): $!\n" if not defined $i;
 close $ifh;
 
 print $ofh <<"EOF";
-
-_binary_${infile}_end:
-
-#if defined(__hppa__)
-\t_binary_${infile}_size: .equ $sz
-#else
-\t.equ _binary_${infile}_size, $sz
-#endif
+_binary_${infile_basename}_end:
 EOF
 
 close $ofh;

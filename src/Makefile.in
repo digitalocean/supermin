@@ -15,7 +15,7 @@
 @SET_MAKE@
 
 # supermin Makefile.am
-# (C) Copyright 2009-2014 Red Hat Inc.
+# (C) Copyright 2009-2016 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,8 +30,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-#
-# Written by Richard W.M. Jones <rjones@redhat.com>
 
 
 VPATH = @srcdir@
@@ -110,7 +108,6 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = supermin$(EXEEXT)
 @HAVE_OCAMLOPT_FALSE@am__append_1 = -custom
-noinst_PROGRAMS = init$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
@@ -163,13 +160,7 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES = supermin-link.sh config.ml
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
-PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
-am_init_OBJECTS = init-init.$(OBJEXT)
-init_OBJECTS = $(am_init_OBJECTS)
-am__DEPENDENCIES_1 =
-init_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-init_LINK = $(CCLD) $(init_CFLAGS) $(CFLAGS) $(init_LDFLAGS) \
-	$(LDFLAGS) -o $@
+PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 = supermin-ext2fs-c.$(OBJEXT) \
 	supermin-ext2init-c.$(OBJEXT) supermin-fnmatch-c.$(OBJEXT) \
 	supermin-glob-c.$(OBJEXT) supermin-librpm-c.$(OBJEXT) \
@@ -208,7 +199,7 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-DIST_SOURCES = $(init_SOURCES) $(supermin_SOURCES)
+DIST_SOURCES = $(supermin_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -688,7 +679,6 @@ LIBRPM_LIBS = @LIBRPM_LIBS@
 LIBS = @LIBS@
 LTLIBINTL = @LTLIBINTL@
 LTLIBOBJS = @LTLIBOBJS@
-LZMA_STATIC_LIBS = @LZMA_STATIC_LIBS@
 MAKEINFO = @MAKEINFO@
 MAKEPKG = @MAKEPKG@
 MKDIR_P = @MKDIR_P@
@@ -893,9 +883,9 @@ WERROR_CFLAGS = @WERROR_CFLAGS@
 WINDOWS_64_BIT_OFF_T = @WINDOWS_64_BIT_OFF_T@
 WINDOWS_64_BIT_ST_SIZE = @WINDOWS_64_BIT_ST_SIZE@
 WINT_T_SUFFIX = @WINT_T_SUFFIX@
+XZCAT = @XZCAT@
 YUMDOWNLOADER = @YUMDOWNLOADER@
-ZLIB_LIBS = @ZLIB_LIBS@
-ZLIB_STATIC_LIBS = @ZLIB_STATIC_LIBS@
+ZCAT = @ZCAT@
 ZYPPER = @ZYPPER@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -1056,10 +1046,6 @@ supermin_LINK = \
 	  $(OCAMLFIND) $(BEST) $(OCAMLFLAGS) $(OCAMLPACKAGES) \
 	  $(OBJECTS) -o $@
 
-init_SOURCES = init.c
-init_CFLAGS = -static
-init_LDFLAGS = -static
-init_LDADD = $(ZLIB_STATIC_LIBS) $(LZMA_STATIC_LIBS)
 SUFFIXES = .cmo .cmi .cmx .ml .mli .mll .mly
 @HAVE_PERLDOC_TRUE@noinst_DATA = \
 @HAVE_PERLDOC_TRUE@	../html/supermin.1.html
@@ -1144,13 +1130,6 @@ uninstall-binPROGRAMS:
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
-clean-noinstPROGRAMS:
-	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
-
-init$(EXEEXT): $(init_OBJECTS) $(init_DEPENDENCIES) $(EXTRA_init_DEPENDENCIES) 
-	@rm -f init$(EXEEXT)
-	$(AM_V_CCLD)$(init_LINK) $(init_OBJECTS) $(init_LDADD) $(LIBS)
-
 supermin$(EXEEXT): $(supermin_OBJECTS) $(supermin_DEPENDENCIES) $(EXTRA_supermin_DEPENDENCIES) 
 	@rm -f supermin$(EXEEXT)
 	$(AM_V_GEN)$(supermin_LINK) $(supermin_OBJECTS) $(supermin_LDADD) $(LIBS)
@@ -1161,7 +1140,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/init-init.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin-ext2fs-c.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin-ext2init-c.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supermin-fnmatch-c.Po@am__quote@
@@ -1182,20 +1160,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-init-init.o: init.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(init_CFLAGS) $(CFLAGS) -MT init-init.o -MD -MP -MF $(DEPDIR)/init-init.Tpo -c -o init-init.o `test -f 'init.c' || echo '$(srcdir)/'`init.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/init-init.Tpo $(DEPDIR)/init-init.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='init.c' object='init-init.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(init_CFLAGS) $(CFLAGS) -c -o init-init.o `test -f 'init.c' || echo '$(srcdir)/'`init.c
-
-init-init.obj: init.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(init_CFLAGS) $(CFLAGS) -MT init-init.obj -MD -MP -MF $(DEPDIR)/init-init.Tpo -c -o init-init.obj `if test -f 'init.c'; then $(CYGPATH_W) 'init.c'; else $(CYGPATH_W) '$(srcdir)/init.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/init-init.Tpo $(DEPDIR)/init-init.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='init.c' object='init-init.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(init_CFLAGS) $(CFLAGS) -c -o init-init.obj `if test -f 'init.c'; then $(CYGPATH_W) 'init.c'; else $(CYGPATH_W) '$(srcdir)/init.c'; fi`
 
 supermin-ext2fs-c.o: ext2fs-c.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(supermin_CFLAGS) $(CFLAGS) -MT supermin-ext2fs-c.o -MD -MP -MF $(DEPDIR)/supermin-ext2fs-c.Tpo -c -o supermin-ext2fs-c.o `test -f 'ext2fs-c.c' || echo '$(srcdir)/'`ext2fs-c.c
@@ -1446,8 +1410,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic clean-noinstPROGRAMS \
-	mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -1519,19 +1482,18 @@ uninstall-man: uninstall-man1
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am check check-am clean \
-	clean-binPROGRAMS clean-generic clean-noinstPROGRAMS \
-	cscopelist-am ctags ctags-am distclean distclean-compile \
-	distclean-generic distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-man1 \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-man uninstall-man1
+	clean-binPROGRAMS clean-generic cscopelist-am ctags ctags-am \
+	distclean distclean-compile distclean-generic distclean-tags \
+	distdir dvi dvi-am html html-am info info-am install \
+	install-am install-binPROGRAMS install-data install-data-am \
+	install-dvi install-dvi-am install-exec install-exec-am \
+	install-html install-html-am install-info install-info-am \
+	install-man install-man1 install-pdf install-pdf-am install-ps \
+	install-ps-am install-strip installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic pdf pdf-am \
+	ps ps-am tags tags-am uninstall uninstall-am \
+	uninstall-binPROGRAMS uninstall-man uninstall-man1
 
 .PRECIOUS: Makefile
 
@@ -1546,7 +1508,7 @@ uninstall-man: uninstall-man1
 ext2init-bin.o: ext2init-bin.S
 	$(CC) -o $@ -c $<
 
-ext2init-bin.S: init $(srcdir)/bin2s.pl
+ext2init-bin.S: ../init/init $(srcdir)/bin2s.pl
 	strip --strip-all $<
 	@file $< | grep -isq static || \
 	  (echo "*** error: init is not statically linked"; exit 1)

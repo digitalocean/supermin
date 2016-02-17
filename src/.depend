@@ -16,8 +16,8 @@ config.cmx :
 ./ext2init.cmi :
 ./ext2init.cmo : ./ext2init.cmi
 ./ext2init.cmx : ./ext2init.cmi
-./ext2_initrd.cmo : utils.cmi fnmatch.cmi ext2init.cmi ext2fs.cmi
-./ext2_initrd.cmx : utils.cmx fnmatch.cmx ext2init.cmx ext2fs.cmx
+./ext2_initrd.cmo : utils.cmi fnmatch.cmi ext2init.cmi ext2fs.cmi config.cmo
+./ext2_initrd.cmx : utils.cmx fnmatch.cmx ext2init.cmx ext2fs.cmx config.cmx
 ./fnmatch.cmi :
 ./fnmatch.cmo : ./fnmatch.cmi
 ./fnmatch.cmx : ./fnmatch.cmi
