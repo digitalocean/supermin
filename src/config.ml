@@ -18,7 +18,7 @@
  *)
 
 let package_name = "supermin"
-let package_version = "5.1.14"
+let package_version = "5.1.15"
 let host_cpu = "x86_64"
 
 let apt_get = "no"
@@ -37,6 +37,8 @@ let rpm = "/usr/bin/rpm"
 let rpm2cpio = "/usr/bin/rpm2cpio"
 let urpmi = "no"
 let yumdownloader = "/usr/bin/yumdownloader"
+let xzcat = "/usr/bin/xzcat"
+let zcat = "/usr/bin/zcat"
 let zypper = "no"
 
 let mke2fs = "/usr/sbin/mke2fs"

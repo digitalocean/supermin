@@ -226,9 +226,6 @@
 /* Define to 1 if you have the 'lstat' function. */
 #undef HAVE_LSTAT
 
-/* Define if you have static lzma */
-#undef HAVE_LZMA_STATIC
-
 /* Define if the 'malloc' function is POSIX compliant. */
 #undef HAVE_MALLOC_POSIX
 
@@ -760,12 +757,6 @@
 
 /* Define to 1 if O_NOFOLLOW works. */
 #undef HAVE_WORKING_O_NOFOLLOW
-
-/* Define if you have zlib */
-#undef HAVE_ZLIB
-
-/* Define if you have static zlib */
-#undef HAVE_ZLIB_STATIC
 
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL

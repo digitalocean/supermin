@@ -15,7 +15,7 @@
 @SET_MAKE@
 
 # supermin Makefile.am
-# (C) Copyright 2009-2013 Red Hat Inc.
+# (C) Copyright 2009-2016 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,8 +30,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-#
-# Written by Richard W.M. Jones <rjones@redhat.com>
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -683,7 +681,6 @@ LIBRPM_LIBS = @LIBRPM_LIBS@
 LIBS = @LIBS@
 LTLIBINTL = @LTLIBINTL@
 LTLIBOBJS = @LTLIBOBJS@
-LZMA_STATIC_LIBS = @LZMA_STATIC_LIBS@
 MAKEINFO = @MAKEINFO@
 MAKEPKG = @MAKEPKG@
 MKDIR_P = @MKDIR_P@
@@ -888,9 +885,9 @@ WERROR_CFLAGS = @WERROR_CFLAGS@
 WINDOWS_64_BIT_OFF_T = @WINDOWS_64_BIT_OFF_T@
 WINDOWS_64_BIT_ST_SIZE = @WINDOWS_64_BIT_ST_SIZE@
 WINT_T_SUFFIX = @WINT_T_SUFFIX@
+XZCAT = @XZCAT@
 YUMDOWNLOADER = @YUMDOWNLOADER@
-ZLIB_LIBS = @ZLIB_LIBS@
-ZLIB_STATIC_LIBS = @ZLIB_STATIC_LIBS@
+ZCAT = @ZCAT@
 ZYPPER = @ZYPPER@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -948,7 +945,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = lib src examples tests
+SUBDIRS = lib init src examples tests
 EXTRA_DIST = \
 	.gitignore \
 	autogen.sh \
