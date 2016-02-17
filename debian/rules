@@ -4,7 +4,7 @@
 #export DH_VERBOSE=1
 
 override_dh_auto_configure:
-	dh_auto_configure -- --disable-network-tests
+	dh_auto_configure -- --disable-network-tests $(cfgflags)
 
 override_dh_auto_build:
 	chmod a+x src/bin2s.pl
@@ -14,7 +14,7 @@ override_dh_auto_test:
 	dh_auto_test -- SKIP_TEST_EXECSTACK=1
 
 override_dh_gencontrol:
-	dh_gencontrol -- -Vmisc:Built-Using="$(shell dpkg-query -f '$${source:Package} (= $${source:Version}), ' -W zlib1g-dev liblzma-dev)"
+	dh_gencontrol -- -Vmisc:Built-Using="$(shell dpkg-query -f '$${source:Package} (= $${source:Version}), ' -W libc6-dev)"
 
 %:
 	dh $@ --with=ocaml,autoreconf
