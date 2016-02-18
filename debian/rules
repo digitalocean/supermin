@@ -8,7 +8,7 @@ override_dh_auto_configure:
 
 override_dh_auto_build:
 	chmod a+x src/bin2s.pl
-	which musl-gcc >/dev/null && dh_auto_build -- -C init CC=musl-gcc
+	if which musl-gcc >/dev/null; then dh_auto_build -- -C init CC=musl-gcc; fi
 	dh_auto_build
 
 override_dh_auto_test:
