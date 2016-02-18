@@ -8,13 +8,14 @@ override_dh_auto_configure:
 
 override_dh_auto_build:
 	chmod a+x src/bin2s.pl
+	which musl-gcc >/dev/null && dh_auto_build -- -C init CC=musl-gcc
 	dh_auto_build
 
 override_dh_auto_test:
 	dh_auto_test -- SKIP_TEST_EXECSTACK=1
 
 override_dh_gencontrol:
-	dh_gencontrol -- -Vmisc:Built-Using="$(shell dpkg-query -f '$${source:Package} (= $${source:Version}), ' -W libc6-dev)"
+	dh_gencontrol -- -Vmisc:Built-Using="$(shell dpkg-query -f '$${source:Package} (= $${source:Version}), ' -W $(if $(shell which musl-gcc),musl-tools,libc6-dev))"
 
 %:
 	dh $@ --with=ocaml,autoreconf
