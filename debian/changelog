@@ -1,3 +1,11 @@
+supermin (5.1.15-1) unstable; urgency=medium
+
+  * New upstream version
+  * Drop zlib, lzma dependencies
+  * Drop bin2s.pl-related patch
+
+ -- Hilko Bengen <bengen@debian.org>  Thu, 18 Feb 2016 01:43:33 +0100
+
 supermin (5.1.14-2) unstable; urgency=medium
 
   * Apply upstream change to bin2s.pl
