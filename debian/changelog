@@ -1,3 +1,9 @@
+supermin (5.1.16-1) unstable; urgency=medium
+
+  * Imported Upstream version 5.1.16
+
+ -- Hilko Bengen <bengen@debian.org>  Thu, 28 Apr 2016 18:50:04 +0200
+
 supermin (5.1.15-3) unstable; urgency=medium
 
   * Fix build on architectures without musl
