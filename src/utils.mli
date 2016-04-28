@@ -24,6 +24,9 @@ val ( *^ ) : int64 -> int64 -> int64
 val (/^) : int64 -> int64 -> int64
   (** Int64 operators. *)
 
+val error : ?exit_code:int -> ('a, unit, string, 'b) format4 -> 'a
+(** Standard error function. *)
+
 val dir_exists : string -> bool
   (** Return [true] iff dir exists. *)
 
@@ -48,11 +51,6 @@ val run_shell : string -> string list -> unit
   (** [run_shell code args] runs shell [code] with arguments [args].
       This does not return anything, but exits with an error message
       if the shell code returns an error. *)
-
-val run_python : string -> string list -> unit
-  (** [run_python code args] runs Python [code] with arguments [args].
-      This does not return anything, but exits with an error message
-      if the Python code returns an error. *)
 
 val (//) : string -> string -> string
   (** [x // y] concatenates file paths [x] and [y] into a single path. *)
