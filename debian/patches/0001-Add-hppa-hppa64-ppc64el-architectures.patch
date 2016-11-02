@@ -8,7 +8,7 @@ Subject: Add hppa, hppa64, ppc64el architectures
  2 files changed, 4 insertions(+)
 
 diff --git a/src/kernel.ml b/src/kernel.ml
-index 046cde9..9e090ac 100644
+index 356ac4b..9b0e8a2 100644
 --- a/src/kernel.ml
 +++ b/src/kernel.ml
 @@ -30,6 +30,8 @@ let patt_of_cpu host_cpu =
@@ -21,10 +21,10 @@ index 046cde9..9e090ac 100644
      | _ when String.length host_cpu >= 5 && String.sub host_cpu 0 5 = "armv7" ->  ["armmp"]
      | _ -> [host_cpu]
 diff --git a/src/utils.ml b/src/utils.ml
-index 7ae24bd..c81078d 100644
+index 4223be4..e3b8742 100644
 --- a/src/utils.ml
 +++ b/src/utils.ml
-@@ -191,6 +191,8 @@ let compare_architecture a1 a2 =
+@@ -183,6 +183,8 @@ let compare_architecture a1 a2 =
      | a when string_prefix "armv6" a -> 32
      | a when string_prefix "armv7" a -> 32
      | a when string_prefix "armv8" a -> 64
