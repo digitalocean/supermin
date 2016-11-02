@@ -1,3 +1,10 @@
+supermin (5.1.17-1) unstable; urgency=medium
+
+  * New upstream version 5.1.17
+  * Rebase patch
+
+ -- Hilko Bengen <bengen@debian.org>  Wed, 02 Nov 2016 09:05:34 +0100
+
 supermin (5.1.16-1) unstable; urgency=medium
 
   * Imported Upstream version 5.1.16
