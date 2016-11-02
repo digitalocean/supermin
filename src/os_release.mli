@@ -1,6 +1,5 @@
 (* supermin 5
- * Copyright (C) 2009-2014 Red Hat Inc.
- * src/config.ml.  Generated from config.ml.in by configure.
+ * Copyright (C) 2016 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,29 +16,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *)
 
-let package_name = "supermin"
-let package_version = "5.1.17"
-let host_cpu = "x86_64"
+(** Handling of /etc/os-release. *)
 
-let apt_get = "no"
-let cpio = "/usr/bin/cpio"
-let dnf = "/usr/bin/dnf"
-let dpkg = "no"
-let dpkg_deb = "no"
-let dpkg_query = "no"
-let dpkg_divert = "no"
-let fakeroot = "/usr/bin/fakeroot"
-let makepkg = "no"
-let pacman = "no"
-let pactree = "no"
-let pacman_g2 = "no"
-let rpm = "/usr/bin/rpm"
-let rpm2cpio = "/usr/bin/rpm2cpio"
-let urpmi = "no"
-let yumdownloader = "/usr/bin/yumdownloader"
-let xzcat = "/usr/bin/xzcat"
-let zcat = "/usr/bin/zcat"
-let zypper = "no"
+val get_id : unit -> string
+(** Get the value of the "ID" field from the /etc/os-release file
+    on the current system.
 
-let mke2fs = "/usr/sbin/mke2fs"
-let mke2fs_t_option = "-t"
+    An empty string is returned if the file does not exist or cannot
+    be read. *)

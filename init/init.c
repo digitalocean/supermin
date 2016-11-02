@@ -1,5 +1,5 @@
 /* supermin-helper reimplementation in C.
- * Copyright (C) 2009-2014 Red Hat Inc.
+ * Copyright (C) 2009-2016 Red Hat Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <sys/sysmacros.h>
 
 /* Maximum time to wait for the root device to appear (seconds).
  *
@@ -80,6 +81,7 @@ static void mount_proc (void);
 static void print_uptime (void);
 static void read_cmdline (void);
 static void insmod (const char *filename);
+static void delete_initramfs_files (void);
 static void show_directory (const char *dir);
 
 static char cmdline[1024];
@@ -137,7 +139,7 @@ main ()
     /* XXX Because of the way we construct the module list, the
      * "modules" file can contain non-existent modules.  Ignore those
      * for now.  Really we should add them as missing dependencies.
-     * See ext2initrd.c:ext2_make_initrd().
+     * See src/ext2_initrd.ml.
      */
     if (access (line, R_OK) == 0)
       insmod (line);
@@ -154,11 +156,14 @@ main ()
    */
   char *root, *path;
   size_t len;
+  int dax = 0;
   root = strstr (cmdline, "root=");
   if (root) {
     root += 5;
     if (strncmp (root, "/dev/", 5) == 0)
       root += 5;
+    if (strncmp (root, "pmem", 4) == 0)
+      dax = 1;
     len = strcspn (root, " ");
     root[len] = '\0';
 
@@ -243,17 +248,30 @@ main ()
     exit (EXIT_FAILURE);
   }
 
+  /* Construct the filesystem mount options. */
+  const char *mount_options = "";
+  if (dax)
+    mount_options = "dax";
+
   /* Mount new root and chroot to it. */
-  if (!quiet)
-    fprintf (stderr, "supermin: mounting new root on /root\n");
-  if (mount ("/dev/root", "/root", "ext2", MS_NOATIME, "") == -1) {
+  if (!quiet) {
+    fprintf (stderr, "supermin: mounting new root on /root");
+    if (mount_options[0] != '\0')
+      fprintf (stderr, " (%s)", mount_options);
+    fprintf (stderr, "\n");
+  }
+  if (mount ("/dev/root", "/root", "ext2", MS_NOATIME,
+             mount_options) == -1) {
     perror ("mount: /root");
     exit (EXIT_FAILURE);
   }
 
+  if (!quiet)
+    fprintf (stderr, "supermin: deleting initramfs files\n");
+  delete_initramfs_files ();
+
   /* Note that pivot_root won't work.  See the note in
    * Documentation/filesystems/ramfs-rootfs-initramfs.txt
-   * We could remove the old initramfs files, but let's not bother.
    */
   if (!quiet)
     fprintf (stderr, "supermin: chroot\n");
@@ -301,7 +319,11 @@ insmod (const char *filename)
     exit (EXIT_FAILURE);
   }
   size = st.st_size;
-  char buf[size];
+  char *buf = malloc (size);
+  if (buf == NULL) {
+    fprintf (stderr, "insmod: malloc (%s, %zu bytes): %m\n", filename, size);
+    exit (EXIT_FAILURE);
+  }
   size_t offset = 0;
   do {
     ssize_t rc = read (fd, buf + offset, size - offset);
@@ -319,6 +341,8 @@ insmod (const char *filename)
      * of a missing device.
      */
   }
+
+  free (buf);
 }
 
 /* Mount /proc unless it's mounted already. */
@@ -375,6 +399,48 @@ read_cmdline (void)
   len = strlen (cmdline);
   if (len >= 1 && cmdline[len-1] == '\n')
     cmdline[len-1] = '\0';
+}
+
+/* By deleting the files in the initramfs before we chroot, we save a
+ * little bit of memory (or quite a lot of memory if the user is using
+ * unstripped kmods).
+ *
+ * We only delete files in the root directory.  We don't delete
+ * directories because they only take a tiny amount of space and
+ * because we must not delete any mountpoints, especially not /root
+ * where we are about to chroot.
+ *
+ * We don't recursively look for files because that would be too
+ * complex and risky, and the normal supermin initramfs doesn't have
+ * any files except in the root directory.
+ */
+static void
+delete_initramfs_files (void)
+{
+  DIR *dir;
+  struct dirent *d;
+  struct stat statbuf;
+
+  if (chdir ("/") == -1) {
+    perror ("chdir: /");
+    return;
+  }
+
+  dir = opendir (".");
+  if (!dir) {
+    perror ("opendir: /");
+    return;
+  }
+
+  while ((d = readdir (dir)) != NULL) {
+    /* "." and ".." are directories, so the S_ISREG test ignores them. */
+    if (lstat (d->d_name, &statbuf) >= 0 && S_ISREG (statbuf.st_mode)) {
+      if (unlink (d->d_name) == -1)
+        perror (d->d_name);
+    }
+  }
+
+  closedir (dir);
 }
 
 /* Display a directory on stderr.  This is used for debugging only. */
