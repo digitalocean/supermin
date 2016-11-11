@@ -1,3 +1,10 @@
+supermin (5.1.17-2) unstable; urgency=medium
+
+  * Use musl on mips64el
+  * Add patch so that we do not look for dpkg* in the wrong places
+
+ -- Hilko Bengen <bengen@debian.org>  Fri, 11 Nov 2016 10:08:26 +0100
+
 supermin (5.1.17-1) unstable; urgency=medium
 
   * New upstream version 5.1.17
