@@ -3,17 +3,22 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-# work around #843714: GCC cannot build static binaries using the
-# pie-specific spec files added by dpkg on (at least) powerpc, ppc64,
-# sh4, sparc64.
-export DEB_BUILD_MAINT_OPTIONS=hardening=-pie
 
 override_dh_auto_configure:
 	dh_auto_configure -- --disable-network-tests $(cfgflags)
 
 override_dh_auto_build:
 	chmod a+x src/bin2s.pl
-	if which musl-gcc >/dev/null; then dh_auto_build -- -C init CC=musl-gcc; fi
+
+	# Use musl-gcc where available. Otherwise work around #843714: GCC
+	# cannot build static binaries using the pie-specific spec files added
+	# by dpkg on (at least) powerpc, ppc64, sh4, sparc64.
+	if which musl-gcc >/dev/null; then \
+		dh_auto_build -- -C init CC=musl-gcc ; \
+	else \
+		eval $$(DEB_BUILD_MAINT_OPTIONS=hardening=-pie dpkg-buildflags --export=sh | grep '^export LDFLAGS') ; \
+		dh_auto_build -- -C init LDFLAGS=$$(LDFLAGS) ; \
+	fi
 	dh_auto_build
 
 override_dh_auto_test:
