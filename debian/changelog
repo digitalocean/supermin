@@ -1,3 +1,9 @@
+supermin (5.1.17-3) unstable; urgency=medium
+
+  * Add workaround for #843714 which caused FTBFS on some architectures
+
+ -- Hilko Bengen <bengen@debian.org>  Sat, 12 Nov 2016 15:14:50 +0100
+
 supermin (5.1.17-2) unstable; urgency=medium
 
   * Use musl on mips64el
