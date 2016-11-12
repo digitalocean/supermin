@@ -1,3 +1,10 @@
+supermin (5.1.17-4) unstable; urgency=medium
+
+  * Only disable PIE for the C-only static init program because doing
+    so altogether would break OCaml+C at least on amd64.
+
+ -- Hilko Bengen <bengen@debian.org>  Sat, 12 Nov 2016 15:35:41 +0100
+
 supermin (5.1.17-3) unstable; urgency=medium
 
   * Add workaround for #843714 which caused FTBFS on some architectures
