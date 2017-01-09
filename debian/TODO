@@ -1,3 +1,0 @@
-- Figure out how to easily add "Built-Using" field (supermin init)
-- (Possibly) figure out how to set up an initrd equivalent for
-  kfreebsd-*, hurd-*
