@@ -1,3 +1,11 @@
+supermin (5.1.17-5) unstable; urgency=medium
+
+  * Remove links from febootstrap package (Closes: #850635)
+  * Remove old NEWS, TODO items from debian/
+  * Tweak Built-Using in an attempt to fix FTBFS on alpha
+
+ -- Hilko Bengen <bengen@debian.org>  Mon, 09 Jan 2017 23:44:14 +0100
+
 supermin (5.1.17-4) unstable; urgency=medium
 
   * Only disable PIE for the C-only static init program because doing
