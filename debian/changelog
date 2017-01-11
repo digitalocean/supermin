@@ -1,3 +1,9 @@
+supermin (5.1.17-6) unstable; urgency=medium
+
+  * Fix build dependency for determining Built-Using (Closes: #850974)
+  
+ -- Hilko Bengen <bengen@debian.org>  Wed, 11 Jan 2017 19:53:12 +0100
+
 supermin (5.1.17-5) unstable; urgency=medium
 
   * Remove links from febootstrap package (Closes: #850635)
