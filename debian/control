@@ -5,7 +5,7 @@ Maintainer: Debian Libvirt Maintainers <pkg-libvirt-maintainers@lists.alioth.deb
 Uploaders: Hilko Bengen <bengen@debian.org>
 Build-Depends: debhelper (>= 9),
  dh-autoreconf,
- libc6-dev-bin,
+ libc-dev-bin,
  gawk, pkg-config,
  apt,
  ocaml-nox, ocaml-findlib, dh-ocaml,

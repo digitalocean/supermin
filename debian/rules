@@ -25,7 +25,7 @@ override_dh_auto_test:
 	dh_auto_test -- SKIP_TEST_EXECSTACK=1
 
 override_dh_gencontrol:
-	dh_gencontrol -- -Vmisc:Built-Using="$(shell dpkg-query -f '$${source:Package} (= $${source:Version}), ' -W $(if $(shell which musl-gcc),musl-tools,libc6-dev-bin))"
+	dh_gencontrol -- -Vmisc:Built-Using="$(shell dpkg-query -f '$${source:Package} (= $${source:Version}), ' -W $(if $(shell which musl-gcc),musl-tools,libc-dev-bin))"
 
 %:
 	dh $@ --with=ocaml,autoreconf
