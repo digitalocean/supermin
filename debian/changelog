@@ -1,3 +1,9 @@
+supermin (5.1.17-7) unstable; urgency=medium
+
+  * Introduce alternative kernel build-dependency (Closes: #851970)
+
+ -- Hilko Bengen <bengen@debian.org>  Sun, 22 Jan 2017 15:39:12 +0100
+
 supermin (5.1.17-6) unstable; urgency=medium
 
   * Fix build dependency for determining Built-Using (Closes: #850974)
