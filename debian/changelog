@@ -1,3 +1,10 @@
+supermin (5.1.17-8) unstable; urgency=medium
+
+  * Don't build init using musl on MIPS architectures due to toolchain
+    breakage (Closes: #859656)
+
+ -- Hilko Bengen <bengen@debian.org>  Sat, 15 Apr 2017 17:21:10 +0200
+
 supermin (5.1.17-7) unstable; urgency=medium
 
   * Introduce alternative kernel build-dependency (Closes: #851970)
