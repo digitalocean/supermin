@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2014 Free Software Foundation, Inc.
+# Copyright (C) 2002-2017 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,8 +37,13 @@ AC_DEFUN([gl_EARLY],
   m4_pattern_allow([^gl_ES$])dnl a valid locale name
   m4_pattern_allow([^gl_LIBOBJS$])dnl a variable
   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
+
+  # Pre-early section.
+  AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
   AC_REQUIRE([gl_PROG_AR_RANLIB])
+
   # Code from module absolute-header:
+  # Code from module assure:
   # Code from module at-internal:
   # Code from module bitrotate:
   # Code from module chdir:
@@ -62,7 +67,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module error:
   # Code from module exitfail:
   # Code from module extensions:
-  AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
   # Code from module extern-inline:
   # Code from module fchdir:
   # Code from module fcntl:
@@ -72,10 +76,12 @@ AC_DEFUN([gl_EARLY],
   # Code from module fdopendir:
   # Code from module filename:
   # Code from module filenamecat-lgpl:
+  # Code from module flexmember:
   # Code from module fstat:
   # Code from module fts:
   # Code from module getcwd-lgpl:
   # Code from module getdtablesize:
+  # Code from module getprogname:
   # Code from module gettext-h:
   # Code from module gettimeofday:
   # Code from module hash:
@@ -84,6 +90,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module intprops:
   # Code from module largefile:
   AC_REQUIRE([AC_SYS_LARGEFILE])
+  # Code from module limits-h:
   # Code from module lstat:
   # Code from module malloc-posix:
   # Code from module memchr:
@@ -109,6 +116,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module snippet/warn-on-use:
   # Code from module ssize_t:
   # Code from module stat:
+  # Code from module stdalign:
   # Code from module stdbool:
   # Code from module stddef:
   # Code from module stdint:
@@ -169,7 +177,8 @@ AC_DEFUN([gl_INIT],
   gl_DIRENT_SAFER
   gl_MODULE_INDICATOR([dirent-safer])
   gl_FUNC_DIRFD
-  if test $ac_cv_func_dirfd = no && test $gl_cv_func_dirfd_macro = no; then
+  if test $ac_cv_func_dirfd = no && test $gl_cv_func_dirfd_macro = no \
+     || test $REPLACE_DIRFD = 1; then
     AC_LIBOBJ([dirfd])
     gl_PREREQ_DIRFD
   fi
@@ -215,6 +224,7 @@ AC_DEFUN([gl_INIT],
   gl_DIRENT_MODULE_INDICATOR([fdopendir])
   gl_MODULE_INDICATOR([fdopendir])
   gl_FILE_NAME_CONCAT_LGPL
+  AC_C_FLEXIBLE_ARRAY_MEMBER
   gl_FUNC_FSTAT
   if test $REPLACE_FSTAT = 1; then
     AC_LIBOBJ([fstat])
@@ -236,6 +246,7 @@ AC_DEFUN([gl_INIT],
     gl_PREREQ_GETDTABLESIZE
   fi
   gl_UNISTD_MODULE_INDICATOR([getdtablesize])
+  gl_FUNC_GETPROGNAME
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
   gl_FUNC_GETTIMEOFDAY
@@ -246,6 +257,7 @@ AC_DEFUN([gl_INIT],
   gl_SYS_TIME_MODULE_INDICATOR([gettimeofday])
   gl_I_RING
   AC_REQUIRE([gl_LARGEFILE])
+  gl_LIMITS_H
   gl_FUNC_LSTAT
   if test $REPLACE_LSTAT = 1; then
     AC_LIBOBJ([lstat])
@@ -275,11 +287,11 @@ AC_DEFUN([gl_INIT],
     gl_PREREQ_MEMRCHR
   fi
   gl_STRING_MODULE_INDICATOR([memrchr])
-  gl_MSVC_INVAL
+  AC_REQUIRE([gl_MSVC_INVAL])
   if test $HAVE_MSVC_INVALID_PARAMETER_HANDLER = 1; then
     AC_LIBOBJ([msvc-inval])
   fi
-  gl_MSVC_NOTHROW
+  AC_REQUIRE([gl_MSVC_NOTHROW])
   if test $HAVE_MSVC_INVALID_PARAMETER_HANDLER = 1; then
     AC_LIBOBJ([msvc-nothrow])
   fi
@@ -323,6 +335,7 @@ AC_DEFUN([gl_INIT],
     gl_PREREQ_STAT
   fi
   gl_SYS_STAT_MODULE_INDICATOR([stat])
+  gl_STDALIGN_H
   AM_STDBOOL_H
   gl_STDDEF_H
   gl_STDINT_H
@@ -500,6 +513,7 @@ AC_DEFUN([gl_FILE_LIST], [
   build-aux/snippet/arg-nonnull.h
   build-aux/snippet/c++defs.h
   build-aux/snippet/warn-on-use.h
+  lib/assure.h
   lib/basename-lgpl.c
   lib/bitrotate.c
   lib/bitrotate.h
@@ -541,12 +555,15 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/filename.h
   lib/filenamecat-lgpl.c
   lib/filenamecat.h
+  lib/flexmember.h
   lib/fstat.c
   lib/fts-cycle.c
   lib/fts.c
   lib/fts_.h
   lib/getcwd-lgpl.c
   lib/getdtablesize.c
+  lib/getprogname.c
+  lib/getprogname.h
   lib/gettext.h
   lib/gettimeofday.c
   lib/hash.c
@@ -554,6 +571,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/i-ring.c
   lib/i-ring.h
   lib/intprops.h
+  lib/limits.in.h
   lib/lstat.c
   lib/malloc.c
   lib/memchr.c
@@ -582,6 +600,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/save-cwd.c
   lib/save-cwd.h
   lib/stat.c
+  lib/stdalign.in.h
   lib/stdbool.in.h
   lib/stddef.in.h
   lib/stdint.in.h
@@ -629,15 +648,18 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/fcntl_h.m4
   m4/fdopendir.m4
   m4/filenamecat.m4
+  m4/flexmember.m4
   m4/fstat.m4
   m4/fts.m4
   m4/getcwd.m4
   m4/getdtablesize.m4
+  m4/getprogname.m4
   m4/gettimeofday.m4
   m4/gnulib-common.m4
   m4/i-ring.m4
   m4/include_next.m4
   m4/largefile.m4
+  m4/limits-h.m4
   m4/longlong.m4
   m4/lstat.m4
   m4/malloc.m4
@@ -660,6 +682,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/save-cwd.m4
   m4/ssize_t.m4
   m4/stat.m4
+  m4/stdalign.m4
   m4/stdbool.m4
   m4/stddef_h.m4
   m4/stdint.m4
@@ -677,4 +700,5 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/unistd_h.m4
   m4/warn-on-use.m4
   m4/wchar_t.m4
+  m4/wint_t.m4
 ])

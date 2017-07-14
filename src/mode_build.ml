@@ -58,7 +58,7 @@ and string_of_file_content = function
   | Excludefiles -> "excludefiles"
 
 let rec build debug
-    (copy_kernel, dtb_wildcard, format, host_cpu,
+    (copy_kernel, format, host_cpu,
      packager_config, tmpdir, use_installed, size,
      include_packagelist)
     inputs outputdir =
@@ -218,18 +218,17 @@ let rec build debug
   (match format with
   | Chroot ->
     (* chroot doesn't need an external kernel or initrd *)
-    Chroot.build_chroot debug files outputdir packagelist_file
+    Format_chroot.build_chroot debug files outputdir packagelist_file
 
   | Ext2 ->
     let kernel = outputdir // "kernel"
-    and dtb = outputdir // "dtb"
     and appliance = outputdir // "root"
     and initrd = outputdir // "initrd" in
     let kernel_version, modpath =
-      Kernel.build_kernel debug host_cpu dtb_wildcard copy_kernel kernel dtb in
-    Ext2.build_ext2 debug basedir files modpath kernel_version appliance size
-      packagelist_file;
-    Ext2_initrd.build_initrd debug tmpdir modpath initrd
+      Format_ext2_kernel.build_kernel debug host_cpu copy_kernel kernel in
+    Format_ext2.build_ext2 debug basedir files modpath kernel_version
+                           appliance size packagelist_file;
+    Format_ext2_initrd.build_initrd debug tmpdir modpath initrd
   )
 
 and read_appliance debug basedir appliance = function
@@ -344,10 +343,6 @@ and get_compressed_file_content zcat file =
   ignore (Unix.close_process_full (chan_out, chan_in, chan_err));
 
   get_file_content file buf len
-
-and isalnum = function
-  | '0'..'9' | 'a'..'z' | 'A'..'Z' -> true
-  | _ -> false
 
 (* The files may not be listed in an order that allows us to run
  * through the list (even if we sorted it).  The particular problem is
