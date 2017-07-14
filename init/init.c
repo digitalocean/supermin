@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <ctype.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <unistd.h>
@@ -40,7 +41,13 @@
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+
+#if MAJOR_IN_MKDEV
+#include <sys/mkdev.h>
+#elif MAJOR_IN_SYSMACROS
 #include <sys/sysmacros.h>
+/* else it's in sys/types.h, included above */
+#endif
 
 /* Maximum time to wait for the root device to appear (seconds).
  *
@@ -83,6 +90,11 @@ static void read_cmdline (void);
 static void insmod (const char *filename);
 static void delete_initramfs_files (void);
 static void show_directory (const char *dir);
+static void parse_root_uuid (const char *uuid, unsigned char *raw_uuid);
+static int hexdigit (char d);
+static int find_fs_uuid (const unsigned char *raw_uuid, int *major, int *minor);
+static int parse_dev_file (const char *path, int *major, int *minor);
+static void virtio_warning (uint64_t delay_ns, const char *what);
 
 static char cmdline[1024];
 static char line[1024];
@@ -90,6 +102,21 @@ static char line[1024];
 int
 main ()
 {
+  FILE *fp;
+  char *root;
+  size_t len;
+  int dax = 0;
+  uint64_t delay_ns;
+  int major, minor;
+  const char *mount_options = "";
+
+#define NANOSLEEP(ns) do {                      \
+    struct timespec t;                          \
+    t.tv_sec = delay_ns / 1000000000;           \
+    t.tv_nsec = delay_ns % 1000000000;          \
+    nanosleep (&t, NULL);                       \
+  } while(0)
+
   mount_proc ();
 
   fprintf (stderr, "supermin: ext2 mini initrd starting up: "
@@ -126,7 +153,7 @@ main ()
     exit (EXIT_FAILURE);
   }
 
-  FILE *fp = fopen ("/modules", "r");
+  fp = fopen ("/modules", "r");
   if (fp == NULL) {
     perror ("fopen: /modules");
     exit (EXIT_FAILURE);
@@ -148,20 +175,20 @@ main ()
   }
   fclose (fp);
 
-  /* Look for the ext2 filesystem device.  It's always the last one
-   * that was added.  Modern versions of libguestfs supply the
-   * expected name of the root device on the command line
-   * ("root=/dev/...").  For virtio-scsi this is required, because we
-   * must wait for the device to appear after the module is loaded.
+  /* Look for the ext2 filesystem root device specified as root=...
+   * on the kernel command line.
    */
-  char *root, *path;
-  size_t len;
-  int dax = 0;
   root = strstr (cmdline, "root=");
-  if (root) {
+  if (!root) {
+    fprintf (stderr, "supermin: missing root= parameter on the command line\n");
+    exit (EXIT_FAILURE);
+  }
+  root += 5;
+
+  if (strncmp (root, "/dev/", 5) == 0) {
+    char *path;
+
     root += 5;
-    if (strncmp (root, "/dev/", 5) == 0)
-      root += 5;
     if (strncmp (root, "pmem", 4) == 0)
       dax = 1;
     len = strcspn (root, " ");
@@ -169,75 +196,51 @@ main ()
 
     asprintf (&path, "/sys/block/%s/dev", root);
 
-    uint64_t delay_ns = 250000;
-    int virtio_message = 0;
-    while (delay_ns <= MAX_ROOT_WAIT * UINT64_C(1000000000)) {
-      fp = fopen (path, "r");
-      if (fp != NULL)
-        goto found;
-
-      if (delay_ns > 1000000000) {
-	fprintf (stderr,
-		 "supermin: waiting another %" PRIu64 " ns for %s to appear\n",
-		 delay_ns, path);
-        if (!virtio_message) {
-          fprintf (stderr,
-                   "This usually means your kernel doesn't support virtio, or supermin was unable\n"
-                   "to load some kernel modules (see module loading messages above).\n");
-          virtio_message = 1;
-        }
+    for (delay_ns = 250000;
+         delay_ns <= MAX_ROOT_WAIT * UINT64_C(1000000000);
+         delay_ns *= 2) {
+      if (parse_dev_file (path, &major, &minor) != -1) {
+        if (!quiet)
+          fprintf (stderr, "supermin: picked %s (%d:%d) as root device\n",
+                   path, major, minor);
+        break;
       }
 
-      struct timespec t;
-      t.tv_sec = delay_ns / 1000000000;
-      t.tv_nsec = delay_ns % 1000000000;
-      nanosleep (&t, NULL);
-      delay_ns *= 2;
+      virtio_warning (delay_ns, path);
+      NANOSLEEP (delay_ns);
+    }
+
+    free (path);
+  }
+  else if (strncmp (root, "UUID=", 5) == 0) {
+    unsigned char raw_uuid[16];
+
+    root += 5;
+    parse_root_uuid (root, raw_uuid);
+
+    for (delay_ns = 250000;
+         delay_ns <= MAX_ROOT_WAIT * UINT64_C(1000000000);
+         delay_ns *= 2) {
+      if (find_fs_uuid (raw_uuid, &major, &minor) != -1) {
+        if (!quiet)
+          fprintf (stderr, "supermin: picked %d:%d as root device\n",
+                   major, minor);
+        break;
+      }
+
+      virtio_warning (delay_ns, "root UUID");
+      NANOSLEEP (delay_ns);
     }
   }
   else {
-    path = strdup ("/sys/block/xdx/dev");
-
-    char class[3] = { 'v', 's', 'h' };
-    size_t i, j;
-    fp = NULL;
-    for (i = 0; i < sizeof class; ++i) {
-      for (j = 'z'; j >= 'a'; --j) {
-        path[11] = class[i];
-        path[13] = j;
-        fp = fopen (path, "r");
-        if (fp != NULL)
-          goto found;
-      }
-    }
+    fprintf (stderr, "supermin: unknown root= parameter on the command line\n");
+    exit (EXIT_FAILURE);
   }
 
-  fprintf (stderr,
-           "supermin: no ext2 root device found\n"
-           "Please include FULL verbose output in your bug report.\n");
-  exit (EXIT_FAILURE);
-
- found:
-  if (!quiet)
-    fprintf (stderr, "supermin: picked %s as root device\n", path);
-
-  fgets (line, sizeof line, fp);
-  int major = atoi (line);
-  char *p = line + strcspn (line, ":") + 1;
-  int minor = atoi (p);
-
-  fclose (fp);
   if (umount ("/sys") == -1) {
     perror ("umount: /sys");
     exit (EXIT_FAILURE);
   }
-
-  /* Make current process the controlling process of the tty. */
-  setsid ();
-#ifdef TIOCSCTTY
-  if (ioctl (0, TIOCSCTTY, 1) == -1)
-    perror ("ioctl: TIOCSCTTY");
-#endif
 
   if (!quiet)
     fprintf (stderr, "supermin: creating /dev/root as block special %d:%d\n",
@@ -249,7 +252,7 @@ main ()
   }
 
   /* Construct the filesystem mount options. */
-  const char *mount_options = "";
+  mount_options = "";
   if (dax)
     mount_options = "dax";
 
@@ -304,27 +307,30 @@ static void
 insmod (const char *filename)
 {
   size_t size;
+  int fd;
+  struct stat st;
+  char *buf;
+  size_t offset;
 
   if (!quiet)
     fprintf (stderr, "supermin: internal insmod %s\n", filename);
 
-  int fd = open (filename, O_RDONLY);
+  fd = open (filename, O_RDONLY);
   if (fd == -1) {
     fprintf (stderr, "insmod: open: %s: %m\n", filename);
     exit (EXIT_FAILURE);
   }
-  struct stat st;
   if (fstat (fd, &st) == -1) {
     perror ("insmod: fstat");
     exit (EXIT_FAILURE);
   }
   size = st.st_size;
-  char *buf = malloc (size);
+  buf = malloc (size);
   if (buf == NULL) {
     fprintf (stderr, "insmod: malloc (%s, %zu bytes): %m\n", filename, size);
     exit (EXIT_FAILURE);
   }
-  size_t offset = 0;
+  offset = 0;
   do {
     ssize_t rc = read (fd, buf + offset, size - offset);
     if (rc == -1) {
@@ -502,4 +508,146 @@ show_directory (const char *dirname)
 
   closedir (dir);
   chdir ("/");
+}
+
+static void
+parse_root_uuid (const char *root, unsigned char *raw_uuid)
+{
+  size_t i;
+
+  i = 0;
+  while (i < 16) {
+    if (*root == '-') {
+      ++root;
+      continue;
+    }
+    if (!isxdigit (root[0]) || !isxdigit (root[1])) {
+      fprintf (stderr, "supermin: root UUID is not a 16 byte UUID string\n");
+      exit (EXIT_FAILURE);
+    }
+    raw_uuid[i] = hexdigit (root[0]) * 0x10 + hexdigit (root[1]);
+    ++i;
+    root += 2;
+  }
+
+  if (*root && isxdigit (*root)) {
+    fprintf (stderr, "supermin: root UUID is longer than 16 bytes\n");
+    exit (EXIT_FAILURE);
+  }
+}
+
+static int
+hexdigit (char d)
+{
+  switch (d) {
+  case '0'...'9': return d - '0';
+  case 'a'...'f': return d - 'a' + 10;
+  case 'A'...'F': return d - 'A' + 10;
+  default: return -1;
+  }
+}
+
+/* Search every block device under /sys/block to see if we can find
+ * one which contains a filesystem with the matching volume UUID.
+ */
+static int
+find_fs_uuid (const unsigned char *raw_uuid, int *major, int *minor)
+{
+  DIR *dir;
+  struct dirent *d;
+  unsigned char uuid[16];
+
+  dir = opendir ("/sys/block");
+  if (!dir) {
+    perror ("/sys/block");
+    return -1;
+  }
+
+  while ((d = readdir (dir)) != NULL) {
+    int fd = -1;
+    char *path = NULL;
+
+    if (d->d_name[0] == '.')
+      goto cont;
+
+    asprintf (&path, "/sys/block/%s/dev", d->d_name);
+
+    if (parse_dev_file (path, major, minor) == -1)
+      goto cont;
+
+    /* We have to make a dummy inode so we can open the device. */
+    unlink ("/dev/disk");
+    if (mknod ("/dev/disk", S_IFBLK|0700, makedev (*major, *minor)) == -1) {
+      perror ("mknod");
+      goto cont;
+    }
+
+    fd = open ("/dev/disk", O_RDONLY);
+    if (fd == -1) {
+      perror ("open");
+      goto cont;
+    }
+
+    if (pread (fd, uuid, sizeof uuid, 0x468) != sizeof uuid) {
+      /*perror ("pread"); - not an error, the device might just be small */
+      goto cont;
+    }
+
+    if (memcmp (uuid, raw_uuid, sizeof uuid) != 0)
+      goto cont;
+
+    close (fd);
+    free (path);
+    closedir (dir);
+    unlink ("/dev/disk");
+    return 0;
+
+  cont:
+    if (fd >= 0) close (fd);
+    free (path);
+  }
+
+  closedir (dir);
+
+  return -1;
+}
+
+/* Parse a /sys/block/X/dev file and extract the major:minor numbers. */
+static int
+parse_dev_file (const char *path, int *major, int *minor)
+{
+  FILE *fp;
+  char *p;
+
+  fp = fopen (path, "r");
+  if (fp == NULL)
+    return -1;
+
+  fgets (line, sizeof line, fp);
+  *major = atoi (line);
+  p = line + strcspn (line, ":") + 1;
+  *minor = atoi (p);
+
+  fclose (fp);
+
+  return 0;
+}
+
+static void
+virtio_warning (uint64_t delay_ns, const char *what)
+{
+  static int virtio_message = 0;
+
+  if (delay_ns > 1000000000) {
+    fprintf (stderr,
+             "supermin: waiting another %" PRIu64 " ns for %s to appear\n",
+             delay_ns, what);
+
+    if (!virtio_message) {
+      fprintf (stderr,
+               "This usually means your kernel doesn't support virtio, or supermin was unable\n"
+               "to load some kernel modules (see module loading messages above).\n");
+      virtio_message = 1;
+    }
+  }
 }

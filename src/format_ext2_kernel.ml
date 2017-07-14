@@ -22,6 +22,7 @@ open Printf
 open Utils
 open Ext2fs
 open Fnmatch
+open Glob
 
 let patt_of_cpu host_cpu =
   let models =
@@ -30,36 +31,17 @@ let patt_of_cpu host_cpu =
     | "ppc" | "powerpc" | "powerpc64" -> ["ppc"; "powerpc"; "powerpc64"]
     | "sparc" | "sparc64" -> ["sparc"; "sparc64"]
     | "amd64" | "x86_64" -> ["amd64"; "x86_64"]
+    | "parisc" | "parisc64" -> ["hppa"; "hppa64"]
+    | "ppc64el" -> ["powerpc64le"]
     | _ when host_cpu.[0] = 'i' && host_cpu.[2] = '8' && host_cpu.[3] = '6' -> ["?86"]
     | _ when String.length host_cpu >= 5 && String.sub host_cpu 0 5 = "armv7" ->  ["armmp"]
     | _ -> [host_cpu]
   in
   List.map (fun model -> sprintf "vmlinu?-*-%s" model) models
 
-let rec build_kernel debug host_cpu dtb_wildcard copy_kernel kernel dtb =
+let rec build_kernel debug host_cpu copy_kernel kernel =
   (* Locate the kernel. *)
-  let kernel_name, kernel_version =
-    find_kernel debug host_cpu copy_kernel kernel in
-
-  (* If the user passed --dtb option, locate dtb. *)
-  (match dtb_wildcard with
-  | None -> ()
-  | Some wildcard ->
-    find_dtb debug copy_kernel kernel_name wildcard dtb
-  );
-
-  (* Get the kernel modules. *)
-  let modpath = find_modpath debug kernel_version in
-
-  if debug >= 1 then (
-    printf "supermin: kernel: kernel_version %s\n" kernel_version;
-    printf "supermin: kernel: modules %s\n%!" modpath;
-  );
-
-  (kernel_version, modpath)
-
-and find_kernel debug host_cpu copy_kernel kernel =
-  let kernel_file, kernel_name, kernel_version =
+  let kernel_file, kernel_name, kernel_version, modpath =
     try
       let kernel_env = getenv "SUPERMIN_KERNEL" in
       if debug >= 1 then
@@ -76,38 +58,72 @@ and find_kernel debug host_cpu copy_kernel kernel =
         printf "supermin: kernel: SUPERMIN_KERNEL version %s\n%!"
           kernel_version;
       let kernel_name = Filename.basename kernel_env in
-      kernel_env, kernel_name, kernel_version
+      let modpath = find_modpath debug kernel_version in
+      kernel_env, kernel_name, kernel_version, modpath
     with Not_found ->
-      let is_arm =
-        String.length host_cpu >= 3 &&
-        host_cpu.[0] = 'a' && host_cpu.[1] = 'r' && host_cpu.[2] = 'm' in
+      let kernels =
+        let files = glob "/lib/modules/*/vmlinuz" [GLOB_NOSORT; GLOB_NOESCAPE] in
+        let files = Array.to_list files in
+        let kernels =
+          List.map (
+            fun f ->
+              let modpath = Filename.dirname f in
+              f, Filename.basename f, Filename.basename modpath, modpath
+          ) files in
+        List.sort (
+          fun (_, _, a, _) (_, _, b, _) -> compare_version b a
+        ) kernels in
 
-      let all_files = Sys.readdir "/boot" in
-      let all_files = Array.to_list all_files in
+      if kernels <> [] then (
+        let kernel = List.hd kernels in
+        if debug >= 1 then (
+          let kernel_file, _, _, _ = kernel in
+          printf "supermin: kernel: picked vmlinuz %s\n%!" kernel_file;
+        );
+        kernel
+      ) else
+        find_kernel debug host_cpu kernel in
 
-      (* In original: ls -1dvr /boot/vmlinuz-*.$arch* 2>/dev/null | grep -v xen *)
-      let patterns = patt_of_cpu host_cpu in
-      let files = kernel_filter patterns is_arm all_files in
-
-      let files =
-        if files <> [] then files
-        else
-          (* In original: ls -1dvr /boot/vmlinuz-* 2>/dev/null | grep -v xen *)
-          kernel_filter ["vmlinu?-*"] is_arm all_files in
-
-      if files = [] then no_kernels host_cpu;
-
-      let files = List.sort (fun a b -> compare_version b a) files in
-      let kernel_name = List.hd files in
-      let kernel_version = get_kernel_version kernel_name in
-
-      if debug >= 1 then
-        printf "supermin: kernel: picked kernel %s\n%!" kernel_name;
-
-      ("/boot" // kernel_name), kernel_name, kernel_version in
+  if debug >= 1 then (
+    printf "supermin: kernel: kernel_version %s\n" kernel_version;
+    printf "supermin: kernel: modules %s\n%!" modpath;
+  );
 
   copy_or_symlink_file copy_kernel kernel_file kernel;
-  kernel_name, kernel_version
+
+  (kernel_version, modpath)
+
+and find_kernel debug host_cpu kernel =
+  let is_arm =
+    String.length host_cpu >= 3 &&
+    host_cpu.[0] = 'a' && host_cpu.[1] = 'r' && host_cpu.[2] = 'm' in
+
+  let all_files = Sys.readdir "/boot" in
+  let all_files = Array.to_list all_files in
+
+  (* In original: ls -1dvr /boot/vmlinuz-*.$arch* 2>/dev/null | grep -v xen *)
+  let patterns = patt_of_cpu host_cpu in
+  let files = kernel_filter patterns is_arm all_files in
+
+  let files =
+    if files <> [] then files
+    else
+      (* In original: ls -1dvr /boot/vmlinuz-* 2>/dev/null | grep -v xen *)
+      kernel_filter ["vmlinu?-*"] is_arm all_files in
+
+  if files = [] then no_kernels host_cpu;
+
+  let files = List.sort (fun a b -> compare_version b a) files in
+  let kernel_name = List.hd files in
+  let kernel_version = get_kernel_version kernel_name in
+
+  if debug >= 1 then
+    printf "supermin: kernel: picked kernel %s\n%!" kernel_name;
+
+  (* Get the kernel modules. *)
+  let modpath = find_modpath debug kernel_version in
+
+  ("/boot" // kernel_name), kernel_name, kernel_version, modpath
 
 and kernel_filter patterns is_arm all_files =
   let files =
@@ -137,67 +153,6 @@ If this is a Xen guest, and you only have Xen domU kernels
 installed, try installing a fullvirt kernel (only for
 supermin use, you shouldn't boot the Xen guest with it)."
     host_cpu
-
-and find_dtb debug copy_kernel kernel_name wildcard dtb =
-  let dtb_file =
-    try
-      let dtb_file = getenv "SUPERMIN_DTB" in
-      if debug >= 1 then
-        printf "supermin: kernel: SUPERMIN_DTB environment variable = %s\n%!"
-          dtb_file;
-      dtb_file
-    with Not_found ->
-      (* Replace vmlinuz- with dtb- *)
-      if not (string_prefix "vmlinuz-" kernel_name) &&
-        not (string_prefix "vmlinuz-" kernel_name) then
-        no_dtb_dir kernel_name;
-      let dtb_dir =
-        try
-          List.find dir_exists (
-            List.map (fun prefix ->
-              prefix ^ String.sub kernel_name 8 (String.length kernel_name - 8)
-            ) ["/boot/dtb-"; "/usr/lib/linux-image-"])
-        with Not_found ->
-          no_dtb_dir kernel_name; ""
-      in
-
-      let all_files = Sys.readdir dtb_dir in
-      let all_files = Array.to_list all_files in
-
-      let files =
-        List.filter (fun filename -> fnmatch wildcard filename [FNM_NOESCAPE])
-          all_files in
-      if files = [] then
-        no_dtb dtb_dir wildcard;
-
-      let dtb_name = List.hd files in
-      let dtb_file = dtb_dir // dtb_name in
-      if debug >= 1 then
-        printf "supermin: kernel: picked dtb %s\n%!" dtb_file;
-      dtb_file in
-
-  copy_or_symlink_file copy_kernel dtb_file dtb
-
-and no_dtb_dir kernel_name =
-  error "\
-failed to find a dtb (device tree) directory.
-
-I expected to take '%s' and to
-replace vmlinuz- with dtb- to form a directory.
-
-You can set SUPERMIN_KERNEL, SUPERMIN_MODULES and SUPERMIN_DTB
-to override automatic selection.  See supermin(1)."
-    kernel_name
-
-and no_dtb dtb_dir wildcard =
-  error "\
-failed to find a matching device tree.
-
-I looked for a file matching '%s' in directory '%s'.
-
-You can set SUPERMIN_KERNEL, SUPERMIN_MODULES and SUPERMIN_DTB
-to override automatic selection.  See supermin(1)."
-    wildcard dtb_dir
 
 and find_modpath debug kernel_version =
   try

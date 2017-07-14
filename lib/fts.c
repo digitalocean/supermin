@@ -1,6 +1,6 @@
 /* Traverse a file hierarchy.
 
-   Copyright (C) 2004-2014 Free Software Foundation, Inc.
+   Copyright (C) 2004-2017 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -46,9 +46,9 @@
 
 #include <config.h>
 
-#if defined(LIBC_SCCS) && !defined(lint)
+#if defined LIBC_SCCS && !defined GCC_LINT && !defined lint
 static char sccsid[] = "@(#)fts.c       8.6 (Berkeley) 8/14/94";
-#endif /* LIBC_SCCS and not lint */
+#endif
 
 #include "fts_.h"
 
@@ -62,7 +62,9 @@ static char sccsid[] = "@(#)fts.c       8.6 (Berkeley) 8/14/94";
 #endif
 #include <fcntl.h>
 #include <errno.h>
+#include <stdalign.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -74,6 +76,7 @@ static char sccsid[] = "@(#)fts.c       8.6 (Berkeley) 8/14/94";
 /* FIXME - use fcntl(F_DUPFD_CLOEXEC)/openat(O_CLOEXEC) once they are
    supported.  */
 # include "cloexec.h"
+# include "flexmember.h"
 # include "openat.h"
 # include "same-inode.h"
 #endif
@@ -189,7 +192,7 @@ enum Fts_stat
 #endif
 
 #ifdef NDEBUG
-# define fts_assert(expr) ((void) 0)
+# define fts_assert(expr) ((void) (0 && (expr)))
 #else
 # define fts_assert(expr)       \
     do                          \
@@ -663,6 +666,7 @@ fts_close (FTS *sp)
 # define S_MAGIC_TMPFS 0x1021994
 # define S_MAGIC_NFS 0x6969
 # define S_MAGIC_REISERFS 0x52654973
+# define S_MAGIC_XFS 0x58465342
 # define S_MAGIC_PROC 0x9FA0
 
 /* Return false if it is easy to determine the file system type of
@@ -718,13 +722,20 @@ leaf_optimization_applies (int dir_fd)
       /* List here the file system types that lack usable dirent.d_type
          info, yet for which the optimization does apply.  */
     case S_MAGIC_REISERFS:
+    case S_MAGIC_XFS:
       return true;
 
+      /* Explicitly list here any other file system type for which the
+         optimization is not applicable, but need documentation.  */
+    case S_MAGIC_NFS:
+      /* NFS provides usable dirent.d_type but not necessarily for all entries
+         of large directories, so as per <https://bugzilla.redhat.com/1252549>
+         NFS should return true.  However st_nlink values are not accurate on
+         all implementations as per <https://bugzilla.redhat.com/1299169>.  */
+      /* fall through */
     case S_MAGIC_PROC:
-      /* Explicitly listing this or any other file system type for which
-         the optimization is not applicable is not necessary, but we leave
-         it here to document the risk.  Per http://bugs.debian.org/143111,
-         /proc may have bogus stat.st_nlink values.  */
+      /* Per <http://bugs.debian.org/143111> /proc may have
+         bogus stat.st_nlink values.  */
       /* fall through */
     default:
       return false;
@@ -1079,9 +1090,6 @@ cd_dot_dot:
                 }
         } else if (p->fts_flags & FTS_SYMFOLLOW) {
                 if (FCHDIR(sp, p->fts_symfd)) {
-                        int saved_errno = errno;
-                        (void)close(p->fts_symfd);
-                        __set_errno (saved_errno);
                         p->fts_errno = errno;
                         SET(FTS_STOP);
                 }
@@ -1091,9 +1099,15 @@ cd_dot_dot:
                 p->fts_errno = errno;
                 SET(FTS_STOP);
         }
-        p->fts_info = p->fts_errno ? FTS_ERR : FTS_DP;
-        if (p->fts_errno == 0)
-                LEAVE_DIR (sp, p, "3");
+
+        /* If the directory causes a cycle, preserve the FTS_DC flag and keep
+           the corresponding dev/ino pair in the hash table.  It is going to be
+           removed when leaving the original directory.  */
+        if (p->fts_info != FTS_DC) {
+                p->fts_info = p->fts_errno ? FTS_ERR : FTS_DP;
+                if (p->fts_errno == 0)
+                        LEAVE_DIR (sp, p, "3");
+        }
         return ISSET(FTS_STOP) ? NULL : p;
 }
 
@@ -1293,6 +1307,7 @@ fts_build (register FTS *sp, int type)
         int dir_fd;
         FTSENT *cur = sp->fts_cur;
         bool continue_readdir = !!cur->fts_dirp;
+        size_t max_entries;
 
         /* When cur->fts_dirp is non-NULL, that means we should
            continue calling readdir on that existing DIR* pointer
@@ -1354,8 +1369,7 @@ fts_build (register FTS *sp, int type)
            function.  But when no such function is specified, we can read
            entries in batches that are large enough to help us with inode-
            sorting, yet not so large that we risk exhausting memory.  */
-        size_t max_entries = (sp->fts_compar == NULL
-                              ? FTS_MAX_READDIR_ENTRIES : SIZE_MAX);
+        max_entries = sp->fts_compar ? SIZE_MAX : FTS_MAX_READDIR_ENTRIES;
 
         /*
          * Nlinks is the number of possible entries of type directory in the
@@ -1447,19 +1461,30 @@ fts_build (register FTS *sp, int type)
         nitems = 0;
         while (cur->fts_dirp) {
                 bool is_dir;
+                size_t d_namelen;
+                __set_errno (0);
                 struct dirent *dp = readdir(cur->fts_dirp);
-                if (dp == NULL)
+                if (dp == NULL) {
+                        if (errno) {
+                                cur->fts_errno = errno;
+                                /* If we've not read any items yet, treat
+                                   the error as if we can't access the dir.  */
+                                cur->fts_info = (continue_readdir || nitems)
+                                                ? FTS_ERR : FTS_DNR;
+                        }
                         break;
+                }
                 if (!ISSET(FTS_SEEDOT) && ISDOT(dp->d_name))
                         continue;
 
-                if ((p = fts_alloc (sp, dp->d_name,
-                                    _D_EXACT_NAMLEN (dp))) == NULL)
+                d_namelen = _D_EXACT_NAMLEN (dp);
+                p = fts_alloc (sp, dp->d_name, d_namelen);
+                if (!p)
                         goto mem1;
-                if (_D_EXACT_NAMLEN (dp) >= maxlen) {
+                if (d_namelen >= maxlen) {
                         /* include space for NUL */
                         oldaddr = sp->fts_path;
-                        if (! fts_palloc(sp, _D_EXACT_NAMLEN (dp) + len + 1)) {
+                        if (! fts_palloc(sp, d_namelen + len + 1)) {
                                 /*
                                  * No more memory.  Save
                                  * errno, free up the current structure and the
@@ -1483,7 +1508,7 @@ mem1:                           saved_errno = errno;
                         maxlen = sp->fts_pathlen - len;
                 }
 
-                new_len = len + _D_EXACT_NAMLEN (dp);
+                new_len = len + d_namelen;
                 if (new_len < len) {
                         /*
                          * In the unlikely event that we would end up
@@ -1607,7 +1632,8 @@ mem1:                           saved_errno = errno;
 
         /* If didn't find anything, return NULL. */
         if (!nitems) {
-                if (type == BREAD)
+                if (type == BREAD
+                    && cur->fts_info != FTS_DNR && cur->fts_info != FTS_ERR)
                         cur->fts_info = FTS_DP;
                 fts_lfree(head);
                 return (NULL);
@@ -1900,7 +1926,7 @@ fts_alloc (FTS *sp, const char *name, register size_t namelen)
          * The file name is a variable length array.  Allocate the FTSENT
          * structure and the file name in one chunk.
          */
-        len = sizeof(FTSENT) + namelen;
+        len = FLEXSIZEOF(FTSENT, fts_name, namelen + 1);
         if ((p = malloc(len)) == NULL)
                 return (NULL);
 
