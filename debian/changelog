@@ -1,3 +1,11 @@
+supermin (5.1.18-1) unstable; urgency=medium
+
+  * New upstream version 5.1.18
+  * Drop patches that have been integrated upstream
+  * Modernize package: Bump Standards-Version, Debhelper compat level
+
+ -- Hilko Bengen <bengen@debian.org>  Fri, 14 Jul 2017 07:13:44 +0200
+
 supermin (5.1.17-8) unstable; urgency=medium
 
   * Don't build init using musl on MIPS architectures due to toolchain
