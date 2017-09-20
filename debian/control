@@ -4,7 +4,6 @@ Priority: optional
 Maintainer: Debian Libvirt Maintainers <pkg-libvirt-maintainers@lists.alioth.debian.org>
 Uploaders: Hilko Bengen <bengen@debian.org>
 Build-Depends: debhelper (>= 10),
- dh-autoreconf,
  libc-dev-bin,
  gawk, pkg-config,
  apt,
@@ -13,7 +12,7 @@ Build-Depends: debhelper (>= 10),
  comerr-dev, e2fslibs-dev,
  cpio,
  musl-tools [amd64 arm64 armel armhf i386],
- augeas-tools, libhivex-bin, 
+ augeas-tools, libhivex-bin,
  linux-image-alpha-generic [alpha],
  linux-image-marvell [armel] | linux-image-versatile [armel],
  linux-image-armmp [armhf],
@@ -30,7 +29,7 @@ Build-Depends: debhelper (>= 10),
  linux-image-686-pae [i386] | linux-image-586 [i386] | linux-image-486 [i386],
 Standards-Version: 4.0.0
 Homepage: http://people.redhat.com/~rjones/supermin/
-Vcs-Git: git://anonscm.debian.org/pkg-libvirt/supermin.git
+Vcs-Git: https://anonscm.debian.org/git/pkg-libvirt/supermin.git
 Vcs-Browser: http://anonscm.debian.org/?p=pkg-libvirt/supermin.git
 
 Package: supermin
