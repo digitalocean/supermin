@@ -44,11 +44,3 @@ Description: tool for building supermin appliances.
  images, usually around 100KB in size, which get fully instantiated
  on-the-fly in a fraction of a second to a filesystem image when they
  are booted.
-
-Package: febootstrap
-Architecture: all
-Section: oldlibs
-Priority: extra
-Depends: supermin (>= ${source:Version}), ${misc:Depends}
-Description: transitional package to deal with package renames.
- The febootstrap tool was renamed to supermin.
