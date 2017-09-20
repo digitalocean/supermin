@@ -1,3 +1,14 @@
+supermin (5.1.19-1) unstable; urgency=medium
+
+  * New upstream version 5.1.19
+  * Reorder kernel build-dependencies for i386 architecture
+  * Remove unneeded chmod
+  * Drop febootstrap package
+  * Modernize package: VCS URL, structured copyright file, drop explicit
+    autoreconf
+
+ -- Hilko Bengen <bengen@debian.org>  Wed, 20 Sep 2017 10:51:28 +0200
+
 supermin (5.1.18-1) unstable; urgency=medium
 
   * New upstream version 5.1.18
