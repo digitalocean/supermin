@@ -18,7 +18,7 @@
  *)
 
 let package_name = "supermin"
-let package_version = "5.1.18"
+let package_version = "5.1.19"
 let host_cpu = "x86_64"
 
 let apt_get = "no"

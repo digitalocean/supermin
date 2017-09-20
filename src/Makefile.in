@@ -168,7 +168,8 @@ am__objects_1 = supermin-ext2fs-c.$(OBJEXT) \
 	supermin-fnmatch-c.$(OBJEXT) supermin-glob-c.$(OBJEXT) \
 	supermin-librpm-c.$(OBJEXT) supermin-realpath-c.$(OBJEXT)
 am_supermin_OBJECTS = $(am__objects_1)
-supermin_OBJECTS = $(am_supermin_OBJECTS)
+nodist_supermin_OBJECTS =
+supermin_OBJECTS = $(am_supermin_OBJECTS) $(nodist_supermin_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -963,7 +964,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 EXTRA_DIST = \
 	.depend \
-	bin2s.pl \
+	bin2c.pl \
 	config.ml.in \
 	supermin.1 \
 	supermin.pod \
@@ -1051,11 +1052,12 @@ SOURCES_C = \
 	librpm-c.c \
 	realpath-c.c
 
-CLEANFILES = *~ *.cmi *.cmo *.cmx *.o supermin format-ext2-init-bin.S
+CLEANFILES = *~ *.cmi *.cmo *.cmx *.o supermin format-ext2-init-bin.h
 man_MANS = \
 	supermin.1
 
 supermin_SOURCES = $(SOURCES_C)
+nodist_supermin_SOURCES = format-ext2-init-bin.h
 supermin_CFLAGS = \
 	-I$(shell $(OCAMLC) -where) \
 	$(EXT2FS_CFLAGS) $(COM_ERR_CFLAGS) $(LIBRPM_CFLAGS) \
@@ -1070,18 +1072,20 @@ OCAMLFLAGS = -warn-error CDEFLMPSUVXYZ-3 $(am__append_1)
 @HAVE_OCAMLOPT_TRUE@OBJECTS = $(XOBJECTS)
 @HAVE_OCAMLOPT_FALSE@BEST = c
 @HAVE_OCAMLOPT_TRUE@BEST = opt
-supermin_DEPENDENCIES = $(OBJECTS) format-ext2-init-bin.o
-supermin_LDADD = format-ext2-init-bin.o ../lib/libgnu.a
+supermin_DEPENDENCIES = $(OBJECTS)
+supermin_LDADD = ../lib/libgnu.a
 supermin_LINK = \
 	./supermin-link.sh \
 	  $(OCAMLFIND) $(BEST) $(OCAMLFLAGS) $(OCAMLPACKAGES) \
 	  $(OBJECTS) -o $@
 
+BUILT_SOURCES = format-ext2-init-bin.h
 SUFFIXES = .cmo .cmi .cmx .ml .mli .mll .mly
 @HAVE_PERLDOC_TRUE@noinst_DATA = \
 @HAVE_PERLDOC_TRUE@	../html/supermin.1.html
 
-all: all-am
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .cmo .cmi .cmx .ml .mli .mll .mly .c .o .obj
@@ -1402,13 +1406,15 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(PROGRAMS) $(MANS) $(DATA)
 installdirs:
 	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -1439,6 +1445,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
@@ -1510,7 +1517,7 @@ uninstall-am: uninstall-binPROGRAMS uninstall-man
 
 uninstall-man: uninstall-man1
 
-.MAKE: install-am install-strip
+.MAKE: all check install install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am check check-am clean \
 	clean-binPROGRAMS clean-generic cscopelist-am ctags ctags-am \
@@ -1528,6 +1535,7 @@ uninstall-man: uninstall-man1
 
 .PRECIOUS: Makefile
 
+format-ext2-init-c.$(OBJEXT): format-ext2-init-bin.h
 
 .mli.cmi:
 	$(OCAMLFIND) ocamlc $(OCAMLFLAGS) $(OCAMLPACKAGES) -c $< -o $@
@@ -1536,15 +1544,12 @@ uninstall-man: uninstall-man1
 .ml.cmx:
 	$(OCAMLFIND) ocamlopt $(OCAMLFLAGS) $(OCAMLPACKAGES) -c $< -o $@
 
-format-ext2-init-bin.o: format-ext2-init-bin.S
-	$(CC) -o $@ -c $<
-
-format-ext2-init-bin.S: ../init/init $(srcdir)/bin2s.pl
+format-ext2-init-bin.h: ../init/init $(srcdir)/bin2c.pl
 	strip --strip-all $<
 	ls -l $<
 	@file $< | grep -isq static || \
 	  (echo "*** error: init is not statically linked"; exit 1)
-	$(srcdir)/bin2s.pl $< $@
+	$(srcdir)/bin2c.pl $< $@
 
 depend: .depend
 
