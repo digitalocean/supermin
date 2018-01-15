@@ -1,3 +1,10 @@
+supermin (5.1.19-2) unstable; urgency=medium
+
+  * Add e2fsprogs to Build-Depends, Depends (Closes: #887182)
+  * Bump Standards-Version
+
+ -- Hilko Bengen <bengen@debian.org>  Mon, 15 Jan 2018 12:20:05 +0100
+
 supermin (5.1.19-1) unstable; urgency=medium
 
   * New upstream version 5.1.19
