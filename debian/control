@@ -11,6 +11,7 @@ Build-Depends: debhelper (>= 10),
  perl,
  comerr-dev, e2fslibs-dev,
  cpio,
+ e2fsprogs,
  musl-tools [amd64 arm64 armel armhf i386],
  augeas-tools, libhivex-bin,
  linux-image-alpha-generic [alpha],
@@ -35,7 +36,7 @@ Vcs-Browser: http://anonscm.debian.org/?p=pkg-libvirt/supermin.git
 Package: supermin
 Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends},
- apt, cpio,
+ apt, cpio, e2fsprogs,
 Breaks: libguestfs-tools (<< 1.25.38),
 Built-Using: ${misc:Built-Using}
 Description: tool for building supermin appliances.
