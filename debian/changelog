@@ -1,3 +1,11 @@
+supermin (5.1.19-3) unstable; urgency=medium
+
+  * Bump Standards-Version
+  * Update Vcs-* URLs to Salsa
+  * Update watch file URL
+
+ -- Hilko Bengen <bengen@debian.org>  Fri, 24 Aug 2018 09:38:48 +0200
+
 supermin (5.1.19-2) unstable; urgency=medium
 
   * Add e2fsprogs to Build-Depends, Depends (Closes: #887182)
