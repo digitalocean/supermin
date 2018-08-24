@@ -30,8 +30,8 @@ Build-Depends: debhelper (>= 10),
  linux-image-686-pae [i386] | linux-image-586 [i386] | linux-image-486 [i386],
 Standards-Version: 4.2.0
 Homepage: http://people.redhat.com/~rjones/supermin/
-Vcs-Git: https://anonscm.debian.org/git/pkg-libvirt/supermin.git
-Vcs-Browser: http://anonscm.debian.org/?p=pkg-libvirt/supermin.git
+Vcs-Git: https://salsa.debian.org/libvirt-team/supermin.git
+Vcs-Browser: https://salsa.debian.org/libvirt-team/supermin
 
 Package: supermin
 Architecture: linux-any
