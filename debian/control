@@ -37,6 +37,21 @@ Package: supermin
 Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends},
  apt, cpio, e2fsprogs,
+Recommends:
+ linux-image-alpha-generic [alpha],
+ linux-image-marvell [armel] | linux-image-versatile [armel],
+ linux-image-armmp [armhf],
+ linux-image-arm64 [arm64],
+ linux-image-4kc-malta [mips mipsel] | linux-image-5kc-malta [mips mipsel],
+ linux-image-5kc-malta [mips64 mips64el],
+ linux-image-s390x [s390x],
+ linux-image-parisc [hppa],
+ linux-image-powerpc [powerpc],
+ linux-image-powerpc64 [ppc64],
+ linux-image-powerpc64le [ppc64el],
+ linux-image-sparc64 [sparc sparc64],
+ linux-image-amd64 [amd64],
+ linux-image-686-pae [i386] | linux-image-586 [i386] | linux-image-486 [i386],
 Breaks: libguestfs-tools (<< 1.25.38),
 Built-Using: ${misc:Built-Using}
 Description: tool for building supermin appliances.
