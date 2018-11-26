@@ -1,3 +1,10 @@
+supermin (5.1.19-4) unstable; urgency=medium
+
+  * Add Recommends for linux-image packages (Closes: #914413)
+  * Bump Standards-Version
+
+ -- Hilko Bengen <bengen@debian.org>  Mon, 26 Nov 2018 22:25:08 +0100
+
 supermin (5.1.19-3) unstable; urgency=medium
 
   * Bump Standards-Version
