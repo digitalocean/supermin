@@ -1,3 +1,11 @@
+supermin (5.1.20-1) unstable; urgency=medium
+
+  * New upstream version 5.1.20
+  * Bump Debhelper compat level
+  * Bump Standards-Version
+
+ -- Hilko Bengen <bengen@debian.org>  Mon, 21 Jan 2019 14:09:38 +0100
+
 supermin (5.1.19-4) unstable; urgency=medium
 
   * Add Recommends for linux-image packages (Closes: #914413)
