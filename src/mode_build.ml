@@ -46,6 +46,7 @@ and file_content =
 | Packages
 | Hostfiles
 | Excludefiles
+| Empty
 
 let rec string_of_file_type = function
   | GZip c -> sprintf "gzip %s" (string_of_file_content c)
@@ -56,6 +57,7 @@ and string_of_file_content = function
   | Packages -> "packages"
   | Hostfiles -> "hostfiles"
   | Excludefiles -> "excludefiles"
+  | Empty -> "empty"
 
 let rec build debug
     (copy_kernel, format, host_cpu,
@@ -250,6 +252,8 @@ and read_appliance debug basedir appliance = function
     (* Depending on the file type, read or unpack the file. *)
     let appliance =
       match file_type with
+      | Uncompressed Empty | GZip Empty | XZ Empty ->
+        appliance
       | Uncompressed ((Packages|Hostfiles|Excludefiles) as t) ->
         let chan = open_in file in
         let lines = input_all_lines chan in
@@ -294,14 +298,15 @@ and update_appliance appliance lines = function
         String.sub path 1 (n-1)
     ) lines in
     { appliance with excludefiles = appliance.excludefiles @ lines }
-  | Base_image -> assert false
+  | Base_image | Empty -> assert false
 
 (* Determine the [file_type] of [file], or exit with an error. *)
 and get_file_type file =
   let chan = open_in file in
-  let buf = String.create 512 in
-  let len = input chan buf 0 (String.length buf) in
+  let buf = Bytes.create 512 in
+  let len = input chan buf 0 (Bytes.length buf) in
   close_in chan;
+  let buf = Bytes.to_string buf in
 
   if len >= 3 && buf.[0] = '\x1f' && buf.[1] = '\x8b' && buf.[2] = '\x08'
   then                                  (* gzip-compressed file *)
@@ -330,13 +335,15 @@ and get_file_content file buf len =
   else if len >= 2 && buf.[0] = '/' then Hostfiles
   else if len >= 2 && buf.[0] = '-' then Excludefiles
   else if len >= 1 && isalnum buf.[0] then Packages
+  else if len = 0 then Empty
   else error "%s: unknown file type in supermin directory" file
 
 and get_compressed_file_content zcat file =
   let cmd = sprintf "%s %s" zcat (quote file) in
   let chan_out, chan_in, chan_err = open_process_full cmd [||] in
-  let buf = String.create 512 in
-  let len = input chan_out buf 0 (String.length buf) in
+  let buf = Bytes.create 512 in
+  let len = input chan_out buf 0 (Bytes.length buf) in
+  let buf = Bytes.to_string buf in
   (* We're expecting the subprocess to fail because we close the pipe
    * early, so:
    *)

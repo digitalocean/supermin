@@ -1,7 +1,5 @@
 ./config.cmo :
-config.cmo :
 ./config.cmx :
-config.cmx :
 ./ext2fs.cmi :
 ./ext2fs.cmo : ./ext2fs.cmi
 ./ext2fs.cmx : ./ext2fs.cmi
@@ -60,3 +58,5 @@ config.cmx :
 ./utils.cmi :
 ./utils.cmo : ./utils.cmi
 ./utils.cmx : ./utils.cmi
+config.cmo :
+config.cmx :
