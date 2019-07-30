@@ -1,3 +1,9 @@
+supermin (5.1.20-1digitalocean0) unstable; urgency=medium
+
+  * Build for Trusty
+
+ -- Andrew James <ajames@digitalocean.com>  Tue, 30 Jul 2019 17:55:42 -0600
+
 supermin (5.1.20-1) unstable; urgency=medium
 
   * New upstream version 5.1.20
